@@ -1,0 +1,921 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. User Management
+// ==========================================
+
+model User {
+  id               Int       @id @default(autoincrement())
+  username         String    @unique @db.VarChar(50)
+  email            String    @unique @db.VarChar(255)
+  passwordHash     String    @map("password_hash") @db.VarChar(255)
+  firstName        String    @map("first_name") @db.VarChar(50)
+  lastName         String    @map("last_name") @db.VarChar(50)
+  role             Role      @default(USER)
+  profileImageUrl  String?   @map("profile_image_url") @db.VarChar(500)
+  bio              String?   @db.Text
+  isActive         Boolean   @default(true) @map("is_active")
+  lastLogin        DateTime? @map("last_login")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  createdCourses       Course[]                @relation("CourseCreator")
+  userProgress         UserProgress[]
+  userMaterialAccess   UserMaterialAccess[]
+  learningStreaks      LearningStreak[]
+  userSkills           UserSkill[]
+  userBadges           UserBadge[]
+  userPoints           UserPoint[]
+  qaQuestions          QaQuestion[]
+  qaAnswers            QaAnswer[]
+  qaAttachments        QaAttachment[]
+  qaVotes              QaVote[]
+  knowledgeBase        KnowledgeBase[]
+  createdQuestions     Question[]              @relation("QuestionCreator")
+  userTestResults      UserTestResult[]
+  // userAnswers can be accessed through userTestResults
+  gradedAnswers        UserAnswer[]            @relation("AnswerGrader")
+  createdTests         Test[]
+  createdForums        Forum[]
+  forumTopics          ForumTopic[]
+  forumPosts           ForumPost[]
+  editedPosts          ForumPost[]             @relation("PostEditor")
+  lastReplies          ForumTopic[]            @relation("LastReplyUser")
+  notifications        Notification[]
+  auditLogs            AuditLog[]
+  fileUploads          FileUpload[]
+
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@map("users")
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+// ==========================================
+// 2. Learning Content Management
+// ==========================================
+
+model Course {
+  id               Int                @id @default(autoincrement())
+  title            String             @db.VarChar(200)
+  description      String?            @db.Text
+  category         String             @db.VarChar(50)
+  difficultyLevel  DifficultyLevel    @default(BEGINNER) @map("difficulty_level")
+  estimatedHours   Int?               @map("estimated_hours")
+  thumbnailUrl     String?            @map("thumbnail_url") @db.VarChar(500)
+  isPublished      Boolean            @default(false) @map("is_published")
+  sortOrder        Int                @default(0) @map("sort_order")
+  createdBy        Int                @map("created_by")
+  creator          User               @relation("CourseCreator", fields: [createdBy], references: [id])
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  lessons          Lesson[]
+  userProgress     UserProgress[]
+  learningResources LearningResource[]
+  qaQuestions      QaQuestion[]
+  questions        Question[]
+  tests            Test[]
+
+  @@index([category])
+  @@index([difficultyLevel])
+  @@index([isPublished])
+  @@index([sortOrder])
+  @@map("courses")
+}
+
+model Lesson {
+  id               Int                @id @default(autoincrement())
+  courseId         Int                @map("course_id")
+  course           Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title            String             @db.VarChar(200)
+  description      String?            @db.Text
+  content          String?            @db.Text
+  estimatedMinutes Int?               @map("estimated_minutes")
+  sortOrder        Int                @default(0) @map("sort_order")
+  isPublished      Boolean            @default(false) @map("is_published")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  learningMaterials LearningMaterial[]
+  learningResources LearningResource[]
+  userProgress      UserProgress[]
+  qaQuestions       QaQuestion[]
+  questions         Question[]
+  tests             Test[]
+
+  @@index([courseId])
+  @@index([sortOrder])
+  @@index([isPublished])
+  @@map("lessons")
+}
+
+model LearningMaterial {
+  id                   Int                @id @default(autoincrement())
+  lessonId             Int                @map("lesson_id")
+  lesson               Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title                String             @db.VarChar(200)
+  description          String?            @db.Text
+  materialType         MaterialType       @map("material_type")
+  materialCategory     MaterialCategory   @default(MAIN) @map("material_category")
+  filePath             String?            @map("file_path") @db.VarChar(500)
+  fileSize             BigInt?            @map("file_size")
+  fileType             String?            @map("file_type") @db.VarChar(100)
+  externalUrl          String?            @map("external_url") @db.VarChar(1000)
+  durationMinutes      Int?               @map("duration_minutes")
+  allowManualProgress  Boolean            @default(false) @map("allow_manual_progress")
+  sortOrder            Int                @default(0) @map("sort_order")
+  isPublished          Boolean            @default(true) @map("is_published")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  userProgress         UserProgress[]
+  userMaterialAccess   UserMaterialAccess[]
+
+  @@index([lessonId])
+  @@index([materialType])
+  @@index([sortOrder])
+  @@map("learning_materials")
+}
+
+model LearningResource {
+  id              Int                @id @default(autoincrement())
+  lessonId        Int?               @map("lesson_id")
+  lesson          Lesson?            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  courseId        Int?               @map("course_id")
+  course          Course?            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title           String             @db.VarChar(200)
+  description     String?            @db.Text
+  resourceType    ResourceType       @map("resource_type")
+  resourceUrl     String             @map("resource_url") @db.VarChar(1000)
+  difficultyLevel DifficultyLevel    @default(BEGINNER) @map("difficulty_level")
+  importance      ImportanceLevel    @default(REFERENCE)
+  tags            String?            @db.Text // JSON array format
+  thumbnailUrl    String?            @map("thumbnail_url") @db.VarChar(500)
+  viewCount       Int                @default(0) @map("view_count")
+  isPublished     Boolean            @default(true) @map("is_published")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  userMaterialAccess UserMaterialAccess[]
+
+  @@index([lessonId])
+  @@index([courseId])
+  @@index([resourceType])
+  @@index([difficultyLevel])
+  @@map("learning_resources")
+}
+
+enum DifficultyLevel {
+  BEGINNER     @map("beginner")
+  INTERMEDIATE @map("intermediate")
+  ADVANCED     @map("advanced")
+}
+
+enum MaterialType {
+  FILE            @map("file")
+  URL             @map("url")
+  MANUAL_PROGRESS @map("manual_progress")
+}
+
+enum MaterialCategory {
+  MAIN          @map("main")
+  SUPPLEMENTARY @map("supplementary")
+}
+
+enum ResourceType {
+  FILE     @map("file")
+  WEBSITE  @map("website")
+  YOUTUBE  @map("youtube")
+  DOCUMENT @map("document")
+  TOOL     @map("tool")
+}
+
+enum ImportanceLevel {
+  REQUIRED    @map("required")
+  RECOMMENDED @map("recommended")
+  REFERENCE   @map("reference")
+}
+
+// ==========================================
+// 3. Progress Management
+// ==========================================
+
+model UserProgress {
+  id                  Int               @id @default(autoincrement())
+  userId              Int               @map("user_id")
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId            Int               @map("course_id")
+  course              Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId            Int?              @map("lesson_id")
+  lesson              Lesson?           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  materialId          Int?              @map("material_id")
+  material            LearningMaterial? @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  progressType        ProgressType      @default(AUTO) @map("progress_type")
+  progressRate        Decimal           @default(0.00) @map("progress_rate") @db.Decimal(5, 2)
+  manualProgressRate  Decimal?          @map("manual_progress_rate") @db.Decimal(5, 2)
+  spentMinutes        Int               @default(0) @map("spent_minutes")
+  isCompleted         Boolean           @default(false) @map("is_completed")
+  completionDate      DateTime?         @map("completion_date")
+  notes               String?           @db.Text
+  lastAccessed        DateTime          @default(now()) @map("last_accessed")
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  @@unique([userId, courseId, lessonId, materialId], name: "unique_user_progress")
+  @@index([userId])
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([isCompleted])
+  @@index([lastAccessed])
+  @@map("user_progress")
+}
+
+model UserMaterialAccess {
+  id              Int               @id @default(autoincrement())
+  userId          Int               @map("user_id")
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materialId      Int?              @map("material_id")
+  material        LearningMaterial? @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  resourceId      Int?              @map("resource_id")
+  resource        LearningResource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  accessType      AccessType        @map("access_type")
+  sessionDuration Int?              @map("session_duration")
+  ipAddress       String?           @map("ip_address") @db.Inet
+  userAgent       String?           @map("user_agent") @db.Text
+  accessedAt      DateTime          @default(now()) @map("accessed_at")
+
+  @@index([userId])
+  @@index([materialId])
+  @@index([accessedAt])
+  @@map("user_material_access")
+}
+
+model LearningStreak {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streakDate         DateTime @map("streak_date") @db.Date
+  minutesStudied     Int      @default(0) @map("minutes_studied")
+  lessonsCompleted   Int      @default(0) @map("lessons_completed")
+  materialsAccessed  Int      @default(0) @map("materials_accessed")
+  pointsEarned       Int      @default(0) @map("points_earned")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, streakDate], name: "unique_user_streak_date")
+  @@index([userId])
+  @@index([streakDate])
+  @@map("learning_streaks")
+}
+
+enum ProgressType {
+  AUTO   @map("auto")
+  MANUAL @map("manual")
+}
+
+enum AccessType {
+  VIEW          @map("view")
+  DOWNLOAD      @map("download")
+  EXTERNAL_LINK @map("external_link")
+}
+
+// ==========================================
+// 4. Test & Assessment Management
+// ==========================================
+
+model Question {
+  id               Int            @id @default(autoincrement())
+  courseId         Int?           @map("course_id")
+  course           Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lessonId         Int?           @map("lesson_id")
+  lesson           Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  title            String         @db.VarChar(200)
+  questionText     String         @map("question_text") @db.Text
+  questionType     QuestionType   @map("question_type")
+  difficultyLevel  DifficultyLevel @default(BEGINNER) @map("difficulty_level")
+  points           Int            @default(10)
+  timeLimitMinutes Int?           @map("time_limit_minutes")
+  explanation      String?        @db.Text
+  hints            String?        @db.Text // JSON array format
+  tags             String?        @db.Text // JSON array format
+  isPublished      Boolean        @default(false) @map("is_published")
+  createdBy        Int            @map("created_by")
+  creator          User           @relation("QuestionCreator", fields: [createdBy], references: [id])
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  questionOptions  QuestionOption[]
+  testQuestions    TestQuestion[]
+  userAnswers      UserAnswer[]
+
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([questionType])
+  @@index([difficultyLevel])
+  @@index([createdBy])
+  @@map("questions")
+}
+
+model QuestionOption {
+  id          Int      @id @default(autoincrement())
+  questionId  Int      @map("question_id")
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionText  String   @map("option_text") @db.Text
+  isCorrect   Boolean  @default(false) @map("is_correct")
+  sortOrder   Int      @default(0) @map("sort_order")
+  explanation String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  userAnswers UserAnswer[]
+
+  @@index([questionId])
+  @@index([sortOrder])
+  @@map("question_options")
+}
+
+model Test {
+  id                     Int      @id @default(autoincrement())
+  courseId               Int      @map("course_id")
+  course                 Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId               Int?     @map("lesson_id")
+  lesson                 Lesson?  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title                  String   @db.VarChar(200)
+  description            String?  @db.Text
+  timeLimitMinutes       Int?     @map("time_limit_minutes")
+  maxAttempts            Int?     @map("max_attempts")
+  passingScore           Decimal  @default(60.00) @map("passing_score") @db.Decimal(5, 2)
+  shuffleQuestions       Boolean  @default(false) @map("shuffle_questions")
+  shuffleOptions         Boolean  @default(false) @map("shuffle_options")
+  showResultsImmediately Boolean  @default(true) @map("show_results_immediately")
+  isPublished            Boolean  @default(false) @map("is_published")
+  availableFrom          DateTime? @map("available_from")
+  availableUntil         DateTime? @map("available_until")
+  createdBy              Int      @map("created_by")
+  creator                User     @relation(fields: [createdBy], references: [id])
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  testQuestions   TestQuestion[]
+  userTestResults UserTestResult[]
+
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([isPublished])
+  @@index([availableFrom])
+  @@map("tests")
+}
+
+model TestQuestion {
+  id         Int      @id @default(autoincrement())
+  testId     Int      @map("test_id")
+  test       Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionId Int      @map("question_id")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([testId, questionId], name: "unique_test_question")
+  @@index([testId])
+  @@index([questionId])
+  @@index([sortOrder])
+  @@map("test_questions")
+}
+
+model UserTestResult {
+  id             Int            @id @default(autoincrement())
+  userId         Int            @map("user_id")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testId         Int            @map("test_id")
+  test           Test           @relation(fields: [testId], references: [id], onDelete: Cascade)
+  attemptNumber  Int            @default(1) @map("attempt_number")
+  score          Decimal        @default(0.00) @db.Decimal(5, 2)
+  totalPoints    Int            @default(0) @map("total_points")
+  earnedPoints   Int            @default(0) @map("earned_points")
+  isPassed       Boolean        @default(false) @map("is_passed")
+  timeSpentMinutes Int?         @map("time_spent_minutes")
+  startedAt      DateTime       @map("started_at")
+  completedAt    DateTime?      @map("completed_at")
+  status         TestStatus     @default(IN_PROGRESS)
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  userAnswers    UserAnswer[]
+
+  @@index([userId])
+  @@index([testId])
+  @@index([isPassed])
+  @@index([completedAt])
+  @@map("user_test_results")
+}
+
+model UserAnswer {
+  id               Int             @id @default(autoincrement())
+  testResultId     Int             @map("test_result_id")
+  testResult       UserTestResult  @relation(fields: [testResultId], references: [id], onDelete: Cascade)
+  questionId       Int             @map("question_id")
+  question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOptionId Int?            @map("selected_option_id")
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id])
+  answerText       String?         @map("answer_text") @db.Text
+  isCorrect        Boolean?        @map("is_correct")
+  pointsEarned     Int             @default(0) @map("points_earned")
+  gradedBy         Int?            @map("graded_by")
+  grader           User?           @relation("AnswerGrader", fields: [gradedBy], references: [id])
+  feedback         String?         @db.Text
+  gradedAt         DateTime?       @map("graded_at")
+  answeredAt       DateTime        @default(now()) @map("answered_at")
+  // User can be accessed through testResult.user
+
+  @@index([testResultId])
+  @@index([questionId])
+  @@index([gradedBy])
+  @@map("user_answers")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE @map("multiple_choice")
+  ESSAY           @map("essay")
+  PROGRAMMING     @map("programming")
+  TRUE_FALSE      @map("true_false")
+}
+
+enum TestStatus {
+  IN_PROGRESS @map("in_progress")
+  COMPLETED   @map("completed")
+  ABANDONED   @map("abandoned")
+}
+
+// ==========================================
+// 5. Q&A & Knowledge Management
+// ==========================================
+
+model QaQuestion {
+  id             Int        @id @default(autoincrement())
+  userId         Int        @map("user_id")
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId       Int?       @map("course_id")
+  course         Course?    @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lessonId       Int?       @map("lesson_id")
+  lesson         Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  questionTitle  String     @map("question_title") @db.VarChar(200)
+  questionContent String    @map("question_content") @db.Text
+  questionTags   String?    @map("question_tags") @db.Text // JSON array format
+  category       String?    @db.VarChar(50)
+  priority       Priority   @default(NORMAL)
+  isPublic       Boolean    @default(true) @map("is_public")
+  isResolved     Boolean    @default(false) @map("is_resolved")
+  viewCount      Int        @default(0) @map("view_count")
+  voteCount      Int        @default(0) @map("vote_count")
+  answerCount    Int        @default(0) @map("answer_count")
+  bestAnswerId   Int?       @map("best_answer_id")
+  resolvedAt     DateTime?  @map("resolved_at")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  qaAnswers      QaAnswer[]
+  qaAttachments  QaAttachment[]
+  qaVotes        QaVote[]
+  knowledgeBase  KnowledgeBase[]
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([category])
+  @@index([isPublic])
+  @@index([isResolved])
+  @@index([createdAt])
+  @@map("qa_questions")
+}
+
+model QaAnswer {
+  id            Int        @id @default(autoincrement())
+  questionId    Int        @map("question_id")
+  question      QaQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId        Int        @map("user_id")
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answerContent String     @map("answer_content") @db.Text
+  isBestAnswer  Boolean    @default(false) @map("is_best_answer")
+  helpfulCount  Int        @default(0) @map("helpful_count")
+  voteCount     Int        @default(0) @map("vote_count")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  qaAttachments QaAttachment[]
+  qaVotes       QaVote[]
+
+  @@index([questionId])
+  @@index([userId])
+  @@index([isBestAnswer])
+  @@index([createdAt])
+  @@map("qa_answers")
+}
+
+model QaAttachment {
+  id         Int         @id @default(autoincrement())
+  questionId Int?        @map("question_id")
+  question   QaQuestion? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answerId   Int?        @map("answer_id")
+  answer     QaAnswer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  fileName   String      @map("file_name") @db.VarChar(255)
+  filePath   String      @map("file_path") @db.VarChar(500)
+  fileSize   BigInt      @map("file_size")
+  fileType   String      @map("file_type") @db.VarChar(100)
+  uploadedBy Int         @map("uploaded_by")
+  uploader   User        @relation(fields: [uploadedBy], references: [id])
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@index([questionId])
+  @@index([answerId])
+  @@index([uploadedBy])
+  @@map("qa_attachments")
+}
+
+model QaVote {
+  id         Int         @id @default(autoincrement())
+  userId     Int         @map("user_id")
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId Int?        @map("question_id")
+  question   QaQuestion? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answerId   Int?        @map("answer_id")
+  answer     QaAnswer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  voteType   VoteType    @map("vote_type")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@unique([userId, questionId, voteType], name: "unique_user_question_vote")
+  @@unique([userId, answerId, voteType], name: "unique_user_answer_vote")
+  @@index([userId])
+  @@index([questionId])
+  @@index([answerId])
+  @@index([voteType])
+  @@map("qa_votes")
+}
+
+model KnowledgeBase {
+  id               Int         @id @default(autoincrement())
+  questionId       Int?        @map("question_id")
+  question         QaQuestion? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  title            String      @db.VarChar(200)
+  content          String      @db.Text
+  faqCategory      String?     @map("faq_category") @db.VarChar(50)
+  searchKeywords   String?     @map("search_keywords") @db.Text
+  relatedMaterials String?     @map("related_materials") @db.Text // JSON array format
+  tags             String?     @db.Text // JSON array format
+  viewCount        Int         @default(0) @map("view_count")
+  isPublished      Boolean     @default(true) @map("is_published")
+  sortOrder        Int         @default(0) @map("sort_order")
+  createdBy        Int         @map("created_by")
+  creator          User        @relation(fields: [createdBy], references: [id])
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  @@index([questionId])
+  @@index([faqCategory])
+  @@index([isPublished])
+  @@index([sortOrder])
+  @@index([viewCount])
+  @@map("knowledge_base")
+}
+
+enum Priority {
+  NORMAL @map("normal")
+  URGENT @map("urgent")
+}
+
+enum VoteType {
+  LIKE    @map("like")
+  HELPFUL @map("helpful")
+  DISLIKE @map("dislike")
+}
+
+// ==========================================
+// 6. Gamification
+// ==========================================
+
+model Skill {
+  id            Int         @id @default(autoincrement())
+  skillName     String      @map("skill_name") @db.VarChar(100)
+  skillCategory String      @map("skill_category") @db.VarChar(50)
+  description   String?     @db.Text
+  iconUrl       String?     @map("icon_url") @db.VarChar(500)
+  colorCode     String?     @map("color_code") @db.VarChar(7)
+  isActive      Boolean     @default(true) @map("is_active")
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  userSkills    UserSkill[]
+
+  @@unique([skillName, skillCategory], name: "unique_skill_name_category")
+  @@index([skillCategory])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("skills")
+}
+
+model UserSkill {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId          Int      @map("skill_id")
+  skill            Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillLevel       Int      @default(1) @map("skill_level")
+  experiencePoints Int      @default(0) @map("experience_points")
+  lastActivityDate DateTime? @map("last_activity_date") @db.Date
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, skillId], name: "unique_user_skill")
+  @@index([userId])
+  @@index([skillId])
+  @@index([skillLevel])
+  @@map("user_skills")
+}
+
+model Badge {
+  id                   Int         @id @default(autoincrement())
+  badgeName            String      @map("badge_name") @db.VarChar(100)
+  badgeCategory        String      @map("badge_category") @db.VarChar(50)
+  description          String      @db.Text
+  iconUrl              String?     @map("icon_url") @db.VarChar(500)
+  badgeColor           BadgeColor  @default(BRONZE) @map("badge_color")
+  pointsReward         Int         @default(0) @map("points_reward")
+  rarity               Rarity      @default(COMMON)
+  achievementCondition String?     @map("achievement_condition") @db.Text // JSON format
+  isActive             Boolean     @default(true) @map("is_active")
+  sortOrder            Int         @default(0) @map("sort_order")
+  createdAt            DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  userBadges           UserBadge[]
+
+  @@index([badgeCategory])
+  @@index([badgeColor])
+  @@index([rarity])
+  @@index([isActive])
+  @@map("badges")
+}
+
+model UserBadge {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId         Int      @map("badge_id")
+  badge           Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt        DateTime @default(now()) @map("earned_at")
+  isDisplayed     Boolean  @default(true) @map("is_displayed")
+  achievementData String?  @map("achievement_data") @db.Text // JSON format
+
+  @@unique([userId, badgeId], name: "unique_user_badge")
+  @@index([userId])
+  @@index([badgeId])
+  @@index([earnedAt])
+  @@map("user_badges")
+}
+
+model UserPoint {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsChange  Int      @map("points_change")
+  pointsBalance Int      @map("points_balance")
+  pointSource   String   @map("point_source") @db.VarChar(50)
+  sourceId      Int?     @map("source_id")
+  description   String?  @db.Text
+  multiplier    Decimal  @default(1.00) @db.Decimal(3, 2)
+  earnedAt      DateTime @default(now()) @map("earned_at")
+
+  @@index([userId])
+  @@index([pointSource])
+  @@index([earnedAt])
+  @@map("user_points")
+}
+
+enum BadgeColor {
+  BRONZE   @map("bronze")
+  SILVER   @map("silver")
+  GOLD     @map("gold")
+  PLATINUM @map("platinum")
+}
+
+enum Rarity {
+  COMMON    @map("common")
+  UNCOMMON  @map("uncommon")
+  RARE      @map("rare")
+  EPIC      @map("epic")
+  LEGENDARY @map("legendary")
+}
+
+// ==========================================
+// 7. Communication
+// ==========================================
+
+model Forum {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(200)
+  description String?  @db.Text
+  category    String   @db.VarChar(50)
+  isPublic    Boolean  @default(true) @map("is_public")
+  isReadonly  Boolean  @default(false) @map("is_readonly")
+  sortOrder   Int      @default(0) @map("sort_order")
+  topicCount  Int      @default(0) @map("topic_count")
+  postCount   Int      @default(0) @map("post_count")
+  lastPostId  Int?     @map("last_post_id")
+  lastPostAt  DateTime? @map("last_post_at")
+  createdBy   Int      @map("created_by")
+  creator     User     @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  forumTopics ForumTopic[]
+
+  @@index([category])
+  @@index([isPublic])
+  @@index([sortOrder])
+  @@map("forums")
+}
+
+model ForumTopic {
+  id              Int      @id @default(autoincrement())
+  forumId         Int      @map("forum_id")
+  forum           Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  userId          Int      @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String   @db.VarChar(200)
+  content         String   @db.Text
+  isPinned        Boolean  @default(false) @map("is_pinned")
+  isLocked        Boolean  @default(false) @map("is_locked")
+  viewCount       Int      @default(0) @map("view_count")
+  replyCount      Int      @default(0) @map("reply_count")
+  lastReplyId     Int?     @map("last_reply_id")
+  lastReplyAt     DateTime? @map("last_reply_at")
+  lastReplyUserId Int?     @map("last_reply_user_id")
+  lastReplyUser   User?    @relation("LastReplyUser", fields: [lastReplyUserId], references: [id])
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  forumPosts      ForumPost[]
+
+  @@index([forumId])
+  @@index([userId])
+  @@index([isPinned])
+  @@index([lastReplyAt])
+  @@map("forum_topics")
+}
+
+model ForumPost {
+  id           Int        @id @default(autoincrement())
+  topicId      Int        @map("topic_id")
+  topic        ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId       Int        @map("user_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content      String     @db.Text
+  isFirstPost  Boolean    @default(false) @map("is_first_post")
+  quotePostId  Int?       @map("quote_post_id")
+  quotedPost   ForumPost? @relation("PostQuote", fields: [quotePostId], references: [id])
+  likeCount    Int        @default(0) @map("like_count")
+  isEdited     Boolean    @default(false) @map("is_edited")
+  editedBy     Int?       @map("edited_by")
+  editor       User?      @relation("PostEditor", fields: [editedBy], references: [id])
+  editedAt     DateTime?  @map("edited_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  // Relations
+  quotedPosts  ForumPost[] @relation("PostQuote")
+
+  @@index([topicId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("forum_posts")
+}
+
+model Notification {
+  id               Int                 @id @default(autoincrement())
+  userId           Int                 @map("user_id")
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationType String              @map("notification_type") @db.VarChar(50)
+  title            String              @db.VarChar(200)
+  message          String?             @db.Text
+  relatedId        Int?                @map("related_id")
+  relatedType      String?             @map("related_type") @db.VarChar(50)
+  actionUrl        String?             @map("action_url") @db.VarChar(500)
+  isRead           Boolean             @default(false) @map("is_read")
+  readAt           DateTime?           @map("read_at")
+  priority         NotificationPriority @default(NORMAL)
+  expiresAt        DateTime?           @map("expires_at")
+  createdAt        DateTime            @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([notificationType])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+enum NotificationPriority {
+  LOW    @map("low")
+  NORMAL @map("normal")
+  HIGH   @map("high")
+  URGENT @map("urgent")
+}
+
+// ==========================================
+// 8. System Management
+// ==========================================
+
+model SystemSetting {
+  id           Int         @id @default(autoincrement())
+  settingKey   String      @unique @map("setting_key") @db.VarChar(100)
+  settingValue String?     @map("setting_value") @db.Text
+  settingType  SettingType @default(STRING) @map("setting_type")
+  description  String?     @db.Text
+  isPublic     Boolean     @default(false) @map("is_public")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  @@index([settingKey])
+  @@index([isPublic])
+  @@map("system_settings")
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String   @db.VarChar(100)
+  entityType String   @map("entity_type") @db.VarChar(50)
+  entityId   Int?     @map("entity_id")
+  oldValues  String?  @map("old_values") @db.Text // JSON format
+  newValues  String?  @map("new_values") @db.Text // JSON format
+  ipAddress  String?  @map("ip_address") @db.Inet
+  userAgent  String?  @map("user_agent") @db.Text
+  sessionId  String?  @map("session_id") @db.VarChar(255)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model FileUpload {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originalFilename String   @map("original_filename") @db.VarChar(255)
+  storedFilename   String   @map("stored_filename") @db.VarChar(255)
+  filePath         String   @map("file_path") @db.VarChar(500)
+  fileSize         BigInt   @map("file_size")
+  mimeType         String   @map("mime_type") @db.VarChar(100)
+  fileHash         String   @map("file_hash") @db.VarChar(64)
+  entityType       String?  @map("entity_type") @db.VarChar(50)
+  entityId         Int?     @map("entity_id")
+  isTemporary      Boolean  @default(false) @map("is_temporary")
+  isProcessed      Boolean  @default(true) @map("is_processed")
+  downloadCount    Int      @default(0) @map("download_count")
+  expiresAt        DateTime? @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([fileHash])
+  @@index([entityType, entityId])
+  @@index([isTemporary])
+  @@index([expiresAt])
+  @@map("file_uploads")
+}
+
+enum SettingType {
+  STRING  @map("string")
+  NUMBER  @map("number")
+  BOOLEAN @map("boolean")
+  JSON    @map("json")
+  DATE    @map("date")
+}
