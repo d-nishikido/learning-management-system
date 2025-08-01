@@ -1,9 +1,10 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
-import { useAuth } from '@/hooks/useAuth';
-import { AuthError } from '@/types';
+import { useAuth } from '@/contexts';
+import type { AuthError } from '@/types';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');

@@ -1,8 +1,22 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, userSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
+import { UserController } from '../controllers/userController';
 
 const router = Router();
+
+/**
+ * POST /users
+ * Create a new user
+ * Admin only
+ */
+router.post('/',
+  authenticateToken,
+  requireRole('ADMIN'),
+  validateBody(userSchemas.create),
+  UserController.createUser
+);
 
 /**
  * GET /users
@@ -13,14 +27,7 @@ router.get('/',
   authenticateToken,
   requireRole('ADMIN'),
   validateQuery(userSchemas.query),
-  // UserController.getAllUsers - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User listing endpoint not yet implemented',
-      message: 'This endpoint will return paginated user list with filtering'
-    });
-  }
+  UserController.getAllUsers
 );
 
 /**
@@ -30,14 +37,7 @@ router.get('/',
  */
 router.get('/me',
   authenticateToken,
-  // UserController.getCurrentUser - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User profile endpoint not yet implemented',
-      message: 'This endpoint will return current user profile'
-    });
-  }
+  UserController.getCurrentUser
 );
 
 /**
@@ -47,15 +47,8 @@ router.get('/me',
  */
 router.put('/me',
   authenticateToken,
-  validateBody(userSchemas.update.fork(['role'], (schema) => schema.forbidden())),
-  // UserController.updateCurrentUser - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User profile update endpoint not yet implemented',
-      message: 'This endpoint will update current user profile'
-    });
-  }
+  validateBody(userSchemas.update.fork(['role', 'isActive'], (schema) => schema.forbidden())),
+  UserController.updateCurrentUser
 );
 
 /**
@@ -65,15 +58,8 @@ router.put('/me',
  */
 router.get('/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
-  // UserController.getUserById - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User details endpoint not yet implemented',
-      message: 'This endpoint will return user details'
-    });
-  }
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  UserController.getUserById
 );
 
 /**
@@ -84,16 +70,9 @@ router.get('/:id',
 router.put('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(userSchemas.update),
-  // UserController.updateUser - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User update endpoint not yet implemented',
-      message: 'This endpoint will update user information'
-    });
-  }
+  UserController.updateUser
 );
 
 /**
@@ -104,15 +83,8 @@ router.put('/:id',
 router.delete('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
-  // UserController.deleteUser - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User deletion endpoint not yet implemented',
-      message: 'This endpoint will soft delete a user'
-    });
-  }
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  UserController.deleteUser
 );
 
 /**
@@ -122,15 +94,8 @@ router.delete('/:id',
  */
 router.get('/:id/progress',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
-  // UserController.getUserProgress - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User progress endpoint not yet implemented',
-      message: 'This endpoint will return user learning progress'
-    });
-  }
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  UserController.getUserProgress
 );
 
 /**
@@ -140,15 +105,8 @@ router.get('/:id/progress',
  */
 router.get('/:id/badges',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
-  // UserController.getUserBadges - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User badges endpoint not yet implemented',
-      message: 'This endpoint will return user badges'
-    });
-  }
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  UserController.getUserBadges
 );
 
 /**
@@ -158,15 +116,8 @@ router.get('/:id/badges',
  */
 router.get('/:id/skills',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
-  // UserController.getUserSkills - To be implemented
-  (req, res) => {
-    res.status(501).json({
-      success: false,
-      error: 'User skills endpoint not yet implemented',
-      message: 'This endpoint will return user skills'
-    });
-  }
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  UserController.getUserSkills
 );
 
 export default router;
