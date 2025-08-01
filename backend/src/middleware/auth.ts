@@ -70,6 +70,32 @@ export const authenticateToken = async (
   }
 };
 
+export const requireRole = (role: 'USER' | 'ADMIN') => {
+  return (
+    req: RequestWithUser,
+    res: Response<ApiResponse>,
+    next: NextFunction,
+  ): void => {
+    if (!req.user) {
+      res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+      });
+      return;
+    }
+
+    if (req.user.role !== role) {
+      res.status(403).json({
+        success: false,
+        error: `${role.toLowerCase()} privileges required`,
+      });
+      return;
+    }
+
+    next();
+  };
+};
+
 export const requireAdmin = (
   req: RequestWithUser,
   res: Response<ApiResponse>,

@@ -5,7 +5,15 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   message?: string;
   error?: string;
+  errorCode?: string;
   errors?: Record<string, string[]>;
+  details?: Record<string, unknown>;
+  stack?: string;
+  requestInfo?: {
+    url: string;
+    method: string;
+    timestamp: string;
+  };
 }
 
 export interface PaginationQuery {

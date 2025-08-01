@@ -1,40 +1,17 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
 import { AuthController } from '../controllers/authController';
 import { authenticateToken } from '../middleware/auth';
-import { validateRequest } from '../middleware/validateRequest';
+import { validateBody } from '../middleware/validation';
+import { authSchemas } from '../middleware/validation';
 
 const router = Router();
 
-const loginValidation = [
-  body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Valid email is required'),
-  body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
-];
+router.post('/login', validateBody(authSchemas.login), AuthController.login);
 
-const refreshValidation = [
-  body('refreshToken')
-    .notEmpty()
-    .withMessage('Refresh token is required'),
-];
-
-const forgotPasswordValidation = [
-  body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Valid email is required'),
-];
-
-router.post('/login', loginValidation, validateRequest, AuthController.login);
-
-router.post('/refresh', refreshValidation, validateRequest, AuthController.refresh);
+router.post('/refresh', validateBody(authSchemas.refresh), AuthController.refresh);
 
 router.post('/logout', authenticateToken, AuthController.logout);
 
-router.post('/forgot-password', forgotPasswordValidation, validateRequest, AuthController.forgotPassword);
+router.post('/forgot-password', validateBody(authSchemas.forgotPassword), AuthController.forgotPassword);
 
 export default router;
