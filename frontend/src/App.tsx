@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/common/Layout';
 import Home from './pages/Home';
+import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
@@ -24,6 +26,18 @@ const router = createBrowserRouter([
         path: 'profile',
         element: <div className="text-center py-12">Profile Page (Coming Soon)</div>,
       },
+      {
+        path: 'progress',
+        element: <div className="text-center py-12">Progress Page (Coming Soon)</div>,
+      },
+      {
+        path: 'admin',
+        element: <div className="text-center py-12">Admin Page (Coming Soon)</div>,
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
     ],
   },
   {
@@ -33,7 +47,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;

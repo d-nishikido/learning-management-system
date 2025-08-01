@@ -1,57 +1,72 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Outlet, Link } from 'react-router-dom';
+import { Sidebar } from './Sidebar';
+import { MobileMenu } from './MobileMenu';
+import { LogoutButton } from '@/components/auth/LogoutButton';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Layout() {
-  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/' },
-    { name: 'Courses', href: '/courses' },
-    { name: 'Q&A', href: '/qa' },
-    { name: 'Profile', href: '/profile' },
-  ];
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
+  if (!isAuthenticated) {
+    return <Outlet />;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="container">
-          <div className="flex h-16 items-center justify-between">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+
+      {/* Main content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Top navigation */}
+        <header className="bg-white shadow-sm">
+          <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-primary-600">
-                LMS System
-              </Link>
-              <div className="ml-10 flex items-baseline space-x-4">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                      location.pathname === item.href
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+              <MobileMenu isOpen={sidebarOpen} onToggle={toggleSidebar} />
+              <div className="ml-4 lg:hidden">
+                <Link to="/" className="text-xl font-bold text-primary-600">
+                  LMS System
+                </Link>
               </div>
             </div>
+            
             <div className="flex items-center space-x-4">
-              <button className="btn-outline">Sign In</button>
-              <button className="btn-primary">Sign Up</button>
+              {user && (
+                <span className="hidden text-sm text-gray-700 sm:block">
+                  {user.name}
+                </span>
+              )}
+              <LogoutButton size="sm" />
             </div>
           </div>
-        </div>
-      </nav>
-      <main className="container py-8">
-        <Outlet />
-      </main>
-      <footer className="bg-white border-t mt-auto">
-        <div className="container py-6">
-          <p className="text-center text-sm text-gray-600">
-            © 2025 LMS System. All rights reserved.
-          </p>
-        </div>
-      </footer>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <Outlet />
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-white border-t">
+          <div className="px-4 py-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm text-gray-600">
+              © 2025 LMS System. All rights reserved.
+            </p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
