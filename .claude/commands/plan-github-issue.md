@@ -1,3 +1,8 @@
+---
+description: Plan GitHub issue
+argument-hint: Issue number
+---
+
 Please analyze and plan implementation for the GitHub issue: $ARGUMENTS.
 
 Follow these steps:

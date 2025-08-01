@@ -1,3 +1,7 @@
+---
+description: Review local changes
+---
+
 Please review the local changes based on the GitHub issue: $ARGUMENTS.
 
 Follow these steps:

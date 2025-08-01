@@ -1,3 +1,8 @@
+---
+description: Create GitHub pull-request
+argument-hint: Comma-separeted issue numbers
+---
+
 Please create a pull request based on the current changes compared to the main branch.
 
 The issues to close are: $ARGUMENTS (comma-separeted issue numbers)
