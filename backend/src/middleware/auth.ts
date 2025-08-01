@@ -83,7 +83,7 @@ export const requireAdmin = (
     return;
   }
 
-  if (req.user.role !== 'admin') {
+  if (req.user.role !== 'ADMIN') {
     res.status(403).json({
       success: false,
       error: 'Admin privileges required',

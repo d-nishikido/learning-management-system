@@ -31,7 +31,7 @@ export interface JwtPayload {
   userId: number;
   username: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'USER' | 'ADMIN';
   iat?: number;
   exp?: number;
 }
@@ -40,7 +40,7 @@ export interface AuthenticatedUser {
   id: number;
   username: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'USER' | 'ADMIN';
   firstName: string;
   lastName: string;
   isActive: boolean;
