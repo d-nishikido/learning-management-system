@@ -201,6 +201,8 @@ export const userSchemas = {
     email: commonSchemas.email.optional(),
     firstName: commonSchemas.name.optional(),
     lastName: commonSchemas.name.optional(),
+    bio: Joi.string().max(500).trim().optional(),
+    profileImageUrl: Joi.string().uri().max(500).optional(),
     isActive: Joi.boolean().optional(),
     role: Joi.string().valid('USER', 'ADMIN').optional(),
   }),
