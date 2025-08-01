@@ -1,9 +1,14 @@
+export type UserRole = 'USER' | 'ADMIN';
+
 export interface User {
-  id: string;
+  id: number;
+  username: string;
   email: string;
-  name: string;
-  role: 'ADMIN' | 'INSTRUCTOR' | 'STUDENT';
-  avatar?: string;
+  firstName: string;
+  lastName: string;
+  name: string; // computed from firstName + lastName
+  role: UserRole;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,13 +26,36 @@ export interface Course {
 }
 
 export interface ApiResponse<T> {
-  data: T;
+  success: boolean;
+  data?: T;
   message?: string;
-  status: number;
+  error?: string;
+  errors?: Record<string, string[]>;
 }
 
 export interface ApiError {
   message: string;
   status: number;
   errors?: Record<string, string[]>;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthError extends Error {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
 }
