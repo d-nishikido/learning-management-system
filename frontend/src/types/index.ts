@@ -1,3 +1,5 @@
+export type UserRole = 'USER' | 'ADMIN';
+
 export interface User {
   id: number;
   username: string;
@@ -5,7 +7,7 @@ export interface User {
   firstName: string;
   lastName: string;
   name: string; // computed from firstName + lastName
-  role: 'USER' | 'ADMIN';
+  role: UserRole;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -46,4 +48,14 @@ export interface LoginResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface AuthError extends Error {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
 }

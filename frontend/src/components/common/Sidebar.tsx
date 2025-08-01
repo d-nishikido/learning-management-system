@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { UserRole } from '@/types';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,7 +11,7 @@ interface NavItem {
   name: string;
   href: string;
   icon: JSX.Element;
-  roles?: Array<'ADMIN' | 'INSTRUCTOR' | 'STUDENT'>;
+  roles?: UserRole[];
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {

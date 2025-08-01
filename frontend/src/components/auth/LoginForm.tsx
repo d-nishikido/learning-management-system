@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { AuthError } from '@/types';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -43,13 +44,11 @@ export function LoginForm() {
     try {
       await login(email, password);
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { status?: number } };
-        if (axiosError.response?.status === 401) {
-          setErrors({ general: 'メールアドレスまたはパスワードが正しくありません' });
-        } else {
-          setErrors({ general: 'ログインに失敗しました。もう一度お試しください' });
-        }
+      const authError = error as AuthError;
+      if (authError.response?.status === 401) {
+        setErrors({ general: 'メールアドレスまたはパスワードが正しくありません' });
+      } else if (authError.response?.data?.message) {
+        setErrors({ general: authError.response.data.message });
       } else {
         setErrors({ general: 'ログインに失敗しました。もう一度お試しください' });
       }
