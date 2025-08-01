@@ -563,11 +563,11 @@ The User Management API provides a complete, secure, and well-tested foundation 
 - ✅ Test user accounts with predefined data
 - ✅ MCP server integration for test data management
 
-#### CI/CD and Automation
-- ✅ Pre-commit hooks with Husky (`.husky/pre-commit`)
+#### Manual Testing Requirements
 - ✅ Selective test execution for changed files (`scripts/run-affected-e2e-tests.js`)
-- ✅ Linting and type checking in pre-commit workflow
 - ✅ NPM scripts for various test scenarios
+- ✅ **MANDATORY**: E2E tests with MCP must be executed before every git commit
+- ✅ Developer responsibility to ensure all affected tests pass before committing
 
 #### Test Execution Commands
 ```bash
@@ -583,7 +583,7 @@ npm run e2e:ui
 # Run tests in headed mode
 npm run e2e:headed
 
-# Run only affected tests (used in pre-commit)
+# Run only affected tests (REQUIRED before commit)
 npm run e2e:affected
 
 # Start test environment with Docker
@@ -595,7 +595,39 @@ npm run docker:test
 - User 1: `user1@test.example.com` / `User123!`
 - User 2: `user2@test.example.com` / `User123!`
 
-The E2E test suite provides comprehensive coverage of all major user flows, ensuring reliability and quality of the LMS system through automated testing at every commit.
+#### Environment Setup Status
+- ✅ **Playwright Environment**: Fully configured with multi-browser support
+- ✅ **MCP Server Integration**: Complete setup for test data management
+- ✅ **Docker Test Environment**: Isolated database and services ready
+- ✅ **Test Fixtures and Utilities**: All components implemented and verified
+
+## 🚨 CRITICAL DEVELOPMENT WORKFLOW
+
+### Pre-Commit Testing Requirements
+**EVERY developer MUST execute E2E tests with MCP before committing code:**
+
+1. **Identify Affected Tests**:
+   ```bash
+   npm run e2e:affected
+   ```
+
+2. **Run Complete Test Suite** (if major changes):
+   ```bash
+   npm run docker:test  # Start test environment
+   npm run e2e          # Run all tests
+   ```
+
+3. **Verify All Tests Pass** before proceeding with commit
+
+4. **Commit Only After** successful test execution
+
+### Test Execution Responsibility
+- **Individual Developer**: Must run affected E2E tests before every commit
+- **No Automated Hooks**: Manual execution ensures developer awareness of test results
+- **MCP Integration**: Test data is automatically managed through MCP server
+- **Comprehensive Coverage**: Authentication, navigation, courses, and user management flows
+
+The E2E test suite provides comprehensive coverage of all major user flows, ensuring reliability and quality of the LMS system through mandatory manual testing before every commit.
 
 ---
 
