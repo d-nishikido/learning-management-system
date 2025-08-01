@@ -1,3 +1,8 @@
+---
+description: Fix GitHub issue
+argument-hint: Issue number
+---
+
 Please analyze and fix the GitHub issue: $ARGUMENTS.
 
 Follow these steps:
