@@ -1,13 +1,14 @@
-import { createContext } from 'react';
-import { User } from '@/types';
+export { AuthContext, AuthProvider } from './AuthContext';
 
-export interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<void>;
+// Re-export useAuth hook
+import { useContext } from 'react';
+import { AuthContext } from './AuthContext';
+import type { AuthContextType } from './AuthContext';
+
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);

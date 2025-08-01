@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/common/Button';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts';
 
 interface LogoutButtonProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger';

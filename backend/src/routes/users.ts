@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, userSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { UserController } from '../controllers/userController';
@@ -57,7 +58,7 @@ router.put('/me',
  */
 router.get('/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   UserController.getUserById
 );
 
@@ -69,7 +70,7 @@ router.get('/:id',
 router.put('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(userSchemas.update),
   UserController.updateUser
 );
@@ -82,7 +83,7 @@ router.put('/:id',
 router.delete('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   UserController.deleteUser
 );
 
@@ -93,7 +94,7 @@ router.delete('/:id',
  */
 router.get('/:id/progress',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   UserController.getUserProgress
 );
 
@@ -104,7 +105,7 @@ router.get('/:id/progress',
  */
 router.get('/:id/badges',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   UserController.getUserBadges
 );
 
@@ -115,7 +116,7 @@ router.get('/:id/badges',
  */
 router.get('/:id/skills',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   UserController.getUserSkills
 );
 

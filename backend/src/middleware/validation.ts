@@ -7,7 +7,7 @@ import { ApiResponse } from '../types';
  * Generic validation middleware that validates request body, query, or params
  */
 export const validate = (schema: Joi.Schema, target: 'body' | 'query' | 'params' = 'body') => {
-  return (req: Request, res: Response<ApiResponse>, next: NextFunction): void => {
+  return (req: Request, _res: Response<ApiResponse>, next: NextFunction): void => {
     const data = req[target];
     
     const { error, value } = schema.validate(data, {

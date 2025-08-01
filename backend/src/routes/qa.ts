@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, qaSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken } from '../middleware/auth';
 
@@ -12,7 +13,7 @@ const router = Router();
 router.get('/questions',
   validateQuery(qaSchemas.query),
   // QAController.getAllQuestions - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Questions listing endpoint not yet implemented',
@@ -27,9 +28,9 @@ router.get('/questions',
  * Public endpoint
  */
 router.get('/questions/:id',
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // QAController.getQuestionById - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Question details endpoint not yet implemented',
@@ -47,7 +48,7 @@ router.post('/questions',
   authenticateToken,
   validateBody(qaSchemas.createQuestion),
   // QAController.createQuestion - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Question creation endpoint not yet implemented',
@@ -63,10 +64,10 @@ router.post('/questions',
  */
 router.put('/questions/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(qaSchemas.createQuestion),
   // QAController.updateQuestion - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Question update endpoint not yet implemented',
@@ -82,9 +83,9 @@ router.put('/questions/:id',
  */
 router.delete('/questions/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // QAController.deleteQuestion - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Question deletion endpoint not yet implemented',
@@ -100,10 +101,10 @@ router.delete('/questions/:id',
  */
 router.post('/questions/:id/answers',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(qaSchemas.createAnswer),
   // QAController.createAnswer - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Answer creation endpoint not yet implemented',
@@ -119,10 +120,10 @@ router.post('/questions/:id/answers',
  */
 router.put('/answers/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(qaSchemas.createAnswer),
   // QAController.updateAnswer - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Answer update endpoint not yet implemented',
@@ -138,9 +139,9 @@ router.put('/answers/:id',
  */
 router.delete('/answers/:id',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // QAController.deleteAnswer - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Answer deletion endpoint not yet implemented',
@@ -156,9 +157,9 @@ router.delete('/answers/:id',
  */
 router.put('/answers/:id/best-answer',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // QAController.markBestAnswer - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Best answer marking endpoint not yet implemented',
@@ -174,12 +175,12 @@ router.put('/answers/:id/best-answer',
  */
 router.post('/answers/:id/vote',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
-  validateBody({
-    voteType: require('joi').string().valid('UP', 'DOWN').required()
-  }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
+  validateBody(Joi.object({
+    voteType: Joi.string().valid('UP', 'DOWN').required()
+  })),
   // QAController.voteOnAnswer - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Answer voting endpoint not yet implemented',
@@ -196,7 +197,7 @@ router.post('/answers/:id/vote',
 router.get('/knowledge-base',
   validateQuery(commonSchemas.pagination),
   // QAController.getKnowledgeBase - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Knowledge base endpoint not yet implemented',

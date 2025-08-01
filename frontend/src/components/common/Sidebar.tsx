@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { UserRole } from '@/types';
+import { useAuth } from '@/contexts';
+import type { UserRole } from '@/types';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface SidebarProps {
 interface NavItem {
   name: string;
   href: string;
-  icon: JSX.Element;
+  icon: React.JSX.Element;
   roles?: UserRole[];
 }
 

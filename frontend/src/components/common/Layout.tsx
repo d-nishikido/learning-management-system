@@ -3,9 +3,10 @@ import { Outlet, Link } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
 import { LogoutButton } from '@/components/auth/LogoutButton';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts';
+import { AuthProvider } from '@/contexts';
 
-export default function Layout() {
+function LayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
@@ -68,5 +69,13 @@ export default function Layout() {
         </footer>
       </div>
     </div>
+  );
+}
+
+export default function Layout() {
+  return (
+    <AuthProvider>
+      <LayoutContent />
+    </AuthProvider>
   );
 }

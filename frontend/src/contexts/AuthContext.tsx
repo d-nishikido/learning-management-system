@@ -1,8 +1,19 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, createContext } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/services/api';
-import { User } from '@/types';
-import { AuthContext } from './index';
+import type { User, LoginResponse } from '@/types';
+
+export interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -28,7 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await authApi.login(email, password);
-      const { user, accessToken } = response.data;
+      const loginData = response.data as LoginResponse;
+      const { user, accessToken } = loginData;
       localStorage.setItem('authToken', accessToken);
       setUser(user);
       navigate('/');
@@ -53,7 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshToken = async () => {
     try {
       const response = await authApi.refresh();
-      const { user, accessToken } = response.data;
+      const loginData = response.data as LoginResponse;
+      const { user, accessToken } = loginData;
       localStorage.setItem('authToken', accessToken);
       setUser(user);
     } catch (error) {

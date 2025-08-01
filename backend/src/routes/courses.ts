@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, courseSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 
@@ -12,7 +13,7 @@ const router = Router();
 router.get('/', 
   validateQuery(courseSchemas.query),
   // CourseController.getAllCourses - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course listing endpoint not yet implemented',
@@ -27,9 +28,9 @@ router.get('/',
  * Public endpoint
  */
 router.get('/:id',
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // CourseController.getCourseById - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course details endpoint not yet implemented',
@@ -48,7 +49,7 @@ router.post('/',
   requireRole('ADMIN'),
   validateBody(courseSchemas.create),
   // CourseController.createCourse - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course creation endpoint not yet implemented',
@@ -65,10 +66,10 @@ router.post('/',
 router.put('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   validateBody(courseSchemas.update),
   // CourseController.updateCourse - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course update endpoint not yet implemented',
@@ -85,9 +86,9 @@ router.put('/:id',
 router.delete('/:id',
   authenticateToken,
   requireRole('ADMIN'),
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // CourseController.deleteCourse - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course deletion endpoint not yet implemented',
@@ -103,9 +104,9 @@ router.delete('/:id',
  */
 router.post('/:id/enroll',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // CourseController.enrollInCourse - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course enrollment endpoint not yet implemented',
@@ -121,9 +122,9 @@ router.post('/:id/enroll',
  */
 router.delete('/:id/enroll',
   authenticateToken,
-  validateParams({ id: commonSchemas.id }),
+  validateParams(Joi.object({ id: commonSchemas.id })),
   // CourseController.unenrollFromCourse - To be implemented
-  (req, res) => {
+  (_req, res) => {
     res.status(501).json({
       success: false,
       error: 'Course unenrollment endpoint not yet implemented',
