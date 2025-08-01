@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  db-test:
+    image: postgres:16-alpine
+    container_name: lms-db-test
+    environment:
+      POSTGRES_USER: ${DB_USER:-lmsuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-lmspassword}
+      POSTGRES_DB: ${DB_NAME:-lms_test}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-lmsuser} -d ${DB_NAME:-lms_test}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-test:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lms-backend-test
+    environment:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://${DB_USER:-lmsuser}:${DB_PASSWORD:-lmspassword}@db-test:5432/${DB_NAME:-lms_test}
+      JWT_SECRET: ${JWT_SECRET:-test-jwt-secret-key}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      db-test:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: sh -c "npx prisma db push --skip-generate && npm run db:seed:e2e && npm run dev"
+
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lms-frontend-test
+    environment:
+      VITE_API_URL: http://localhost:3001/api/v1
+      NODE_ENV: test
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend-test
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  mcp-server:
+    build:
+      context: ./e2e/mcp-server
+      dockerfile: Dockerfile
+    container_name: lms-mcp-server
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-lmsuser}:${DB_PASSWORD:-lmspassword}@db-test:5432/${DB_NAME:-lms_test}
+      PORT: 3003
+    ports:
+      - "3003:3003"
+    depends_on:
+      db-test:
+        condition: service_healthy
+    volumes:
+      - ./e2e/mcp-server:/app
+      - /app/node_modules
+
+volumes:
+  postgres_test_data:

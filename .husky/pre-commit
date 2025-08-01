@@ -1,0 +1,54 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Check if we're in CI environment
+if [ "$CI" = "true" ]; then
+  echo "📌 Skipping pre-commit hooks in CI environment"
+  exit 0
+fi
+
+# Run linting for frontend
+echo "🎨 Checking frontend code style..."
+cd frontend && npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Frontend linting failed! Please fix the errors and try again."
+  exit 1
+fi
+cd ..
+
+# Run linting for backend
+echo "🎨 Checking backend code style..."
+cd backend && npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Backend linting failed! Please fix the errors and try again."
+  exit 1
+fi
+cd ..
+
+# Run type checking
+echo "📘 Running TypeScript type checks..."
+cd frontend && npm run typecheck
+if [ $? -ne 0 ]; then
+  echo "❌ Frontend type checking failed!"
+  exit 1
+fi
+cd ..
+
+cd backend && npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo "❌ Backend type checking failed!"
+  exit 1
+fi
+cd ..
+
+# Run affected E2E tests
+echo "🧪 Running affected E2E tests..."
+node scripts/run-affected-e2e-tests.js
+if [ $? -ne 0 ]; then
+  echo "❌ E2E tests failed! Please fix the failing tests."
+  exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

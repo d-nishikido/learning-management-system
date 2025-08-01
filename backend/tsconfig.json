@@ -50,7 +50,8 @@
     "dist",
     "coverage",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "prisma/seed-e2e.ts"
   ],
   "ts-node": {
     "esm": false,
