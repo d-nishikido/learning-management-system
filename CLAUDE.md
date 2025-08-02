@@ -1,10 +1,134 @@
-# CLAUDE.md - Learning Management System (LMS) Project Guide
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# Learning Management System (LMS) Project Guide
+
+## Essential Development Commands
+
+### Environment Setup
+```bash
+# Install dependencies for all workspaces
+npm install
+
+# Start development environment with Docker
+npm run docker:up
+
+# Stop Docker environment
+npm run docker:down
+
+# Start only frontend development server
+npm run frontend
+
+# Start only backend development server  
+npm run backend
+```
+
+### Building & Testing
+```bash
+# Frontend commands
+cd frontend
+npm run build          # Build for production
+npm run dev            # Development server
+npm run lint           # Run ESLint
+npm run lint:fix       # Fix ESLint issues
+npm run typecheck      # TypeScript type checking
+npm run format         # Format code with Prettier
+
+# Backend commands  
+cd backend
+npm run build          # Build TypeScript
+npm run dev            # Development server with nodemon
+npm run lint           # Run ESLint
+npm run test           # Run Jest tests
+npm run test:watch     # Watch mode for tests
+npm run test:coverage  # Test coverage report
+```
+
+### Database Operations
+```bash
+cd backend
+npm run db:generate    # Generate Prisma client
+npm run db:push        # Push schema to database
+npm run db:migrate     # Run database migrations
+npm run db:seed        # Seed development data
+npm run db:seed:e2e    # Seed E2E test data
+npm run db:studio      # Open Prisma Studio
+```
+
+### E2E Testing (MANDATORY before commits)
+```bash
+# Install Playwright browsers
+npm run e2e:install
+
+# Run affected tests (required before every commit)
+npm run e2e:affected
+
+# Run all E2E tests
+npm run e2e
+
+# Run tests with UI mode
+npm run e2e:ui
+
+# Start test environment
+npm run docker:test
+```
+
+### Development Workflow
+1. **Before starting work**: `npm run docker:up` to start services
+2. **During development**: Use `npm run frontend` and `npm run backend` for hot reload
+3. **Before committing**: `npm run e2e:affected` to run affected tests
+4. **Code quality**: Run `npm run lint` and `npm run typecheck` in respective directories
 
 ## Project Overview
 
 This is a comprehensive Learning Management System (LMS) designed to support programming education and certification training for approximately 500 users. The system focuses on integrated learning activity planning, implementation, evaluation, and management with strong gamification elements to enhance learning motivation.
 
 ## System Architecture
+
+### Code Organization & Key Patterns
+
+#### Frontend Architecture (`frontend/src/`)
+- **Component Structure**: Located in `components/` with subfolders:
+  - `common/` - Reusable UI components (Button, Input, Card, LoadingSpinner)
+  - `auth/` - Authentication-specific components
+  - `users/` - User management components (planned)
+- **Pages**: Route-level components in `pages/` (Home, Login, Profile, Users, UserDetail)
+- **Context**: React contexts in `contexts/` (AuthContext for user state)
+- **Services**: API clients in `services/api.ts` (authApi, userApi, courseApi, progressApi)
+- **Types**: TypeScript interfaces in `types/index.ts` (User, Course, API responses)
+- **Routing**: React Router v7 configuration in `App.tsx`
+
+#### Backend Architecture (`backend/src/`)
+- **Controllers**: Route handlers in `controllers/` (handle HTTP requests/responses)
+- **Services**: Business logic in `services/` (data processing, validation)
+- **Routes**: API route definitions in `routes/` (authentication, user management)
+- **Middleware**: Custom middleware in `middleware/` (auth, validation, error handling)
+- **Utils**: Shared utilities in `utils/` (errors, helpers)
+- **Prisma**: Database client in `prisma/` (schema, migrations, seeds)
+
+#### Key Architectural Patterns
+- **API Client Pattern**: Centralized axios client with interceptors for auth tokens
+- **Error Handling**: Structured error responses with custom error classes
+- **Type Safety**: End-to-end TypeScript with shared interfaces
+- **Authentication**: JWT-based with refresh token support
+- **Role-Based Access**: Admin vs User permissions enforced in middleware
+- **Validation**: Joi schemas for request validation in backend
+- **Database**: Prisma ORM with PostgreSQL, includes seed data for development
+
+#### Import Patterns
+```typescript
+// Frontend imports
+import { Button } from '@/components/common/Button';
+import { useAuth } from '@/contexts';
+import { userApi } from '@/services/api';
+import type { User, UserListQuery } from '@/types';
+
+// Backend imports  
+import { UserService } from '../services/userService';
+import { validateBody } from '../middleware/validation';
+import { authenticateToken, requireRole } from '../middleware/auth';
+```
 
 ### Technology Stack
 - **Frontend**: React Router v7 with TypeScript
@@ -286,356 +410,6 @@ lms-system/
 - Clear separation of concerns and modular architecture
 
 ---
-
-## Backend Infrastructure Completion Status
-
-### ✅ Completed (January 31, 2025)
-**Backend Foundation (Phase 1)** has been successfully implemented with the following components:
-
-#### Project Structure
-- ✅ Complete backend directory structure (`backend/src/`)
-- ✅ TypeScript configuration with strict settings
-- ✅ ESLint and Prettier code quality tools
-- ✅ Package.json with all required dependencies
-
-#### Database Layer
-- ✅ Prisma ORM configuration  
-- ✅ Complete database schema (47 tables)
-- ✅ All core entities: Users, Courses, Progress, Q&A, Gamification
-- ✅ Proper relationships and indexes defined
-
-#### Application Layer
-- ✅ Express.js server with security middleware
-- ✅ Authentication middleware structure
-- ✅ Error handling and logging
-- ✅ Health check endpoints
-- ✅ Rate limiting and CORS configuration
-
-#### Development Environment
-- ✅ Docker Compose integration
-- ✅ TypeScript compilation pipeline
-- ✅ Code quality validation (ESLint/Prettier)
-- ✅ Development server with hot reload
-
-#### API Foundation
-- ✅ RESTful API structure
-- ✅ Type-safe request/response interfaces
-- ✅ Basic routing system
-- ✅ Health monitoring endpoint
-
-### ✅ Authentication System Completed (August 1, 2025)
-**JWT Authentication Implementation** has been successfully completed with the following components:
-
-#### Authentication Services
-- ✅ Password hashing service with bcrypt (`backend/src/services/passwordService.ts`)
-- ✅ JWT token service with access/refresh tokens (`backend/src/services/jwtService.ts`)
-- ✅ Authentication controller with login/logout/refresh endpoints (`backend/src/controllers/authController.ts`)
-
-#### Route Integration
-- ✅ Authentication routes module (`backend/src/routes/auth.ts`)
-- ✅ Validation middleware for auth endpoints (`backend/src/middleware/validateRequest.ts`)
-- ✅ Auth routes registered in main router
-
-#### API Endpoints
-- ✅ `POST /api/v1/auth/login` - User login with JWT token generation
-- ✅ `POST /api/v1/auth/logout` - User logout
-- ✅ `POST /api/v1/auth/refresh` - Token refresh
-- ✅ `POST /api/v1/auth/forgot-password` - Password reset initiation
-
-#### Testing & Quality
-- ✅ Unit tests for password service (17 tests passing)
-- ✅ Unit tests for JWT service (17 tests passing)
-- ✅ TypeScript compilation passing
-- ✅ ESLint code quality checks passing
-
-### ✅ API Infrastructure Enhanced (August 1, 2025)
-**API基盤実装 (Issue #19/20)** has been successfully completed with comprehensive improvements:
-
-#### Enhanced Error Handling System
-- ✅ Custom error classes with structured error codes (`backend/src/utils/errors.ts`)
-- ✅ Enhanced error handler with Prisma error conversion (`backend/src/middleware/errorHandler.ts`)
-- ✅ Comprehensive error logging with request context
-- ✅ Type-safe error responses with operational/non-operational classification
-
-#### Unified Validation System using Joi
-- ✅ Joi-based validation middleware (`backend/src/middleware/validation.ts`)
-- ✅ Common validation schemas for reusability
-- ✅ Specific validation schemas for auth, courses, users, and Q&A
-- ✅ Migration from express-validator to Joi for consistency
-
-#### Express Router Configuration Enhancement
-- ✅ Complete course routes with CRUD operations (`backend/src/routes/courses.ts`)
-- ✅ Complete user management routes (`backend/src/routes/users.ts`)
-- ✅ Complete Q&A system routes (`backend/src/routes/qa.ts`)
-- ✅ Role-based access control middleware (`backend/src/middleware/auth.ts`)
-- ✅ All routes integrated in main router with proper structure
-
-#### Optimized CORS Configuration
-- ✅ Enhanced CORS with dynamic origin validation
-- ✅ Additional security headers and exposed headers
-- ✅ Support for multiple development environments
-- ✅ Preflight request optimization with maxAge
-
-#### Comprehensive Testing
-- ✅ Error handling system tests (40+ test cases)
-- ✅ Validation system tests (comprehensive schema testing)
-- ✅ Unit tests for all custom error classes
-- ✅ Type-safe test implementations
-
-### 🔄 Next Steps
-1. **Controller Implementation**: Implement actual controller logic for courses, users, Q&A
-2. **Database Integration**: Connect routes to Prisma database operations
-3. **Integration Testing**: E2E API testing with real database scenarios
-4. **Frontend Integration**: Connect React frontend to enhanced API endpoints
-
-The API infrastructure now provides a robust, type-safe, and well-tested foundation for the LMS system with comprehensive error handling, validation, and routing capabilities.
-
----
-
-## Frontend Infrastructure Completion Status
-
-### ✅ Completed (February 1, 2025)
-**Frontend Foundation (Phase 2)** has been successfully implemented with the following components:
-
-#### Project Structure
-- ✅ Complete frontend directory structure (`frontend/src/`)
-- ✅ React Router v7 with Vite build tool
-- ✅ TypeScript configuration with strict mode and path aliases
-- ✅ ESLint and Prettier code quality tools
-
-#### Core Technologies
-- ✅ React Router v7 for routing
-- ✅ TypeScript for type safety
-- ✅ Tailwind CSS for styling
-- ✅ Vite for fast development and building
-- ✅ Axios for API communication
-
-#### UI Components
-- ✅ Layout component with navigation
-- ✅ Home page with LMS overview
-- ✅ 404 Not Found page
-- ✅ Responsive design with Tailwind CSS
-- ✅ Custom utility classes for consistent styling
-
-#### Development Features
-- ✅ Hot module replacement (HMR)
-- ✅ Path aliases (@components, @services, etc.)
-- ✅ Environment variable support
-- ✅ API proxy configuration for development
-
-#### Docker Integration
-- ✅ Frontend container configuration
-- ✅ Port mapping (3002:3000)
-- ✅ Volume mounting for development
-- ✅ Automatic npm install on container start
-
-#### API Services
-- ✅ API client with interceptors
-- ✅ Authentication token management
-- ✅ Typed API responses
-- ✅ Service modules for auth, courses, and progress
-
-### ✅ UI Components Completed (August 1, 2025)
-**Basic UI Components (Issue #16/17)** have been successfully implemented with the following components:
-
-#### Authentication Components
-- ✅ Authentication Context with JWT token management
-- ✅ LoginForm component with validation and error handling
-- ✅ LogoutButton component with confirmation dialog
-- ✅ Login page with responsive design
-
-#### Navigation & Layout Components
-- ✅ Updated Layout component with sidebar integration
-- ✅ Sidebar component with role-based navigation
-- ✅ MobileMenu component for responsive navigation
-- ✅ Responsive design for mobile, tablet, and desktop
-
-#### Common UI Components
-- ✅ Button component with variants and loading states
-- ✅ Input component with validation and error display
-- ✅ Card component for content containers
-- ✅ LoadingSpinner component
-
-#### Integration Features
-- ✅ Authentication state management
-- ✅ Route protection for authenticated users
-- ✅ Type-safe API integration
-- ✅ ESLint and TypeScript compliance
-
-### 🔄 Next Steps
-1. **Course Pages**: Course listing, details, and enrollment
-2. **User Dashboard**: Progress tracking and statistics
-3. **Q&A System**: Question posting and answer interface
-4. **Gamification UI**: Points, badges, and rankings display
-5. **User Registration**: Registration form and workflow
-
-The frontend infrastructure is now ready for advanced feature development, with complete authentication UI and responsive layout system integrated with the backend API and Docker environment.
-
-### ✅ User Management UI Completed (August 2, 2025)
-**User Management UI (Issue #30/31)** has been successfully implemented with comprehensive functionality:
-
-#### Core User Management Pages
-- ✅ **Profile Editing Page** (`frontend/src/pages/Profile.tsx`)
-  - Current user profile display and editing
-  - Password change capability
-  - User statistics display (badges, skills, learning progress)
-  - Bio and profile image URL support
-  - Real-time form validation and error handling
-- ✅ **User Detail Page** (`frontend/src/pages/UserDetail.tsx`)
-  - Individual user information display
-  - Learning progress visualization
-  - Badges and skills display
-  - Admin controls for user editing and deletion
-  - Role-based access control
-- ✅ **User Listing Page** (`frontend/src/pages/Users.tsx`)
-  - Admin-only comprehensive user management
-  - Advanced filtering and search capabilities
-  - Pagination with configurable limits
-  - User creation, editing, and deletion
-  - User status and role management
-
-#### API Integration & Type Safety
-- ✅ **Enhanced API Services** (`frontend/src/services/api.ts`)
-  - Complete userApi with admin and profile endpoints
-  - Type-safe API client integration
-  - Proper error handling and response processing
-- ✅ **Extended Type Definitions** (`frontend/src/types/index.ts`)
-  - UserProfile, UserProgress, UserBadge, UserSkill interfaces
-  - UserListQuery with advanced filtering support
-  - UserCreateRequest and UserUpdateRequest interfaces
-  - PaginatedResponse for list endpoints
-
-#### Routing & Navigation
-- ✅ **Complete Route Configuration** (`frontend/src/App.tsx`)
-  - `/profile` - Profile editing page
-  - `/users` - Admin user listing page
-  - `/users/:id` - User detail page
-- ✅ **Enhanced Navigation** (`frontend/src/components/common/Sidebar.tsx`)
-  - Role-based menu visibility
-  - User management menu for administrators
-  - Responsive navigation design
-
-#### Technical Features
-- ✅ **TypeScript Compliance**: All components fully typed with strict TypeScript
-- ✅ **Error Handling**: Comprehensive error handling with user-friendly messages
-- ✅ **Loading States**: Proper loading indicators and state management
-- ✅ **Responsive Design**: Mobile-first design with Tailwind CSS
-- ✅ **Security**: Role-based access control and input validation
-- ✅ **Code Quality**: ESLint compliant with minimal acceptable warnings
-
-#### Implementation Highlights
-- **Comprehensive User CRUD**: Full create, read, update, delete functionality
-- **Advanced Filtering**: Search by name, email, role, and status
-- **Pagination**: Efficient data loading with configurable page sizes
-- **Real-time Updates**: Immediate UI updates after API operations
-- **Security First**: Admin-only functions properly protected
-- **User Experience**: Intuitive forms with validation and feedback
-
-### 🔄 Next Steps
-1. **Admin User Management Page**: Enhanced admin dashboard (Phase 6)
-2. **Common User Components**: Reusable user UI components (Phase 7)
-3. **Integration Testing**: E2E tests for user management flows
-4. **Performance Optimization**: Large user list optimization
-
-The User Management UI provides a complete, secure, and user-friendly interface for user administration and profile management, following all established architectural patterns and design principles.
-
-### ✅ User Management API Completed (August 1, 2025)
-**User Management API (Issue #22/23)** has been successfully implemented with comprehensive functionality:
-
-#### User Service Layer
-- ✅ Complete user CRUD operations (`backend/src/services/userService.ts`)
-- ✅ Password hashing with bcrypt integration
-- ✅ User conflict detection (username/email uniqueness)
-- ✅ Paginated user queries with filtering and search
-- ✅ User progress, badges, and skills retrieval
-- ✅ Soft delete functionality with isActive flag
-
-#### User Controller Implementation
-- ✅ Complete user controller with business logic (`backend/src/controllers/userController.ts`)
-- ✅ Type-safe request/response handling
-- ✅ Role-based access control for all endpoints
-- ✅ Password hash exclusion from responses
-- ✅ Comprehensive error handling with custom error types
-
-#### API Endpoints
-- ✅ `POST /users` - User registration (Admin only)
-- ✅ `GET /users` - Paginated user listing with filters (Admin only)
-- ✅ `GET /users/me` - Current user profile
-- ✅ `PUT /users/me` - Current user profile update (restricted fields)
-- ✅ `GET /users/:id` - User details (Admin or own profile)
-- ✅ `PUT /users/:id` - User update (Admin only)
-- ✅ `DELETE /users/:id` - Soft delete user (Admin only)
-- ✅ `GET /users/:id/progress` - User learning progress (Admin or own)
-- ✅ `GET /users/:id/badges` - User badges (Admin or own)
-- ✅ `GET /users/:id/skills` - User skills (Admin or own)
-
-#### Validation & Security
-- ✅ Enhanced validation schemas for user operations
-- ✅ Bio and profile image URL fields support
-- ✅ Joi validation with custom error messages
-- ✅ Input sanitization and type safety
-- ✅ Role-based access control enforcement
-
-#### Testing & Quality
-- ✅ Comprehensive unit tests for user service (21 test cases)
-- ✅ Mock database operations with Prisma
-- ✅ Password service integration testing
-- ✅ Error scenario coverage (NotFound, Conflict errors)
-- ✅ TypeScript compilation and linting compliance
-
-#### Technical Features
-- ✅ Generic RequestWithUser interface for type safety
-- ✅ Proper database field mapping (badgeName, skillName, etc.)
-- ✅ Efficient pagination with configurable limits
-- ✅ Search functionality across multiple user fields
-- ✅ Last login timestamp tracking
-
-The User Management API provides a complete, secure, and well-tested foundation for user operations in the LMS system, following all established architectural patterns and security best practices.
-
-### ✅ E2E Test Implementation Completed (August 2, 2025)
-**E2E Test Environment (Issue #25/26)** has been successfully implemented with comprehensive test coverage:
-
-#### Playwright Test Framework
-- ✅ Playwright configuration with multi-browser support (`playwright.config.ts`)
-- ✅ TypeScript configuration for E2E tests (`e2e/tsconfig.json`)
-- ✅ Test fixtures for authentication and test data
-- ✅ Page Object Model implementation for maintainable tests
-- ✅ Utility functions and MCP client integration
-
-#### Test Specifications Implemented
-- ✅ **Authentication Tests** (`e2e/specs/auth.spec.ts`)
-  - Login/logout flows
-  - Form validation
-  - Token refresh handling
-  - Password reset functionality
-- ✅ **Navigation Tests** (`e2e/specs/navigation.spec.ts`)
-  - Menu navigation
-  - Role-based menu visibility
-  - Mobile responsive navigation
-  - Breadcrumb navigation
-  - 404 error handling
-- ✅ **Course Management Tests** (`e2e/specs/courses.spec.ts`)
-  - Course listing and filtering
-  - Course details and enrollment
-  - Admin course CRUD operations
-  - Progress tracking
-- ✅ **User Management Tests** (`e2e/specs/users.spec.ts`)
-  - User profile management
-  - Admin user operations
-  - User registration
-  - Statistics and achievements
-
-#### Test Infrastructure
-- ✅ Docker test environment configuration (`docker-compose.test.yml`)
-- ✅ E2E seed data script (`backend/prisma/seed-e2e.ts`)
-- ✅ Test user accounts with predefined data
-- ✅ MCP server integration for test data management
-
-#### Manual Testing Requirements
-- ✅ Selective test execution for changed files (`scripts/run-affected-e2e-tests.js`)
-- ✅ NPM scripts for various test scenarios
-- ✅ **MANDATORY**: E2E tests with MCP must be executed before every git commit
-- ✅ Developer responsibility to ensure all affected tests pass before committing
 
 #### Test Execution Commands
 ```bash
