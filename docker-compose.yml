@@ -10,7 +10,7 @@ services:
       - "${FRONTEND_PORT:-3002}:3000"
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:5000/api/v1}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:5000/api/v1}
     command: sh -c "npm install && npm start"
     depends_on:
       - backend

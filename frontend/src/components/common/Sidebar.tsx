@@ -159,11 +159,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                   <span className="text-primary-700 font-medium">
-                    {user.name.charAt(0).toUpperCase()}
+                    {(user.name || user.firstName || user.username || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username}
+                  </p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
               </div>

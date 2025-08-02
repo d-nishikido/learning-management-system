@@ -4,7 +4,6 @@ import { Sidebar } from './Sidebar';
 import { MobileMenu } from './MobileMenu';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { useAuth } from '@/contexts';
-import { AuthProvider } from '@/contexts';
 
 function LayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,9 +76,5 @@ function LayoutContent() {
 }
 
 export default function Layout() {
-  return (
-    <AuthProvider>
-      <LayoutContent />
-    </AuthProvider>
-  );
+  return <LayoutContent />;
 }

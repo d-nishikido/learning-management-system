@@ -76,7 +76,7 @@ export default function Dashboard() {
           ダッシュボード
         </h1>
         <p className="mt-4 text-lg text-gray-600">
-          {user ? `${user.name}さん、おかえりなさい！` : 'こんにちは！'}
+          {user ? `${user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username}さん、おかえりなさい！` : 'こんにちは！'}
           学習を続けましょう。
         </p>
       </section>
