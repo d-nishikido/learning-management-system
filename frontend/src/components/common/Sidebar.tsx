@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import type { UserRole } from '@/types';
 
 interface SidebarProps {
@@ -152,6 +153,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               );
             })}
           </nav>
+
+          {/* Language Switcher */}
+          <div className="border-t px-4 py-3">
+            <LanguageSwitcher />
+          </div>
 
           {/* User info */}
           {user && (

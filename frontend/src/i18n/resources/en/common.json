@@ -1,0 +1,23 @@
+{
+  "error": "Error",
+  "loading": "Loading...",
+  "signIn": "Sign In",
+  "reset": "Reset",
+  "search": "Search",
+  "category": "Category",
+  "difficulty": "Difficulty",
+  "status": "Status",
+  "createdBy": "Created by",
+  "backTo": "Back to {{destination}}",
+  "showing": "Showing {{count}} of {{total}} {{item}}",
+  "lesson_one": "lesson",
+  "lesson_other": "lessons",
+  "enrolled_one": "enrolled",
+  "enrolled_other": "enrolled",
+  "student_one": "student",
+  "student_other": "students",
+  "hour_one": "hour",
+  "hour_other": "hours",
+  "course_one": "course",
+  "course_other": "courses"
+}

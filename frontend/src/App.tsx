@@ -12,6 +12,7 @@ import { CourseDetail } from './pages/CourseDetail';
 import { LessonDetail } from './pages/LessonDetail';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import './i18n';
 
 const router = createBrowserRouter([
   {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -11,6 +12,7 @@ import type { Course, Lesson, ApiRequestError } from '@/types';
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { t } = useTranslation(['course', 'common']);
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +46,7 @@ export function CourseDetail() {
         }
 
       } catch (err) {
-        setError((err as ApiRequestError).response?.data?.message || 'Failed to load course');
+        setError((err as ApiRequestError).response?.data?.message || t('course:errors.loadFailed'));
       } finally {
         setIsLoading(false);
         setIsLessonsLoading(false);
@@ -64,7 +66,7 @@ export function CourseDetail() {
         setIsEnrolled(true);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || 'Failed to enroll in course');
+      setError((err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -80,7 +82,7 @@ export function CourseDetail() {
         setIsEnrolled(false);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || 'Failed to unenroll from course');
+      setError((err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -98,10 +100,10 @@ export function CourseDetail() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Course not found</h1>
-          <p className="mt-2 text-gray-600">The course you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('course:notFound')}</h1>
+          <p className="mt-2 text-gray-600">{t('course:notFoundDescription')}</p>
           <Link to="/courses" className="mt-4 inline-block">
-            <Button>Back to Courses</Button>
+            <Button>{t('common:backTo', { destination: t('course:title') })}</Button>
           </Link>
         </div>
       </div>
@@ -121,7 +123,7 @@ export function CourseDetail() {
         <ol className="flex items-center space-x-2 text-sm text-gray-500">
           <li>
             <Link to="/courses" className="hover:text-gray-700">
-              Courses
+              {t('course:title')}
             </Link>
           </li>
           <li>
@@ -140,7 +142,7 @@ export function CourseDetail() {
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <h3 className="text-sm font-medium text-red-800">{t('common:error')}</h3>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -162,10 +164,10 @@ export function CourseDetail() {
                       difficultyColors[course.difficultyLevel]
                     }`}
                   >
-                    {course.difficultyLevel}
+                    {t(`course:difficulty.${course.difficultyLevel}`)}
                   </span>
                   <span>{course.category}</span>
-                  {course.estimatedHours && <span>{course.estimatedHours} hours</span>}
+                  {course.estimatedHours && <span>{course.estimatedHours} {t('common:hour', { count: course.estimatedHours })}</span>}
                 </div>
               </div>
             </div>
@@ -176,9 +178,9 @@ export function CourseDetail() {
 
             <div className="flex items-center justify-between text-sm text-gray-600">
               <span>
-                Created by {course.creator.firstName} {course.creator.lastName}
+                {t('common:createdBy')} {course.creator.firstName} {course.creator.lastName}
               </span>
-              <span>{course._count?.userProgress || 0} students enrolled</span>
+              <span>{course._count?.userProgress || 0} {t('common:student', { count: course._count?.userProgress || 0 })}</span>
             </div>
           </div>
 
@@ -198,18 +200,18 @@ export function CourseDetail() {
                 isLoading={actionLoading}
                 onClick={isEnrolled ? handleUnenroll : handleEnroll}
               >
-                {isEnrolled ? 'Unenroll from Course' : 'Enroll in Course'}
+                {isEnrolled ? t('course:unenroll') : t('course:enroll')}
               </Button>
             )}
 
             {!user && (
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-2">
-                  Sign in to enroll in this course
+                  {t('course:signInToEnroll')}
                 </p>
                 <Link to="/login">
                   <Button variant="primary" size="sm">
-                    Sign In
+                    {t('common:signIn')}
                   </Button>
                 </Link>
               </div>
@@ -221,9 +223,9 @@ export function CourseDetail() {
       {/* Course Content */}
       <Card>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Course Content</h2>
+          <h2 className="text-xl font-semibold text-gray-900">{t('course:content')}</h2>
           <span className="text-sm text-gray-500">
-            {lessons.length} lesson{lessons.length !== 1 ? 's' : ''}
+            {lessons.length} {t('common:lesson', { count: lessons.length })}
           </span>
         </div>
 

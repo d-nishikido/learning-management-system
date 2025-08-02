@@ -1,0 +1,29 @@
+{
+  "title": "コース",
+  "description": "あなたの学習の旅に合わせたプログラミングコースを発見し、登録しましょう。",
+  "notFound": "コースが見つかりません",
+  "notFoundDescription": "お探しのコースは存在しません。",
+  "content": "コース内容",
+  "enrollNow": "今すぐ登録",
+  "enroll": "コースに登録",
+  "unenroll": "コース登録解除",
+  "unenrollShort": "登録解除",
+  "signInToEnroll": "このコースに登録するにはサインインしてください",
+  "searchPlaceholder": "コースを検索...",
+  "allCategories": "すべてのカテゴリ",
+  "allDifficulties": "すべての難易度",
+  "allCourses": "すべてのコース",
+  "publishedOnly": "公開済みのみ",
+  "unpublishedOnly": "未公開のみ",
+  "filters": "フィルター",
+  "difficulty": {
+    "BEGINNER": "初級",
+    "INTERMEDIATE": "中級",
+    "ADVANCED": "上級"
+  },
+  "errors": {
+    "loadFailed": "コースの読み込みに失敗しました",
+    "enrollFailed": "コースへの登録に失敗しました",
+    "unenrollFailed": "コースの登録解除に失敗しました"
+  }
+}

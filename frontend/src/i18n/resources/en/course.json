@@ -1,0 +1,29 @@
+{
+  "title": "Courses",
+  "description": "Discover and enroll in programming courses tailored to your learning journey.",
+  "notFound": "Course not found",
+  "notFoundDescription": "The course you're looking for doesn't exist.",
+  "content": "Course Content",
+  "enrollNow": "Enroll Now",
+  "enroll": "Enroll in Course",
+  "unenroll": "Unenroll from Course",
+  "unenrollShort": "Unenroll",
+  "signInToEnroll": "Sign in to enroll in this course",
+  "searchPlaceholder": "Search courses...",
+  "allCategories": "All Categories",
+  "allDifficulties": "All Difficulties",
+  "allCourses": "All Courses",
+  "publishedOnly": "Published Only",
+  "unpublishedOnly": "Unpublished Only",
+  "filters": "Filters",
+  "difficulty": {
+    "BEGINNER": "Beginner",
+    "INTERMEDIATE": "Intermediate", 
+    "ADVANCED": "Advanced"
+  },
+  "errors": {
+    "loadFailed": "Failed to load courses",
+    "enrollFailed": "Failed to enroll in course",
+    "unenrollFailed": "Failed to unenroll from course"
+  }
+}
