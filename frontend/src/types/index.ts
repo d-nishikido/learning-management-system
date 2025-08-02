@@ -16,16 +16,76 @@ export interface User {
   lastLoginAt?: Date;
 }
 
+export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
 export interface Course {
-  id: string;
+  id: number;
   title: string;
-  description: string;
-  thumbnail?: string;
-  duration: number;
-  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  description?: string;
+  category: string;
+  difficultyLevel: DifficultyLevel;
+  estimatedHours?: number;
+  thumbnailUrl?: string;
   isPublished: boolean;
+  sortOrder: number;
+  createdBy: number;
   createdAt: Date;
   updatedAt: Date;
+  creator: {
+    id: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+  };
+  lessons?: Array<{
+    id: number;
+    title: string;
+    sortOrder: number;
+    isPublished: boolean;
+  }>;
+  _count?: {
+    lessons: number;
+    userProgress: number;
+  };
+}
+
+export interface CourseListResponse {
+  courses: Course[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateCourseRequest {
+  title: string;
+  description?: string;
+  category: string;
+  difficultyLevel?: DifficultyLevel;
+  estimatedHours?: number;
+  thumbnailUrl?: string;
+  isPublished?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateCourseRequest {
+  title?: string;
+  description?: string;
+  category?: string;
+  difficultyLevel?: DifficultyLevel;
+  estimatedHours?: number;
+  thumbnailUrl?: string;
+  isPublished?: boolean;
+  sortOrder?: number;
+}
+
+export interface CourseQueryParams {
+  category?: string;
+  difficultyLevel?: DifficultyLevel;
+  isPublished?: boolean;
+  search?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface ApiResponse<T> {
