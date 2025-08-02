@@ -53,7 +53,8 @@ export class UserController {
       const user = await UserService.createUser(userData);
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = user;
 
       res.status(201).json({
         success: true,
@@ -97,7 +98,8 @@ export class UserController {
 
       // Remove password hashes from response
       const usersWithoutPassword = result.users.map(user => {
-        const { passwordHash: _, ...userResponse } = user;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { passwordHash: _passwordHash, ...userResponse } = user;
         return userResponse;
       });
 
@@ -142,7 +144,8 @@ export class UserController {
       }
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = user;
 
       res.json({
         success: true,
@@ -168,12 +171,14 @@ export class UserController {
       const userId = req.user!.id;
       
       // Remove sensitive fields that users shouldn't be able to update themselves
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { role: _role, isActive: _isActive, ...updateData } = req.body;
 
       const updatedUser = await UserService.updateUser(userId, updateData);
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = updatedUser;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = updatedUser;
 
       res.json({
         success: true,
@@ -236,7 +241,8 @@ export class UserController {
       }
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = user;
 
       res.json({
         success: true,
@@ -265,7 +271,8 @@ export class UserController {
       const updatedUser = await UserService.updateUser(userId, updateData);
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = updatedUser;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = updatedUser;
 
       res.json({
         success: true,
@@ -310,7 +317,8 @@ export class UserController {
       const deletedUser = await UserService.deleteUser(userId);
 
       // Remove password hash from response
-      const { passwordHash: _, ...userResponse } = deletedUser;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { passwordHash: _passwordHash, ...userResponse } = deletedUser;
 
       res.json({
         success: true,
