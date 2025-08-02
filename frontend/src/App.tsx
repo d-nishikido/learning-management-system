@@ -6,6 +6,7 @@ import NotFound from './pages/NotFound';
 import { Profile } from './pages/Profile';
 import { Users } from './pages/Users';
 import { UserDetail } from './pages/UserDetail';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -34,15 +35,27 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'users',
-        element: <Users />,
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <Users />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'users/:id',
-        element: <UserDetail />,
+        element: (
+          <ProtectedRoute>
+            <UserDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'progress',

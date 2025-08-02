@@ -19,7 +19,11 @@ function LayoutContent() {
   };
 
   if (!isAuthenticated) {
-    return <Outlet />;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Outlet />
+      </div>
+    );
   }
 
   return (
