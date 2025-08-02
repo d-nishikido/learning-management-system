@@ -215,6 +215,38 @@ export const userSchemas = {
 };
 
 /**
+ * Lesson validation schemas
+ */
+export const lessonSchemas = {
+  create: Joi.object({
+    title: Joi.string().min(1).max(200).trim().required(),
+    description: Joi.string().max(1000).trim().optional(),
+    content: Joi.string().optional(),
+    estimatedMinutes: Joi.number().integer().min(1).optional(),
+    sortOrder: Joi.number().integer().min(1).optional(),
+    isPublished: Joi.boolean().default(false),
+  }),
+
+  update: Joi.object({
+    title: Joi.string().min(1).max(200).trim().optional(),
+    description: Joi.string().max(1000).trim().optional(),
+    content: Joi.string().optional(),
+    estimatedMinutes: Joi.number().integer().min(1).optional(),
+    sortOrder: Joi.number().integer().min(1).optional(),
+    isPublished: Joi.boolean().optional(),
+  }),
+
+  query: Joi.object({
+    isPublished: Joi.boolean(),
+    search: Joi.string().trim(),
+  }).concat(commonSchemas.pagination),
+
+  updateOrder: Joi.object({
+    sortOrder: Joi.number().integer().min(1).required(),
+  }),
+};
+
+/**
  * Q&A validation schemas
  */
 export const qaSchemas = {
