@@ -3,6 +3,10 @@ import Layout from './components/common/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
+import { Profile } from './pages/Profile';
+import { Users } from './pages/Users';
+import { UserDetail } from './pages/UserDetail';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -31,7 +35,27 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <div className="text-center py-12">Profile Page (Coming Soon)</div>,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'users',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <Users />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'users/:id',
+        element: (
+          <ProtectedRoute>
+            <UserDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'progress',

@@ -89,3 +89,20 @@ export const progressApi = {
     apiClient.post('/progress/complete', { materialId }),
   getStats: () => apiClient.get('/progress/stats'),
 };
+
+export const userApi = {
+  // Admin APIs
+  getAll: (params?: Record<string, unknown>) =>
+    apiClient.get('/users', { params }),
+  getById: (id: string) => apiClient.get(`/users/${id}`),
+  create: (data: unknown) => apiClient.post('/users', data),
+  update: (id: string, data: unknown) => apiClient.put(`/users/${id}`, data),
+  delete: (id: string) => apiClient.delete(`/users/${id}`),
+  
+  // Profile APIs
+  getMe: () => apiClient.get('/users/me'),
+  updateMe: (data: unknown) => apiClient.put('/users/me', data),
+  getMyProgress: (id: string) => apiClient.get(`/users/${id}/progress`),
+  getMyBadges: (id: string) => apiClient.get(`/users/${id}/badges`),
+  getMySkills: (id: string) => apiClient.get(`/users/${id}/skills`),
+};
