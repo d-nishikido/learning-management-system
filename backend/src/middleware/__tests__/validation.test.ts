@@ -145,17 +145,13 @@ describe('Common Schemas', () => {
     it('should reject negative ID', () => {
       const { error } = commonSchemas.id.validate(-1);
       expect(error).toBeDefined();
-      if (error && error.details && error.details.length > 0) {
-        expect(error.details[0].message).toBe('ID must be positive');
-      }
+      expect(error?.details?.[0]?.message).toBe('ID must be positive');
     });
 
     it('should reject non-integer ID', () => {
       const { error } = commonSchemas.id.validate(12.5);
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('ID must be an integer');
-      }
+      expect(error?.details?.[0]?.message).toBe('ID must be an integer');
     });
   });
 
@@ -169,9 +165,7 @@ describe('Common Schemas', () => {
     it('should reject invalid email', () => {
       const { error } = commonSchemas.email.validate('invalid-email');
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Please provide a valid email address');
-      }
+      expect(error?.details?.[0]?.message).toBe('Please provide a valid email address');
     });
   });
 
@@ -185,17 +179,13 @@ describe('Common Schemas', () => {
     it('should reject weak password', () => {
       const { error } = commonSchemas.password.validate('weak');
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Password must be at least 8 characters long');
-      }
+      expect(error?.details?.[0]?.message).toBe('Password must be at least 8 characters long');
     });
 
     it('should reject password without special characters', () => {
       const { error } = commonSchemas.password.validate('Password123');
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toContain('special character');
-      }
+      expect(error?.details?.[0]?.message).toContain('special character');
     });
   });
 
@@ -209,17 +199,13 @@ describe('Common Schemas', () => {
     it('should reject username with special characters', () => {
       const { error } = commonSchemas.username.validate('user@123');
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Username must only contain alphanumeric characters');
-      }
+      expect(error?.details?.[0]?.message).toBe('Username must only contain alphanumeric characters');
     });
 
     it('should reject short username', () => {
       const { error } = commonSchemas.username.validate('ab');
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Username must be at least 3 characters long');
-      }
+      expect(error?.details?.[0]?.message).toBe('Username must be at least 3 characters long');
     });
   });
 
@@ -260,17 +246,13 @@ describe('Auth Schemas', () => {
     it('should reject login without email', () => {
       const { error } = authSchemas.login.validate({ password: 'password123' });
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Email is required');
-      }
+      expect(error?.details?.[0]?.message).toBe('Email is required');
     });
 
     it('should reject login without password', () => {
       const { error } = authSchemas.login.validate({ email: 'test@example.com' });
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Password is required');
-      }
+      expect(error?.details?.[0]?.message).toBe('Password is required');
     });
   });
 
@@ -285,9 +267,7 @@ describe('Auth Schemas', () => {
     it('should reject without refresh token', () => {
       const { error } = authSchemas.refresh.validate({});
       expect(error).toBeDefined();
-      if (error) {
-        expect(error.details[0].message).toBe('Refresh token is required');
-      }
+      expect(error?.details?.[0]?.message).toBe('Refresh token is required');
     });
   });
 });
