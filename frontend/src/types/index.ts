@@ -123,6 +123,17 @@ export interface AuthError extends Error {
   };
 }
 
+export interface ApiRequestError {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
+  message?: string;
+}
+
 // User Management Types
 export interface UserProfile extends User {
   bio?: string;
@@ -193,4 +204,59 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// Lesson Management Types
+export interface Lesson {
+  id: number;
+  title: string;
+  description?: string;
+  content?: string;
+  estimatedMinutes?: number;
+  sortOrder: number;
+  isPublished: boolean;
+  courseId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  course?: {
+    id: number;
+    title: string;
+  };
+}
+
+export interface LessonListResponse {
+  lessons: Lesson[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateLessonRequest {
+  title: string;
+  description?: string;
+  content?: string;
+  estimatedMinutes?: number;
+  sortOrder?: number;
+  isPublished?: boolean;
+}
+
+export interface UpdateLessonRequest {
+  title?: string;
+  description?: string;
+  content?: string;
+  estimatedMinutes?: number;
+  sortOrder?: number;
+  isPublished?: boolean;
+}
+
+export interface LessonQueryParams {
+  isPublished?: boolean;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface LessonOrderUpdateRequest {
+  sortOrder: number;
 }

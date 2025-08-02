@@ -6,6 +6,9 @@ import NotFound from './pages/NotFound';
 import { Profile } from './pages/Profile';
 import { Users } from './pages/Users';
 import { UserDetail } from './pages/UserDetail';
+import { Courses } from './pages/Courses';
+import { CourseDetail } from './pages/CourseDetail';
+import { LessonDetail } from './pages/LessonDetail';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const router = createBrowserRouter([
@@ -27,7 +30,15 @@ const router = createBrowserRouter([
       },
       {
         path: 'courses',
-        element: <div className="text-center py-12">Courses Page (Coming Soon)</div>,
+        element: <Courses />,
+      },
+      {
+        path: 'courses/:id',
+        element: <CourseDetail />,
+      },
+      {
+        path: 'courses/:courseId/lessons/:id',
+        element: <LessonDetail />,
       },
       {
         path: 'qa',

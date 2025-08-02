@@ -8,7 +8,13 @@ import type {
   CreateCourseRequest, 
   UpdateCourseRequest, 
   CourseQueryParams,
-  UserProgress 
+  UserProgress,
+  Lesson,
+  LessonListResponse,
+  CreateLessonRequest,
+  UpdateLessonRequest,
+  LessonQueryParams,
+  LessonOrderUpdateRequest
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -106,6 +112,21 @@ export const progressApi = {
   markComplete: (materialId: string) =>
     apiClient.post('/progress/complete', { materialId }),
   getStats: () => apiClient.get('/progress/stats'),
+};
+
+export const lessonApi = {
+  getByCourse: (courseId: number, params?: LessonQueryParams): Promise<ApiResponse<LessonListResponse>> =>
+    apiClient.get(`/courses/${courseId}/lessons`, { params }),
+  getById: (courseId: number, id: number): Promise<ApiResponse<Lesson>> => 
+    apiClient.get(`/courses/${courseId}/lessons/${id}`),
+  create: (courseId: number, data: CreateLessonRequest): Promise<ApiResponse<Lesson>> => 
+    apiClient.post(`/courses/${courseId}/lessons`, data),
+  update: (courseId: number, id: number, data: UpdateLessonRequest): Promise<ApiResponse<Lesson>> => 
+    apiClient.put(`/courses/${courseId}/lessons/${id}`, data),
+  delete: (courseId: number, id: number): Promise<ApiResponse<void>> => 
+    apiClient.delete(`/courses/${courseId}/lessons/${id}`),
+  updateOrder: (courseId: number, id: number, data: LessonOrderUpdateRequest): Promise<ApiResponse<Lesson>> => 
+    apiClient.put(`/courses/${courseId}/lessons/${id}/order`, data),
 };
 
 export const userApi = {
