@@ -32,7 +32,7 @@ function LayoutContent() {
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
         {/* Top navigation */}
         <header className="bg-white shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
