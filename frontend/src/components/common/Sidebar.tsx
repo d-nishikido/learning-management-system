@@ -21,7 +21,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigation: NavItem[] = [
     {
       name: 'ダッシュボード',
-      href: '/',
+      href: '/dashboard',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -104,9 +104,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out lg:static lg:inset-0 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r shadow-lg lg:static lg:translate-x-0 lg:shadow-none transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } lg:translate-x-0`}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
@@ -159,11 +159,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                   <span className="text-primary-700 font-medium">
-                    {user.name.charAt(0).toUpperCase()}
+                    {(user.name || user.firstName || user.username || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username}
+                  </p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
               </div>

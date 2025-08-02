@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { useAuth } from '@/contexts';
 
@@ -20,6 +21,7 @@ export function LogoutButton({
   const [showDialog, setShowDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     if (showConfirmation && !showDialog) {
@@ -30,6 +32,7 @@ export function LogoutButton({
     setIsLoading(true);
     try {
       await logout();
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {

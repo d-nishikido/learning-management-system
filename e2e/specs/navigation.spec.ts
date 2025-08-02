@@ -8,12 +8,12 @@ test.describe('Navigation', () => {
     test('navigate through main menu items', async ({ page, dashboardPage, authenticatedPage }) => {
       await dashboardPage.goto();
 
-      // Test navigation to different sections
+      // Test navigation to different sections using Japanese menu items
       const menuItems = [
-        { name: 'Courses', url: '/courses' },
-        { name: 'My Progress', url: '/progress' },
+        { name: 'コース', url: '/courses' },
+        { name: '進捗管理', url: '/progress' },
         { name: 'Q&A', url: '/qa' },
-        { name: 'Rankings', url: '/rankings' }
+        { name: 'プロフィール', url: '/profile' }
       ];
 
       for (const item of menuItems) {
@@ -29,37 +29,39 @@ test.describe('Navigation', () => {
     test('role-based menu visibility - Admin', async ({ page, dashboardPage }) => {
       // Mock admin user
       await page.addInitScript(() => {
+        localStorage.setItem('authToken', 'mock-jwt-token');
         localStorage.setItem('user', JSON.stringify({
           id: 1,
           role: 'ADMIN',
-          email: 'admin@test.example.com'
+          email: 'admin@test.example.com',
+          name: 'Admin User'
         }));
       });
 
       await dashboardPage.goto();
 
       // Admin-only menu items should be visible
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'User Management' })).toBeVisible();
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'Course Management' })).toBeVisible();
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'Analytics' })).toBeVisible();
+      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'ユーザー管理' })).toBeVisible();
+      await expect(dashboardPage.sidebarNav.getByRole('link', { name: '管理' })).toBeVisible();
     });
 
     test('role-based menu visibility - Regular User', async ({ page, dashboardPage }) => {
       // Mock regular user
       await page.addInitScript(() => {
+        localStorage.setItem('authToken', 'mock-jwt-token');
         localStorage.setItem('user', JSON.stringify({
           id: 2,
           role: 'USER',
-          email: 'user@test.example.com'
+          email: 'user@test.example.com',
+          name: 'Regular User'
         }));
       });
 
       await dashboardPage.goto();
 
       // Admin-only menu items should NOT be visible
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'User Management' })).not.toBeVisible();
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'Course Management' })).not.toBeVisible();
-      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'Analytics' })).not.toBeVisible();
+      await expect(dashboardPage.sidebarNav.getByRole('link', { name: 'ユーザー管理' })).not.toBeVisible();
+      await expect(dashboardPage.sidebarNav.getByRole('link', { name: '管理' })).not.toBeVisible();
     });
   });
 

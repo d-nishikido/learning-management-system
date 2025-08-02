@@ -3,14 +3,15 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
-import { authApi } from '@/services/api';
-import type { AuthError, LoginResponse } from '@/types';
+import { useAuth } from '@/contexts';
+import type { AuthError } from '@/types';
 
 export function LoginFormWithoutAuth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -43,10 +44,7 @@ export function LoginFormWithoutAuth() {
     setErrors({});
     
     try {
-      const response = await authApi.login(email, password);
-      const loginData = response.data as LoginResponse;
-      const { accessToken } = loginData;
-      localStorage.setItem('authToken', accessToken);
+      await login(email, password);
       navigate('/dashboard');
     } catch (error: unknown) {
       const authError = error as AuthError;
