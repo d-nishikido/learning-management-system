@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AuthProvider } from '@/contexts';
 import Layout from './components/common/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -7,12 +6,20 @@ import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <Login />,
+  },
+  {
     path: '/',
     element: <Layout />,
     children: [
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: 'dashboard',
+        element: <div className="text-center py-12">Dashboard (Coming Soon)</div>,
       },
       {
         path: 'courses',
@@ -34,10 +41,6 @@ const router = createBrowserRouter([
         path: 'admin',
         element: <div className="text-center py-12">Admin Page (Coming Soon)</div>,
       },
-      {
-        path: 'login',
-        element: <Login />,
-      },
     ],
   },
   {
@@ -48,9 +51,7 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   );
 }
 

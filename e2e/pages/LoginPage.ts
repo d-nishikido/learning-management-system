@@ -10,11 +10,11 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.getByLabel('Email');
-    this.passwordInput = page.getByLabel('Password');
-    this.loginButton = page.getByRole('button', { name: 'Login' });
-    this.errorMessage = page.getByTestId('error-message');
-    this.forgotPasswordLink = page.getByRole('link', { name: 'Forgot password?' });
+    this.emailInput = page.getByLabel('メールアドレス');
+    this.passwordInput = page.getByLabel('パスワード');
+    this.loginButton = page.getByRole('button', { name: 'ログイン' });
+    this.errorMessage = page.locator('[role="alert"]');
+    this.forgotPasswordLink = page.getByRole('link', { name: 'パスワードを忘れた方' });
   }
 
   async goto() {

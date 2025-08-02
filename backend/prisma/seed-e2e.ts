@@ -10,34 +10,18 @@ async function main() {
   await prisma.$transaction([
     prisma.userProgress.deleteMany(),
     prisma.lesson.deleteMany(),
-    prisma.courseEnrollment.deleteMany(),
     prisma.course.deleteMany(),
-    prisma.category.deleteMany(),
     prisma.user.deleteMany(),
   ]);
-
-  // Create categories
-  const programmingCategory = await prisma.category.create({
-    data: {
-      name: 'Programming',
-      description: 'Programming languages and concepts',
-    },
-  });
-
-  const webDevCategory = await prisma.category.create({
-    data: {
-      name: 'Web Development',
-      description: 'Web development technologies',
-    },
-  });
 
   // Create test users
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@test.example.com',
       username: 'admin',
-      password: await bcrypt.hash('Admin123!', 10),
-      fullName: 'Test Admin',
+      passwordHash: await bcrypt.hash('Admin123!', 10),
+      firstName: 'Test',
+      lastName: 'Admin',
       role: 'ADMIN',
       isActive: true,
     },
@@ -47,8 +31,9 @@ async function main() {
     data: {
       email: 'user1@test.example.com',
       username: 'user1',
-      password: await bcrypt.hash('User123!', 10),
-      fullName: 'Test User 1',
+      passwordHash: await bcrypt.hash('User123!', 10),
+      firstName: 'Test',
+      lastName: 'User 1',
       role: 'USER',
       isActive: true,
     },
@@ -58,8 +43,9 @@ async function main() {
     data: {
       email: 'user2@test.example.com',
       username: 'user2',
-      password: await bcrypt.hash('User123!', 10),
-      fullName: 'Test User 2',
+      passwordHash: await bcrypt.hash('User123!', 10),
+      firstName: 'Test',
+      lastName: 'User 2',
       role: 'USER',
       isActive: true,
     },
@@ -70,30 +56,30 @@ async function main() {
     data: {
       title: 'Introduction to TypeScript',
       description: 'Learn TypeScript basics and advanced features',
-      categoryId: programmingCategory.id,
-      instructorId: adminUser.id,
-      level: 'BEGINNER',
+      category: 'Programming',
+      createdBy: adminUser.id,
+      difficultyLevel: 'BEGINNER',
       isPublished: true,
-      price: 0,
+      estimatedHours: 8,
       lessons: {
         create: [
           {
             title: 'Getting Started with TypeScript',
             description: 'Introduction to TypeScript and setup',
-            orderIndex: 1,
-            duration: 30,
+            sortOrder: 1,
+            estimatedMinutes: 30,
           },
           {
             title: 'TypeScript Types',
             description: 'Understanding TypeScript type system',
-            orderIndex: 2,
-            duration: 45,
+            sortOrder: 2,
+            estimatedMinutes: 45,
           },
           {
             title: 'Interfaces and Classes',
             description: 'Working with interfaces and classes',
-            orderIndex: 3,
-            duration: 60,
+            sortOrder: 3,
+            estimatedMinutes: 60,
           },
         ],
       },
@@ -104,64 +90,27 @@ async function main() {
     data: {
       title: 'Advanced React Patterns',
       description: 'Master advanced React patterns and best practices',
-      categoryId: webDevCategory.id,
-      instructorId: adminUser.id,
-      level: 'ADVANCED',
+      category: 'Web Development',
+      createdBy: adminUser.id,
+      difficultyLevel: 'ADVANCED',
       isPublished: true,
-      price: 49.99,
+      estimatedHours: 6,
       lessons: {
         create: [
           {
             title: 'Compound Components',
             description: 'Building flexible compound components',
-            orderIndex: 1,
-            duration: 40,
+            sortOrder: 1,
+            estimatedMinutes: 40,
           },
           {
             title: 'Render Props Pattern',
             description: 'Understanding render props',
-            orderIndex: 2,
-            duration: 35,
+            sortOrder: 2,
+            estimatedMinutes: 35,
           },
         ],
       },
-    },
-  });
-
-  const nodeCourse = await prisma.course.create({
-    data: {
-      title: 'Node.js Backend Development',
-      description: 'Build scalable backend applications with Node.js',
-      categoryId: webDevCategory.id,
-      instructorId: adminUser.id,
-      level: 'INTERMEDIATE',
-      isPublished: false,
-      price: 39.99,
-    },
-  });
-
-  // Create enrollments
-  await prisma.courseEnrollment.create({
-    data: {
-      userId: user1.id,
-      courseId: typescriptCourse.id,
-      enrolledAt: new Date(),
-    },
-  });
-
-  await prisma.courseEnrollment.create({
-    data: {
-      userId: user1.id,
-      courseId: reactCourse.id,
-      enrolledAt: new Date(),
-    },
-  });
-
-  await prisma.courseEnrollment.create({
-    data: {
-      userId: user2.id,
-      courseId: typescriptCourse.id,
-      enrolledAt: new Date(),
     },
   });
 
@@ -170,6 +119,10 @@ async function main() {
   console.log('   Admin: admin@test.example.com / Admin123!');
   console.log('   User1: user1@test.example.com / User123!');
   console.log('   User2: user2@test.example.com / User123!');
+  console.log(`📚 Test courses created:`);
+  console.log(`   ${typescriptCourse.title} (${typescriptCourse.id})`);
+  console.log(`   ${reactCourse.title} (${reactCourse.id})`);
+  console.log(`👥 Test users: ${user1.email}, ${user2.email}`);
 }
 
 main()

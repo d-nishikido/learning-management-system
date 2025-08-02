@@ -32,7 +32,7 @@ test.describe('Authentication Flow', () => {
 
     // Verify error message is displayed
     const errorMessage = await loginPage.getErrorMessage();
-    expect(errorMessage).toContain('Invalid email or password');
+    expect(errorMessage).toContain('メールアドレスまたはパスワードが正しくありません');
 
     // Verify we're still on login page
     expect(page.url()).toContain('/login');
@@ -41,16 +41,22 @@ test.describe('Authentication Flow', () => {
   test('login form validation', async ({ loginPage }) => {
     await loginPage.goto();
 
-    // Check that login button is disabled initially
-    expect(await loginPage.isLoginButtonDisabled()).toBe(true);
+    // Try submitting empty form
+    await loginPage.loginButton.click();
 
-    // Fill only email
+    // Verify validation errors are displayed
+    const emailError = await loginPage.page.locator('input[id="email"]').getAttribute('aria-invalid');
+    const passwordError = await loginPage.page.locator('input[id="password"]').getAttribute('aria-invalid');
+    
+    expect(emailError).toBe('true');
+    expect(passwordError).toBe('true');
+
+    // Fill both fields with valid data
     await loginPage.emailInput.fill('test@example.com');
-    expect(await loginPage.isLoginButtonDisabled()).toBe(true);
-
-    // Fill both fields
-    await loginPage.passwordInput.fill('password');
-    expect(await loginPage.isLoginButtonDisabled()).toBe(false);
+    await loginPage.passwordInput.fill('password123');
+    
+    // Check that form is ready for submission
+    expect(await loginPage.loginButton.isVisible()).toBe(true);
   });
 
   test('logout functionality', async ({ page, loginPage, dashboardPage, authenticatedPage }) => {

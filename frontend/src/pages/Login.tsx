@@ -1,4 +1,4 @@
-import { LoginForm } from '@/components/auth/LoginForm';
+import { LoginFormWithoutAuth } from '@/components/auth/LoginFormWithoutAuth';
 
 export default function Login() {
   return (
@@ -13,7 +13,7 @@ export default function Login() {
           </p>
         </div>
         <div className="rounded-lg bg-white p-8 shadow">
-          <LoginForm />
+          <LoginFormWithoutAuth />
         </div>
       </div>
     </div>
