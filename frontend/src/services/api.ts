@@ -1,6 +1,15 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { ApiError, ApiResponse } from '@/types';
+import type { 
+  ApiError, 
+  ApiResponse, 
+  Course, 
+  CourseListResponse, 
+  CreateCourseRequest, 
+  UpdateCourseRequest, 
+  CourseQueryParams,
+  UserProgress 
+} from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
@@ -74,11 +83,20 @@ export const authApi = {
 };
 
 export const courseApi = {
-  getAll: (params?: Record<string, unknown>) =>
+  getAll: (params?: CourseQueryParams): Promise<ApiResponse<CourseListResponse>> =>
     apiClient.get('/courses', { params }),
-  getById: (id: string) => apiClient.get(`/courses/${id}`),
-  create: (data: unknown) => apiClient.post('/courses', data),
-  update: (id: string, data: unknown) => apiClient.put(`/courses/${id}`, data),
+  getById: (id: number): Promise<ApiResponse<Course>> => 
+    apiClient.get(`/courses/${id}`),
+  create: (data: CreateCourseRequest): Promise<ApiResponse<Course>> => 
+    apiClient.post('/courses', data),
+  update: (id: number, data: UpdateCourseRequest): Promise<ApiResponse<Course>> => 
+    apiClient.put(`/courses/${id}`, data),
+  delete: (id: number): Promise<ApiResponse<void>> => 
+    apiClient.delete(`/courses/${id}`),
+  enroll: (id: number): Promise<ApiResponse<UserProgress>> => 
+    apiClient.post(`/courses/${id}/enroll`),
+  unenroll: (id: number): Promise<ApiResponse<void>> => 
+    apiClient.delete(`/courses/${id}/enroll`),
 };
 
 export const progressApi = {
