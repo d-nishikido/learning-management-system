@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, courseSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { CourseController } from '../controllers/courseController';
+import lessonRoutes from './lessons';
 
 const router = Router();
 
@@ -84,5 +85,11 @@ router.delete('/:id/enroll',
   validateParams(Joi.object({ id: commonSchemas.id })),
   CourseController.unenrollFromCourse
 );
+
+/**
+ * Lesson routes
+ * Nested under /courses/:courseId/lessons
+ */
+router.use('/:courseId/lessons', lessonRoutes);
 
 export default router;
