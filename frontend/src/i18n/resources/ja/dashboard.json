@@ -1,0 +1,57 @@
+{
+  "title": "ダッシュボード",
+  "welcome": "{{name}}さん、おかえりなさい！",
+  "welcomeGeneric": "こんにちは！",
+  "subtitle": "学習を続けましょう。",
+  "stats": {
+    "enrolledCourses": "受講中のコース",
+    "averageProgress": "平均進捗率",
+    "badgesEarned": "獲得バッジ"
+  },
+  "sections": {
+    "learningMenu": "学習メニュー",
+    "adminMenu": "管理メニュー",
+    "recentActivity": "最近の活動"
+  },
+  "cards": {
+    "courses": {
+      "title": "コース",
+      "description": "利用可能なコースを閲覧し、学習を開始しましょう",
+      "button": "コースを見る"
+    },
+    "progress": {
+      "title": "進捗管理",
+      "description": "学習の進捗状況を確認し、目標を達成しましょう",
+      "button": "進捗を確認"
+    },
+    "qa": {
+      "title": "Q&A",
+      "description": "質問を投稿したり、他の学習者と知識を共有しましょう",
+      "button": "Q&Aを見る"
+    },
+    "userManagement": {
+      "title": "ユーザー管理",
+      "description": "システムユーザーの管理とアカウント設定",
+      "button": "ユーザー管理"
+    },
+    "systemAdmin": {
+      "title": "システム管理",
+      "description": "システム設定とコンテンツ管理",
+      "button": "管理画面"
+    }
+  },
+  "activity": {
+    "completed": "完了",
+    "inProgress": "進行中",
+    "qa": "Q&A",
+    "hoursAgo": "{{count}}時間前",
+    "hoursAgo_other": "{{count}}時間前",
+    "daysAgo": "{{count}}日前",
+    "daysAgo_other": "{{count}}日前",
+    "items": {
+      "completedLesson": "{{course}} - {{lesson}}を完了",
+      "startedLesson": "{{course}} - {{lesson}}を開始",
+      "answeredQuestion": "Q&A: 「{{question}}」に回答"
+    }
+  }
+}
