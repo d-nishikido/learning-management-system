@@ -260,3 +260,97 @@ export interface LessonQueryParams {
 export interface LessonOrderUpdateRequest {
   sortOrder: number;
 }
+
+// Learning Material Types
+export type MaterialType = 'FILE' | 'URL' | 'MANUAL_PROGRESS';
+export type MaterialCategory = 'MAIN' | 'SUPPLEMENTARY';
+export type ProgressType = 'AUTO' | 'MANUAL';
+
+export interface LearningMaterial {
+  id: number;
+  lessonId: number;
+  title: string;
+  description?: string;
+  materialType: MaterialType;
+  materialCategory: MaterialCategory;
+  filePath?: string;
+  fileSize?: number;
+  fileType?: string;
+  externalUrl?: string;
+  durationMinutes?: number;
+  allowManualProgress: boolean;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userProgress?: {
+    progressRate: number;
+    manualProgressRate?: number;
+    spentMinutes: number;
+    isCompleted: boolean;
+    lastAccessed: Date;
+  };
+}
+
+export interface LearningMaterialListResponse {
+  materials: LearningMaterial[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateLearningMaterialRequest {
+  title: string;
+  description?: string;
+  materialType: MaterialType;
+  materialCategory?: MaterialCategory;
+  externalUrl?: string;
+  durationMinutes?: number;
+  allowManualProgress?: boolean;
+  sortOrder?: number;
+  isPublished?: boolean;
+}
+
+export interface UpdateLearningMaterialRequest {
+  title?: string;
+  description?: string;
+  externalUrl?: string;
+  durationMinutes?: number;
+  allowManualProgress?: boolean;
+  sortOrder?: number;
+  isPublished?: boolean;
+}
+
+export interface LearningMaterialQueryParams {
+  materialType?: MaterialType;
+  materialCategory?: MaterialCategory;
+  isPublished?: boolean;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ManualProgressUpdateRequest {
+  progressRate: number;
+  spentMinutes?: number;
+  notes?: string;
+}
+
+export interface MaterialProgressUpdate {
+  id: number;
+  userId: number;
+  courseId: number;
+  lessonId?: number;
+  materialId?: number;
+  progressType: ProgressType;
+  progressRate: number;
+  manualProgressRate?: number;
+  spentMinutes: number;
+  isCompleted: boolean;
+  completionDate?: Date;
+  notes?: string;
+  lastAccessed: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

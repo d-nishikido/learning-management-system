@@ -181,7 +181,7 @@ router.get('/optimization/stats',
     courseId: commonSchemas.id,
     lessonId: commonSchemas.id 
   })),
-  (req: any, res: any) => {
+  (_req: any, res: any) => {
     const stats = getOptimizationStats();
     res.status(200).json({
       success: true,

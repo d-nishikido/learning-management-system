@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { MaterialList } from '@/components/materials/MaterialList';
 import { lessonApi, courseApi } from '@/services/api';
 import type { Lesson, Course, ApiRequestError } from '@/types';
 
@@ -176,6 +177,12 @@ export function LessonDetail() {
             </div>
           )}
         </div>
+      </Card>
+
+      {/* Learning Materials */}
+      <Card className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">学習教材</h2>
+        <MaterialList courseId={courseIdNum} lessonId={lessonIdNum} />
       </Card>
 
       {/* Navigation */}
