@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, lessonSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { LessonController } from '../controllers/lessonController';
+import materialRoutes from './materials';
 
 const router = Router({ mergeParams: true }); // Allow access to parent route params (courseId)
 
@@ -89,5 +90,11 @@ router.patch('/:id/order',
   validateBody(lessonSchemas.updateOrder),
   LessonController.updateLessonOrder
 );
+
+/**
+ * Material routes - nested under lessons
+ * /courses/:courseId/lessons/:lessonId/materials/*
+ */
+router.use('/:lessonId/materials', materialRoutes);
 
 export default router;
