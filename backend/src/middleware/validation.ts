@@ -247,6 +247,78 @@ export const lessonSchemas = {
 };
 
 /**
+ * Learning Material validation schemas
+ */
+export const learningMaterialSchemas = {
+  create: Joi.object({
+    title: Joi.string().min(1).max(200).trim().required(),
+    description: Joi.string().max(1000).trim().optional(),
+    materialType: Joi.string().valid('FILE', 'URL', 'MANUAL_PROGRESS').required(),
+    materialCategory: Joi.string().valid('MAIN', 'SUPPLEMENTARY').default('MAIN'),
+    externalUrl: Joi.when('materialType', {
+      is: 'URL',
+      then: Joi.string().uri().max(1000).required(),
+      otherwise: Joi.forbidden()
+    }),
+    durationMinutes: Joi.number().integer().min(1).optional(),
+    allowManualProgress: Joi.when('materialType', {
+      is: 'MANUAL_PROGRESS',
+      then: Joi.boolean().valid(true).required(),
+      otherwise: Joi.boolean().default(false)
+    }),
+    sortOrder: Joi.number().integer().min(1).optional(),
+    isPublished: Joi.boolean().default(false),
+    // File fields are populated by upload middleware
+    filePath: Joi.string().when('materialType', {
+      is: 'FILE',
+      then: Joi.required(),
+      otherwise: Joi.forbidden()
+    }),
+    fileSize: Joi.number().integer().min(1).when('materialType', {
+      is: 'FILE',
+      then: Joi.required(),
+      otherwise: Joi.forbidden()
+    }),
+    fileType: Joi.string().when('materialType', {
+      is: 'FILE',
+      then: Joi.required(),
+      otherwise: Joi.forbidden()
+    }),
+  }),
+
+  update: Joi.object({
+    title: Joi.string().min(1).max(200).trim().optional(),
+    description: Joi.string().max(1000).trim().optional(),
+    externalUrl: Joi.string().uri().max(1000).optional(),
+    durationMinutes: Joi.number().integer().min(1).optional(),
+    allowManualProgress: Joi.boolean().optional(),
+    sortOrder: Joi.number().integer().min(1).optional(),
+    isPublished: Joi.boolean().optional(),
+  }),
+
+  query: Joi.object({
+    materialType: Joi.string().valid('FILE', 'URL', 'MANUAL_PROGRESS'),
+    materialCategory: Joi.string().valid('MAIN', 'SUPPLEMENTARY'),
+    isPublished: Joi.boolean(),
+    search: Joi.string().trim(),
+  }).concat(commonSchemas.pagination),
+
+  updateOrder: Joi.object({
+    sortOrder: Joi.number().integer().min(1).required(),
+  }),
+
+  fileUpload: Joi.object({
+    title: Joi.string().min(1).max(200).trim().required(),
+    description: Joi.string().max(1000).trim().optional(),
+    materialCategory: Joi.string().valid('MAIN', 'SUPPLEMENTARY').default('MAIN'),
+    durationMinutes: Joi.number().integer().min(1).optional(),
+    allowManualProgress: Joi.boolean().default(false),
+    sortOrder: Joi.number().integer().min(1).optional(),
+    isPublished: Joi.boolean().default(false),
+  }),
+};
+
+/**
  * Q&A validation schemas
  */
 export const qaSchemas = {
