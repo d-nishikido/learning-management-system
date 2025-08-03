@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CourseList, CourseFilters } from '@/components/course';
 import { useAuth } from '@/contexts';
 import { courseApi } from '@/services/api';
@@ -6,6 +7,7 @@ import type { Course, CourseQueryParams, ApiRequestError } from '@/types';
 
 export function Courses() {
   const { user } = useAuth();
+  const { t } = useTranslation(['course', 'common']);
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -54,7 +56,7 @@ export function Courses() {
         setTotal(response.data.total);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || 'Failed to load courses');
+      setError((err as ApiRequestError).response?.data?.message || t('course:errors.loadFailed'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -103,7 +105,7 @@ export function Courses() {
         setEnrolledCourseIds(prev => [...prev, courseId]);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || 'Failed to enroll in course');
+      setError((err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed'));
     } finally {
       // Action completed
     }
@@ -118,7 +120,7 @@ export function Courses() {
         setEnrolledCourseIds(prev => prev.filter(id => id !== courseId));
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || 'Failed to unenroll from course');
+      setError((err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed'));
     } finally {
       // Action completed
     }
@@ -127,14 +129,14 @@ export function Courses() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('course:title')}</h1>
         <p className="mt-2 text-gray-600">
-          Discover and enroll in programming courses tailored to your learning journey.
+          {t('course:description')}
         </p>
         
         {total > 0 && (
           <p className="mt-1 text-sm text-gray-500">
-            Showing {courses.length} of {total} courses
+            {t('common:showing', { count: courses.length, total, item: t('common:course', { count: total }) })}
           </p>
         )}
       </div>
@@ -146,7 +148,7 @@ export function Courses() {
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <h3 className="text-sm font-medium text-red-800">{t('common:error')}</h3>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
           </div>

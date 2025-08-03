@@ -1,0 +1,57 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back, {{name}}!",
+  "welcomeGeneric": "Hello!",
+  "subtitle": "Let's continue learning.",
+  "stats": {
+    "enrolledCourses": "Enrolled Courses",
+    "averageProgress": "Average Progress",
+    "badgesEarned": "Badges Earned"
+  },
+  "sections": {
+    "learningMenu": "Learning Menu",
+    "adminMenu": "Admin Menu",
+    "recentActivity": "Recent Activity"
+  },
+  "cards": {
+    "courses": {
+      "title": "Courses",
+      "description": "Browse available courses and start learning",
+      "button": "View Courses"
+    },
+    "progress": {
+      "title": "Progress",
+      "description": "Check your learning progress and achieve your goals",
+      "button": "Check Progress"
+    },
+    "qa": {
+      "title": "Q&A",
+      "description": "Post questions and share knowledge with other learners",
+      "button": "View Q&A"
+    },
+    "userManagement": {
+      "title": "User Management",
+      "description": "Manage system users and account settings",
+      "button": "User Management"
+    },
+    "systemAdmin": {
+      "title": "System Administration",
+      "description": "System settings and content management",
+      "button": "Admin Panel"
+    }
+  },
+  "activity": {
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "qa": "Q&A",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "items": {
+      "completedLesson": "{{course}} - Completed {{lesson}}",
+      "startedLesson": "{{course}} - Started {{lesson}}",
+      "answeredQuestion": "Q&A: Answered \"{{question}}\""
+    }
+  }
+}

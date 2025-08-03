@@ -1,0 +1,39 @@
+{
+  "error": "エラー",
+  "loading": "読み込み中...",
+  "signIn": "サインイン",
+  "reset": "リセット",
+  "search": "検索",
+  "category": "カテゴリ",
+  "difficulty": "難易度",
+  "status": "ステータス",
+  "createdBy": "作成者:",
+  "backTo": "{{destination}}に戻る",
+  "showing": "{{total}}{{item}}中{{count}}{{item}}を表示",
+  "lesson_one": "レッスン",
+  "lesson_other": "レッスン",
+  "enrolled_one": "人受講中",
+  "enrolled_other": "人受講中",
+  "student_one": "人が受講中",
+  "student_other": "人が受講中",
+  "hour_one": "時間",
+  "hour_other": "時間",
+  "course_one": "コース",
+  "course_other": "コース",
+  "navigation": {
+    "dashboard": "ダッシュボード",
+    "courses": "コース",
+    "progress": "進捗管理",
+    "qa": "Q&A",
+    "profile": "プロフィール",
+    "userManagement": "ユーザー管理",
+    "admin": "管理"
+  },
+  "logout": "ログアウト",
+  "logoutConfirmation": {
+    "title": "ログアウトの確認",
+    "message": "本当にログアウトしますか？",
+    "confirm": "ログアウト",
+    "cancel": "キャンセル"
+  }
+}

@@ -63,14 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const response = await authApi.login(email, password);
-      const { user, accessToken, refreshToken } = response.data.data;
+      const { user, accessToken, refreshToken } = (response.data as LoginResponse);
       localStorage.setItem('authToken', accessToken);
       localStorage.setItem('user', JSON.stringify(user));
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken);
       }
       setUser(user);
-      return { success: true, user };
     } catch (error) {
       console.error('Login failed:', error);
       throw error;

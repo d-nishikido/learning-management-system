@@ -1,0 +1,39 @@
+{
+  "error": "Error",
+  "loading": "Loading...",
+  "signIn": "Sign In",
+  "reset": "Reset",
+  "search": "Search",
+  "category": "Category",
+  "difficulty": "Difficulty",
+  "status": "Status",
+  "createdBy": "Created by",
+  "backTo": "Back to {{destination}}",
+  "showing": "Showing {{count}} of {{total}} {{item}}",
+  "lesson_one": "lesson",
+  "lesson_other": "lessons",
+  "enrolled_one": "enrolled",
+  "enrolled_other": "enrolled",
+  "student_one": "student",
+  "student_other": "students",
+  "hour_one": "hour",
+  "hour_other": "hours",
+  "course_one": "course",
+  "course_other": "courses",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "courses": "Courses",
+    "progress": "Progress",
+    "qa": "Q&A",
+    "profile": "Profile",
+    "userManagement": "User Management",
+    "admin": "Admin"
+  },
+  "logout": "Logout",
+  "logoutConfirmation": {
+    "title": "Confirm Logout",
+    "message": "Are you sure you want to logout?",
+    "confirm": "Logout",
+    "cancel": "Cancel"
+  }
+}

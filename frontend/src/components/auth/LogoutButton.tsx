@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/common/Button';
 import { useAuth } from '@/contexts';
 
@@ -22,6 +23,7 @@ export function LogoutButton({
   const [isLoading, setIsLoading] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
 
   const handleLogout = async () => {
     if (showConfirmation && !showDialog) {
@@ -55,7 +57,7 @@ export function LogoutButton({
         isLoading={isLoading}
         className={className}
       >
-        ログアウト
+        {t('logout')}
       </Button>
       
       {showDialog && (
@@ -92,11 +94,11 @@ export function LogoutButton({
                   </div>
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                     <h3 className="text-lg font-medium leading-6 text-gray-900">
-                      ログアウトの確認
+                      {t('logoutConfirmation.title')}
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        本当にログアウトしますか？
+                        {t('logoutConfirmation.message')}
                       </p>
                     </div>
                   </div>
@@ -109,14 +111,14 @@ export function LogoutButton({
                   isLoading={isLoading}
                   className="w-full sm:ml-3 sm:w-auto"
                 >
-                  ログアウト
+                  {t('logoutConfirmation.confirm')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleCancel}
                   className="mt-3 w-full sm:mt-0 sm:w-auto"
                 >
-                  キャンセル
+                  {t('logoutConfirmation.cancel')}
                 </Button>
               </div>
             </div>
