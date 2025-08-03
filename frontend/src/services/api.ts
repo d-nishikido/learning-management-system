@@ -14,7 +14,14 @@ import type {
   CreateLessonRequest,
   UpdateLessonRequest,
   LessonQueryParams,
-  LessonOrderUpdateRequest
+  LessonOrderUpdateRequest,
+  LearningMaterial,
+  LearningMaterialListResponse,
+  CreateLearningMaterialRequest,
+  UpdateLearningMaterialRequest,
+  LearningMaterialQueryParams,
+  ManualProgressUpdateRequest,
+  MaterialProgressUpdate
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -144,4 +151,89 @@ export const userApi = {
   getMyProgress: (id: string) => apiClient.get(`/users/${id}/progress`),
   getMyBadges: (id: string) => apiClient.get(`/users/${id}/badges`),
   getMySkills: (id: string) => apiClient.get(`/users/${id}/skills`),
+};
+
+export const materialApi = {
+  getByLesson: (
+    courseId: number, 
+    lessonId: number, 
+    params?: LearningMaterialQueryParams
+  ): Promise<ApiResponse<LearningMaterialListResponse>> =>
+    apiClient.get(`/courses/${courseId}/lessons/${lessonId}/materials`, { params }),
+  
+  getById: (
+    courseId: number, 
+    lessonId: number, 
+    id: number
+  ): Promise<ApiResponse<LearningMaterial>> =>
+    apiClient.get(`/courses/${courseId}/lessons/${lessonId}/materials/${id}`),
+  
+  download: (
+    courseId: number, 
+    lessonId: number, 
+    id: number
+  ): Promise<Blob> => {
+    return axios.get(
+      `${API_BASE_URL}/courses/${courseId}/lessons/${lessonId}/materials/${id}/download`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      }
+    ).then(response => response.data);
+  },
+  
+  create: (
+    courseId: number,
+    lessonId: number,
+    data: CreateLearningMaterialRequest
+  ): Promise<ApiResponse<LearningMaterial>> =>
+    apiClient.post(`/courses/${courseId}/lessons/${lessonId}/materials`, data),
+  
+  upload: (
+    courseId: number,
+    lessonId: number,
+    file: File,
+    data: Omit<CreateLearningMaterialRequest, 'materialType'>
+  ): Promise<ApiResponse<LearningMaterial>> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+    
+    return apiClient.post(
+      `/courses/${courseId}/lessons/${lessonId}/materials/upload`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  },
+  
+  update: (
+    courseId: number,
+    lessonId: number,
+    id: number,
+    data: UpdateLearningMaterialRequest
+  ): Promise<ApiResponse<LearningMaterial>> =>
+    apiClient.put(`/courses/${courseId}/lessons/${lessonId}/materials/${id}`, data),
+  
+  delete: (
+    courseId: number,
+    lessonId: number,
+    id: number
+  ): Promise<ApiResponse<void>> =>
+    apiClient.delete(`/courses/${courseId}/lessons/${lessonId}/materials/${id}`),
+  
+  updateManualProgress: (
+    materialId: number,
+    data: ManualProgressUpdateRequest
+  ): Promise<ApiResponse<MaterialProgressUpdate>> =>
+    apiClient.put(`/progress/materials/${materialId}/manual`, data),
 };
