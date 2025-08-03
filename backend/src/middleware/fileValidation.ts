@@ -52,7 +52,7 @@ const MAX_FILENAME_LENGTH = 255;
 /**
  * Validate file header/magic number
  */
-export async function validateFileHeader(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateFileHeader(req: Request, _res: Response, next: NextFunction): Promise<void> {
   if (!req.file) {
     return next();
   }
@@ -90,7 +90,7 @@ export async function validateFileHeader(req: Request, res: Response, next: Next
 /**
  * Validate file name for security issues
  */
-export function validateFileName(req: Request, res: Response, next: NextFunction): void {
+export function validateFileName(req: Request, _res: Response, next: NextFunction): void {
   if (!req.file) {
     return next();
   }
@@ -134,7 +134,7 @@ export function validateFileName(req: Request, res: Response, next: NextFunction
 /**
  * Validate file content for malicious patterns
  */
-export async function scanFileContent(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function scanFileContent(req: Request, _res: Response, next: NextFunction): Promise<void> {
   if (!req.file) {
     return next();
   }
@@ -186,7 +186,7 @@ export async function scanFileContent(req: Request, res: Response, next: NextFun
  * Validate file size against specific limits
  */
 export function validateFileSize(maxSizeBytes: number) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.file) {
       return next();
     }
@@ -210,11 +210,11 @@ export function validateFileSize(maxSizeBytes: number) {
 /**
  * Validate image dimensions
  */
-export async function validateImageDimensions(
+export function validateImageDimensions(
   maxWidth: number,
   maxHeight: number
 ) {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     if (!req.file || !req.file.mimetype.startsWith('image/')) {
       return next();
     }
@@ -244,8 +244,8 @@ export async function validateImageDimensions(
 /**
  * Validate video duration
  */
-export async function validateVideoDuration(maxDurationSeconds: number) {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export function validateVideoDuration(maxDurationSeconds: number) {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     if (!req.file || !req.file.mimetype.startsWith('video/')) {
       return next();
     }
