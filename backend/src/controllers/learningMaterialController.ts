@@ -100,8 +100,8 @@ export class LearningMaterialController {
         title: req.body.title,
         description: req.body.description,
         materialCategory: req.body.materialCategory || 'MAIN',
-        filePath: req.body.filePath,
-        fileSize: req.body.fileSize,
+        filePath: req.body.optimizedFilePath || req.body.filePath,
+        fileSize: req.body.optimizedFileSize || req.body.fileSize,
         fileType: req.body.fileType,
         durationMinutes: req.body.durationMinutes,
         allowManualProgress: req.body.allowManualProgress || false,
@@ -111,10 +111,23 @@ export class LearningMaterialController {
 
       const material = await LearningMaterialService.createLearningMaterial(materialData);
 
+      // Include optimization information in response
+      const responseData = {
+        ...material,
+        optimization: req.body.optimizedFilePath ? {
+          originalSize: req.body.originalFileSize,
+          optimizedSize: req.body.optimizedFileSize,
+          compressionRatio: req.body.compressionRatio,
+          thumbnailPath: req.body.thumbnailPath,
+          dimensions: req.body.fileDimensions,
+          metadata: req.body.optimizationMetadata
+        } : null
+      };
+
       res.status(201).json({
         success: true,
         message: 'Learning material uploaded successfully',
-        data: material,
+        data: responseData,
       });
     } catch (error) {
       next(error);

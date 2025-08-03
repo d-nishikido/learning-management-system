@@ -97,7 +97,7 @@ async function ensureUploadDir(uploadPath: string): Promise<void> {
 /**
  * File filter function for multer
  */
-function fileFilter(_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+function fileFilter(_req: Request, file: multer.File, cb: multer.FileFilterCallback): void {
   // Check if file type is allowed
   if (!ALLOWED_FILE_TYPES[file.mimetype as keyof typeof ALLOWED_FILE_TYPES]) {
     const error = new ValidationError(`File type ${file.mimetype} is not allowed`);
