@@ -19,5 +19,21 @@
   "hour_one": "hour",
   "hour_other": "hours",
   "course_one": "course",
-  "course_other": "courses"
+  "course_other": "courses",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "courses": "Courses",
+    "progress": "Progress",
+    "qa": "Q&A",
+    "profile": "Profile",
+    "userManagement": "User Management",
+    "admin": "Admin"
+  },
+  "logout": "Logout",
+  "logoutConfirmation": {
+    "title": "Confirm Logout",
+    "message": "Are you sure you want to logout?",
+    "confirm": "Logout",
+    "cancel": "Cancel"
+  }
 }

@@ -19,5 +19,21 @@
   "hour_one": "時間",
   "hour_other": "時間",
   "course_one": "コース",
-  "course_other": "コース"
+  "course_other": "コース",
+  "navigation": {
+    "dashboard": "ダッシュボード",
+    "courses": "コース",
+    "progress": "進捗管理",
+    "qa": "Q&A",
+    "profile": "プロフィール",
+    "userManagement": "ユーザー管理",
+    "admin": "管理"
+  },
+  "logout": "ログアウト",
+  "logoutConfirmation": {
+    "title": "ログアウトの確認",
+    "message": "本当にログアウトしますか？",
+    "confirm": "ログアウト",
+    "cancel": "キャンセル"
+  }
 }

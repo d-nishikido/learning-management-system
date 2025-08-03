@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import type { UserRole } from '@/types';
@@ -18,10 +19,11 @@ interface NavItem {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation('common');
 
   const navigation: NavItem[] = [
     {
-      name: 'ダッシュボード',
+      name: t('navigation.dashboard'),
       href: '/dashboard',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,7 +32,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ),
     },
     {
-      name: 'コース',
+      name: t('navigation.courses'),
       href: '/courses',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,7 +41,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ),
     },
     {
-      name: '進捗管理',
+      name: t('navigation.progress'),
       href: '/progress',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,7 +50,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ),
     },
     {
-      name: 'Q&A',
+      name: t('navigation.qa'),
       href: '/qa',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +59,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ),
     },
     {
-      name: 'プロフィール',
+      name: t('navigation.profile'),
       href: '/profile',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,17 +68,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       ),
     },
     {
-      name: 'ユーザー管理',
+      name: t('navigation.userManagement'),
       href: '/users',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
         </svg>
       ),
       roles: ['ADMIN'],
     },
     {
-      name: '管理',
+      name: t('navigation.admin'),
       href: '/admin',
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
