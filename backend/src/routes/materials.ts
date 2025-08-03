@@ -3,6 +3,8 @@ import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, learningMaterialSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { uploadMaterial, validateFileSize, processFileInfo, cleanupOnError } from '../middleware/upload';
+import { optimizeFile, validateOptimizedFile, cleanupOptimizedFiles, trackOptimizationStats, getOptimizationStats } from '../middleware/fileOptimization';
+import { validateFileComprehensive } from '../middleware/fileValidation';
 import { LearningMaterialController } from '../controllers/learningMaterialController';
 
 const router = Router({ mergeParams: true }); // Allow access to parent route params (courseId, lessonId)
@@ -79,11 +81,42 @@ router.post('/upload',
     lessonId: commonSchemas.id 
   })),
   uploadMaterial.single('file'),
+  ...validateFileComprehensive({
+    maxSizeBytes: 500 * 1024 * 1024, // 500MB max
+    maxImageWidth: 4096,
+    maxImageHeight: 4096,
+    maxVideoDurationSeconds: 7200, // 2 hours max
+    enableHeaderValidation: true,
+    enableContentScanning: true
+  }),
   validateFileSize,
+  optimizeFile({
+    images: {
+      enabled: true,
+      quality: 85,
+      maxWidth: 1920,
+      maxHeight: 1080,
+      generateThumbnail: true,
+      thumbnailSize: 300,
+      convertToWebP: true
+    },
+    videos: {
+      enabled: true,
+      quality: 'medium',
+      maxWidth: 1280,
+      maxHeight: 720,
+      generateThumbnail: true,
+      compression: 'balanced',
+      format: 'mp4'
+    }
+  }),
+  validateOptimizedFile,
   processFileInfo,
+  trackOptimizationStats,
   validateBody(learningMaterialSchemas.fileUpload),
   LearningMaterialController.uploadLearningMaterial as any,
-  cleanupOnError
+  cleanupOnError,
+  cleanupOptimizedFiles
 );
 
 /**
@@ -134,6 +167,28 @@ router.patch('/:id/order',
   })),
   validateBody(learningMaterialSchemas.updateOrder),
   LearningMaterialController.updateLearningMaterialOrder as any
+);
+
+/**
+ * GET /courses/:courseId/lessons/:lessonId/materials/optimization/stats
+ * Get file optimization statistics
+ * Admin only
+ */
+router.get('/optimization/stats',
+  authenticateToken,
+  requireRole('ADMIN'),
+  validateParams(Joi.object({ 
+    courseId: commonSchemas.id,
+    lessonId: commonSchemas.id 
+  })),
+  (req: any, res: any) => {
+    const stats = getOptimizationStats();
+    res.status(200).json({
+      success: true,
+      message: 'Optimization statistics retrieved successfully',
+      data: stats,
+    });
+  }
 );
 
 export default router;

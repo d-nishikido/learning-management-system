@@ -10,7 +10,7 @@ export function MobileMenu({ isOpen, onToggle }: MobileMenuProps) {
       className="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 lg:hidden"
       onClick={onToggle}
       aria-expanded={isOpen}
-      aria-label="Toggle navigation menu"
+      aria-label="Menu"
     >
       {isOpen ? (
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

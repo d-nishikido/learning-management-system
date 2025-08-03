@@ -7,6 +7,7 @@ Please analyze and plan implementation for the GitHub issue: $ARGUMENTS.
 
 Follow these steps:
 
+0. Use `clear` command
 1. Use `gh issue view` to get the issue details
 2. Understand the problem described in the issue
 3. Search the codebase for relevant files
