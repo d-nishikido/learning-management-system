@@ -1,0 +1,80 @@
+{
+  "title": "教材",
+  "editMaterial": "教材を編集",
+  "createMaterial": "教材を作成",
+  "noMaterials": "まだ教材がありません",
+  "fields": {
+    "title": "タイトル",
+    "description": "説明",
+    "materialType": "教材タイプ",
+    "materialCategory": "教材カテゴリー",
+    "file": "ファイル",
+    "externalUrl": "外部URL",
+    "durationMinutes": "所要時間（分）",
+    "allowManualProgress": "手動進捗を許可",
+    "allowManualProgressHelp": "学習者が手動で進捗を報告できるようにします",
+    "sortOrder": "表示順",
+    "sortOrderHelp": "小さい数字ほど先に表示されます",
+    "isPublished": "公開",
+    "isPublishedHelp": "チェックすると学習者に表示されます"
+  },
+  "types": {
+    "file": "ファイル",
+    "url": "URL",
+    "manualProgress": "手動進捗"
+  },
+  "categories": {
+    "main": "メイン教材",
+    "supplementary": "補助教材"
+  },
+  "status": {
+    "published": "公開",
+    "draft": "下書き"
+  },
+  "management": {
+    "title": "教材管理"
+  },
+  "table": {
+    "type": "タイプ",
+    "title": "タイトル",
+    "category": "カテゴリー",
+    "details": "詳細",
+    "status": "ステータス",
+    "actions": "アクション"
+  },
+  "actions": {
+    "addNew": "新規追加",
+    "addFirst": "最初の教材を追加",
+    "removeFile": "ファイルを削除"
+  },
+  "upload": {
+    "dragDropOrClick": "ファイルをドラッグ＆ドロップまたはクリックして選択",
+    "maxSize": "最大サイズ: {{size}}",
+    "supportedFormats": "対応フォーマット",
+    "formats": "形式"
+  },
+  "validation": {
+    "titleRequired": "タイトルは必須です",
+    "fileRequired": "ファイルを選択してください",
+    "urlRequired": "URLを入力してください",
+    "invalidUrl": "有効なURLを入力してください",
+    "invalidDuration": "所要時間は0以上の数値を入力してください",
+    "invalidSortOrder": "表示順は0以上の数値を入力してください",
+    "fileTooLarge": "ファイルサイズ ({{size}}) が最大サイズ ({{maxSize}}) を超えています",
+    "unsupportedFileType": "ファイルタイプ ({{type}}) はサポートされていません"
+  },
+  "errors": {
+    "loadFailed": "教材の読み込みに失敗しました",
+    "createFailed": "教材の作成に失敗しました",
+    "updateFailed": "教材の更新に失敗しました",
+    "deleteFailed": "教材の削除に失敗しました",
+    "uploadFailed": "ファイルのアップロードに失敗しました"
+  },
+  "messages": {
+    "createSuccess": "教材を作成しました",
+    "updateSuccess": "教材を更新しました",
+    "deleteSuccess": "教材を削除しました",
+    "uploadSuccess": "ファイルをアップロードしました"
+  },
+  "confirmDelete": "「{{title}}」を削除してもよろしいですか？"
+}

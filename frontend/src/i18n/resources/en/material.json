@@ -1,0 +1,80 @@
+{
+  "title": "Materials",
+  "editMaterial": "Edit Material",
+  "createMaterial": "Create Material",
+  "noMaterials": "No materials yet",
+  "fields": {
+    "title": "Title",
+    "description": "Description",
+    "materialType": "Material Type",
+    "materialCategory": "Material Category",
+    "file": "File",
+    "externalUrl": "External URL",
+    "durationMinutes": "Duration (minutes)",
+    "allowManualProgress": "Allow Manual Progress",
+    "allowManualProgressHelp": "Allow learners to manually report their progress",
+    "sortOrder": "Sort Order",
+    "sortOrderHelp": "Lower numbers appear first",
+    "isPublished": "Published",
+    "isPublishedHelp": "Check to make visible to learners"
+  },
+  "types": {
+    "file": "File",
+    "url": "URL",
+    "manualProgress": "Manual Progress"
+  },
+  "categories": {
+    "main": "Main Material",
+    "supplementary": "Supplementary Material"
+  },
+  "status": {
+    "published": "Published",
+    "draft": "Draft"
+  },
+  "management": {
+    "title": "Material Management"
+  },
+  "table": {
+    "type": "Type",
+    "title": "Title",
+    "category": "Category",
+    "details": "Details",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "actions": {
+    "addNew": "Add New",
+    "addFirst": "Add First Material",
+    "removeFile": "Remove File"
+  },
+  "upload": {
+    "dragDropOrClick": "Drag & drop file here or click to select",
+    "maxSize": "Max size: {{size}}",
+    "supportedFormats": "Supported formats",
+    "formats": "Formats"
+  },
+  "validation": {
+    "titleRequired": "Title is required",
+    "fileRequired": "Please select a file",
+    "urlRequired": "Please enter a URL",
+    "invalidUrl": "Please enter a valid URL",
+    "invalidDuration": "Duration must be 0 or greater",
+    "invalidSortOrder": "Sort order must be 0 or greater",
+    "fileTooLarge": "File size ({{size}}) exceeds maximum size ({{maxSize}})",
+    "unsupportedFileType": "File type ({{type}}) is not supported"
+  },
+  "errors": {
+    "loadFailed": "Failed to load materials",
+    "createFailed": "Failed to create material",
+    "updateFailed": "Failed to update material",
+    "deleteFailed": "Failed to delete material",
+    "uploadFailed": "Failed to upload file"
+  },
+  "messages": {
+    "createSuccess": "Material created successfully",
+    "updateSuccess": "Material updated successfully",
+    "deleteSuccess": "Material deleted successfully",
+    "uploadSuccess": "File uploaded successfully"
+  },
+  "confirmDelete": "Are you sure you want to delete \"{{title}}\"?"
+}
