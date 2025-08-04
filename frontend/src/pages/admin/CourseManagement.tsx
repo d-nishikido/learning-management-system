@@ -301,6 +301,14 @@ export function CourseManagement() {
                           {t('common:view')}
                         </Button>
                         <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => navigate(`/admin/courses/${course.id}/lessons`)}
+                          className="px-2"
+                        >
+                          Lessons
+                        </Button>
+                        <Button
                           variant="primary"
                           size="sm"
                           onClick={() => navigate(`/admin/courses/${course.id}/edit`)}

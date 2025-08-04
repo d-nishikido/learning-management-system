@@ -220,8 +220,8 @@ export const userSchemas = {
 export const lessonSchemas = {
   create: Joi.object({
     title: Joi.string().min(1).max(200).trim().required(),
-    description: Joi.string().max(1000).trim().optional(),
-    content: Joi.string().optional(),
+    description: Joi.string().max(1000).trim().allow('').optional(),
+    content: Joi.string().allow('').optional(),
     estimatedMinutes: Joi.number().integer().min(1).optional(),
     sortOrder: Joi.number().integer().min(1).optional(),
     isPublished: Joi.boolean().default(false),
@@ -229,8 +229,8 @@ export const lessonSchemas = {
 
   update: Joi.object({
     title: Joi.string().min(1).max(200).trim().optional(),
-    description: Joi.string().max(1000).trim().optional(),
-    content: Joi.string().optional(),
+    description: Joi.string().max(1000).trim().allow('').optional(),
+    content: Joi.string().allow('').optional(),
     estimatedMinutes: Joi.number().integer().min(1).optional(),
     sortOrder: Joi.number().integer().min(1).optional(),
     isPublished: Joi.boolean().optional(),

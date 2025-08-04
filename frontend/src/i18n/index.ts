@@ -5,20 +5,24 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translation resources
 import enCommon from './resources/en/common.json';
 import enCourse from './resources/en/course.json';
+import enLesson from './resources/en/lesson.json';
 import enDashboard from './resources/en/dashboard.json';
 import jaCommon from './resources/ja/common.json';
 import jaCourse from './resources/ja/course.json';
+import jaLesson from './resources/ja/lesson.json';
 import jaDashboard from './resources/ja/dashboard.json';
 
 const resources = {
   en: {
     common: enCommon,
     course: enCourse,
+    lesson: enLesson,
     dashboard: enDashboard,
   },
   ja: {
     common: jaCommon,
     course: jaCourse,
+    lesson: jaLesson,
     dashboard: jaDashboard,
   },
 };
@@ -30,7 +34,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'course', 'dashboard'],
+    ns: ['common', 'course', 'lesson', 'dashboard'],
     
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],

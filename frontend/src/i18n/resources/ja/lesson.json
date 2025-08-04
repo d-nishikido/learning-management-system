@@ -1,0 +1,67 @@
+{
+  "title": "レッスン",
+  "createLesson": "レッスン作成",
+  "editLesson": "レッスン編集",
+  "management": {
+    "title": "レッスン管理",
+    "subtitle": "「{{courseTitle}}」のレッスンを管理"
+  },
+  "breadcrumb": {
+    "courses": "コース",
+    "lessons": "レッスン"
+  },
+  "fields": {
+    "title": "タイトル",
+    "description": "説明",
+    "content": "内容",
+    "contentPlaceholder": "レッスン内容を入力してください（マークダウン対応）",
+    "estimatedMinutes": "推定学習時間（分）",
+    "sortOrder": "並び順",
+    "sortOrderHelp": "レッスンは昇順で表示されます",
+    "isPublished": "公開",
+    "isPublishedHelp": "公開されたレッスンは登録済みの学生に表示されます"
+  },
+  "table": {
+    "title": "タイトル",
+    "description": "説明",
+    "estimatedMinutes": "所要時間",
+    "sortOrder": "順序",
+    "status": "ステータス",
+    "actions": "操作"
+  },
+  "status": {
+    "published": "公開済み",
+    "draft": "下書き"
+  },
+  "filters": {
+    "all": "すべてのレッスン",
+    "published": "公開済みのみ",
+    "unpublished": "未公開のみ"
+  },
+  "search": {
+    "placeholder": "レッスンを検索..."
+  },
+  "noLessons": {
+    "title": "レッスンがありません",
+    "description": "このコースの最初のレッスンを作成して始めましょう。"
+  },
+  "minutes": "分",
+  "confirmDelete": "レッスン「{{title}}」を削除してもよろしいですか？この操作は取り消せません。",
+  "validation": {
+    "titleRequired": "タイトルは必須です",
+    "invalidMinutes": "推定学習時間は正の数値である必要があります",
+    "invalidSortOrder": "並び順は正の数値である必要があります"
+  },
+  "messages": {
+    "createSuccess": "レッスンが正常に作成されました",
+    "updateSuccess": "レッスンが正常に更新されました",
+    "deleteSuccess": "レッスンが正常に削除されました"
+  },
+  "errors": {
+    "loadFailed": "レッスンの読み込みに失敗しました",
+    "courseLoadFailed": "コース情報の読み込みに失敗しました",
+    "saveFailed": "レッスンの保存に失敗しました",
+    "deleteFailed": "レッスンの削除に失敗しました",
+    "invalidCourse": "無効なコースIDです"
+  }
+}
