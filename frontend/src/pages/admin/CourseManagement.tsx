@@ -234,8 +234,9 @@ export function CourseManagement() {
         </div>
       ) : (
         <>
-          <div className="bg-white shadow overflow-hidden rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="bg-white shadow rounded-lg overflow-x-auto">
+            <div className="min-w-full">
+              <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -253,7 +254,7 @@ export function CourseManagement() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {t('course:enrolledCount')}
                   </th>
-                  <th className="relative px-6 py-3">
+                  <th className="relative px-6 py-3 w-48">
                     <span className="sr-only">{t('common:actions')}</span>
                   </th>
                 </tr>
@@ -289,12 +290,13 @@ export function CourseManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {course.enrolledCount || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-48">
+                      <div className="flex justify-end space-x-1">
                         <Button
                           variant="secondary"
                           size="sm"
                           onClick={() => navigate(`/courses/${course.id}`)}
+                          className="px-2"
                         >
                           {t('common:view')}
                         </Button>
@@ -302,6 +304,7 @@ export function CourseManagement() {
                           variant="primary"
                           size="sm"
                           onClick={() => navigate(`/admin/courses/${course.id}/edit`)}
+                          className="px-2"
                         >
                           {t('common:edit')}
                         </Button>
@@ -309,6 +312,7 @@ export function CourseManagement() {
                           variant="danger"
                           size="sm"
                           onClick={() => handleDelete(course)}
+                          className="px-2"
                         >
                           {t('common:delete')}
                         </Button>
@@ -317,7 +321,8 @@ export function CourseManagement() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
 
           {/* Pagination */}
