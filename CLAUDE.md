@@ -397,7 +397,6 @@ lms-system/
 ### Content Focus
 - Programming education primary focus
 - Certification training support
-- Japanese language interface (though this guide is in English)
 
 ### Assessment Philosophy
 - Subjective evaluation combined with automatic grading

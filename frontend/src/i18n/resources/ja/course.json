@@ -16,14 +16,52 @@
   "publishedOnly": "公開済みのみ",
   "unpublishedOnly": "未公開のみ",
   "filters": "フィルター",
+  "adminTitle": "コース管理",
+  "adminDescription": "学習管理システムのコースを作成、編集、管理します。",
+  "createCourse": "コース作成",
+  "editCourse": "コース編集",
+  "noCourses": "コースが見つかりません",
+  "status": "ステータス",
+  "published": "公開済み",
+  "unpublished": "未公開",
+  "enrolledCount": "登録者数",
+  "filterByCategory": "カテゴリで絞り込み",
+  "confirmDelete": "コース「{{title}}」を削除してもよろしいですか？この操作は取り消せません。",
   "difficulty": {
+    "beginner": "初級",
+    "intermediate": "中級",
+    "advanced": "上級",
     "BEGINNER": "初級",
     "INTERMEDIATE": "中級",
     "ADVANCED": "上級"
   },
+  "fields": {
+    "title": "タイトル",
+    "description": "説明",
+    "category": "カテゴリ",
+    "difficultyLevel": "難易度",
+    "estimatedHours": "推定学習時間",
+    "thumbnailUrl": "サムネイルURL",
+    "isPublished": "公開",
+    "isPublishedHelp": "公開されたコースはすべてのユーザーに表示されます",
+    "sortOrder": "並び順"
+  },
+  "validation": {
+    "titleRequired": "タイトルは必須です",
+    "categoryRequired": "カテゴリは必須です",
+    "invalidHours": "推定学習時間は正の数値である必要があります",
+    "invalidSortOrder": "並び順は正の数値である必要があります"
+  },
+  "messages": {
+    "createSuccess": "コースが正常に作成されました",
+    "updateSuccess": "コースが正常に更新されました",
+    "deleteSuccess": "コースが正常に削除されました"
+  },
   "errors": {
     "loadFailed": "コースの読み込みに失敗しました",
     "enrollFailed": "コースへの登録に失敗しました",
-    "unenrollFailed": "コースの登録解除に失敗しました"
+    "unenrollFailed": "コースの登録解除に失敗しました",
+    "saveFailed": "コースの保存に失敗しました",
+    "deleteFailed": "コースの削除に失敗しました"
   }
 }
