@@ -10,6 +10,8 @@ import { UserDetail } from './pages/UserDetail';
 import { Courses } from './pages/Courses';
 import { CourseDetail } from './pages/CourseDetail';
 import { LessonDetail } from './pages/LessonDetail';
+import { CourseManagement } from './pages/admin/CourseManagement';
+import { CourseForm } from './pages/admin/CourseForm';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import './i18n';
@@ -82,6 +84,30 @@ const router = createBrowserRouter([
       {
         path: 'admin',
         element: <div className="text-center py-12">Admin Page (Coming Soon)</div>,
+      },
+      {
+        path: 'admin/courses',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <CourseManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/courses/new',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <CourseForm />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/courses/:id/edit',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <CourseForm />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

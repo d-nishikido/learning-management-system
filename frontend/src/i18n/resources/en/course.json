@@ -16,14 +16,52 @@
   "publishedOnly": "Published Only",
   "unpublishedOnly": "Unpublished Only",
   "filters": "Filters",
+  "adminTitle": "Course Management",
+  "adminDescription": "Create, edit, and manage courses in the learning management system.",
+  "createCourse": "Create Course",
+  "editCourse": "Edit Course",
+  "noCourses": "No courses found",
+  "status": "Status",
+  "published": "Published",
+  "unpublished": "Unpublished", 
+  "enrolledCount": "Enrolled",
+  "filterByCategory": "Filter by category",
+  "confirmDelete": "Are you sure you want to delete the course '{{title}}'? This action cannot be undone.",
   "difficulty": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate", 
+    "advanced": "Advanced",
     "BEGINNER": "Beginner",
     "INTERMEDIATE": "Intermediate", 
     "ADVANCED": "Advanced"
   },
+  "fields": {
+    "title": "Title",
+    "description": "Description",
+    "category": "Category",
+    "difficultyLevel": "Difficulty Level",
+    "estimatedHours": "Estimated Hours",
+    "thumbnailUrl": "Thumbnail URL",
+    "isPublished": "Published",
+    "isPublishedHelp": "Published courses are visible to all users",
+    "sortOrder": "Sort Order"
+  },
+  "validation": {
+    "titleRequired": "Title is required",
+    "categoryRequired": "Category is required",
+    "invalidHours": "Estimated hours must be a positive number",
+    "invalidSortOrder": "Sort order must be a positive number"
+  },
+  "messages": {
+    "createSuccess": "Course created successfully",
+    "updateSuccess": "Course updated successfully",
+    "deleteSuccess": "Course deleted successfully"
+  },
   "errors": {
     "loadFailed": "Failed to load courses",
     "enrollFailed": "Failed to enroll in course",
-    "unenrollFailed": "Failed to unenroll from course"
+    "unenrollFailed": "Failed to unenroll from course",
+    "saveFailed": "Failed to save course",
+    "deleteFailed": "Failed to delete course"
   }
 }
