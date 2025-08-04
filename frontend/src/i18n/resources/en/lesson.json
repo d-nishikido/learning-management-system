@@ -1,0 +1,67 @@
+{
+  "title": "Lessons",
+  "createLesson": "Create Lesson",
+  "editLesson": "Edit Lesson",
+  "management": {
+    "title": "Lesson Management",
+    "subtitle": "Manage lessons for {{courseTitle}}"
+  },
+  "breadcrumb": {
+    "courses": "Courses",
+    "lessons": "Lessons"
+  },
+  "fields": {
+    "title": "Title",
+    "description": "Description",
+    "content": "Content",
+    "contentPlaceholder": "Enter lesson content (supports markdown)",
+    "estimatedMinutes": "Estimated Minutes",
+    "sortOrder": "Sort Order",
+    "sortOrderHelp": "Lessons will be displayed in ascending order",
+    "isPublished": "Published",
+    "isPublishedHelp": "Published lessons are visible to enrolled students"
+  },
+  "table": {
+    "title": "Title",
+    "description": "Description",
+    "estimatedMinutes": "Duration",
+    "sortOrder": "Order",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "status": {
+    "published": "Published",
+    "draft": "Draft"
+  },
+  "filters": {
+    "all": "All Lessons",
+    "published": "Published Only",
+    "unpublished": "Unpublished Only"
+  },
+  "search": {
+    "placeholder": "Search lessons..."
+  },
+  "noLessons": {
+    "title": "No lessons yet",
+    "description": "Get started by creating your first lesson for this course."
+  },
+  "minutes": "min",
+  "confirmDelete": "Are you sure you want to delete the lesson '{{title}}'? This action cannot be undone.",
+  "validation": {
+    "titleRequired": "Title is required",
+    "invalidMinutes": "Estimated minutes must be a positive number",
+    "invalidSortOrder": "Sort order must be a positive number"
+  },
+  "messages": {
+    "createSuccess": "Lesson created successfully",
+    "updateSuccess": "Lesson updated successfully",
+    "deleteSuccess": "Lesson deleted successfully"
+  },
+  "errors": {
+    "loadFailed": "Failed to load lessons",
+    "courseLoadFailed": "Failed to load course information",
+    "saveFailed": "Failed to save lesson",
+    "deleteFailed": "Failed to delete lesson",
+    "invalidCourse": "Invalid course ID"
+  }
+}

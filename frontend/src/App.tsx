@@ -12,6 +12,8 @@ import { CourseDetail } from './pages/CourseDetail';
 import { LessonDetail } from './pages/LessonDetail';
 import { CourseManagement } from './pages/admin/CourseManagement';
 import { CourseForm } from './pages/admin/CourseForm';
+import { LessonManagement } from './pages/admin/LessonManagement';
+import { LessonForm } from './pages/admin/LessonForm';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import './i18n';
@@ -106,6 +108,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRole="ADMIN">
             <CourseForm />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/courses/:courseId/lessons',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <LessonManagement />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/courses/:courseId/lessons/new',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <LessonForm />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'admin/courses/:courseId/lessons/:id/edit',
+        element: (
+          <ProtectedRoute requiredRole="ADMIN">
+            <LessonForm />
           </ProtectedRoute>
         ),
       },
