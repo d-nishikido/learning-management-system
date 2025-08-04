@@ -123,6 +123,9 @@ export class LessonController {
       // Check if user is admin to include unpublished lessons
       const user = (req as RequestWithUser).user;
       const includeUnpublished = user?.role === 'ADMIN';
+      
+      // Debug log
+      console.log('Debug - User role:', user?.role, 'includeUnpublished:', includeUnpublished);
 
       const result = await LessonService.getLessonsByCourse(courseId, query, includeUnpublished);
 

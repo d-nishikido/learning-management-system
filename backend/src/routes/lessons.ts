@@ -15,19 +15,21 @@ const router = Router({ mergeParams: true }); // Allow access to parent route pa
 router.get('/', 
   validateParams(Joi.object({ courseId: commonSchemas.id })),
   validateQuery(lessonSchemas.query),
+  authenticateToken,
   LessonController.getLessonsByCourse
 );
 
 /**
  * GET /courses/:courseId/lessons/:id
  * Get lesson by ID with detailed information
- * Public endpoint
+ * Public endpoint with optional authentication for personalized results
  */
 router.get('/:id',
   validateParams(Joi.object({ 
     courseId: commonSchemas.id,
     id: commonSchemas.id 
   })),
+  authenticateToken,
   LessonController.getLessonById
 );
 

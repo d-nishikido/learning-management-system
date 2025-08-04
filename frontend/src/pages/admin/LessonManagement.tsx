@@ -108,7 +108,7 @@ export function LessonManagement() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <div className="mb-6">
         <nav className="flex" aria-label="Breadcrumb">
@@ -200,26 +200,26 @@ export function LessonManagement() {
             <>
               {/* Lessons Table */}
               {lessons.length > 0 ? (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div className="overflow-x-auto shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
                           {t('lesson:table.title')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                           {t('lesson:table.description')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                           {t('lesson:table.estimatedMinutes')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {t('lesson:table.sortOrder')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {t('lesson:table.status')}
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
                           {t('lesson:table.actions')}
                         </th>
                       </tr>
@@ -227,23 +227,23 @@ export function LessonManagement() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {lessons.map((lesson) => (
                         <tr key={lesson.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
+                          <td className="px-3 py-4 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-xs">
                               {lesson.title}
                             </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-3 py-4 hidden sm:table-cell">
                             <div className="text-sm text-gray-900 max-w-xs truncate">
                               {lesson.description || '-'}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
                             {lesson.estimatedMinutes ? `${lesson.estimatedMinutes} ${t('lesson:minutes')}` : '-'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
                             {lesson.sortOrder}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               lesson.isPublished
                                 ? 'bg-green-100 text-green-800'
@@ -252,26 +252,30 @@ export function LessonManagement() {
                               {lesson.isPublished ? t('lesson:status.published') : t('lesson:status.draft')}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleEditLesson(lesson)}
-                            >
-                              {t('common:edit')}
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleDeleteLesson(lesson)}
-                              disabled={deleteLoading === lesson.id}
-                            >
-                              {deleteLoading === lesson.id ? (
-                                <LoadingSpinner size="sm" />
-                              ) : (
-                                t('common:delete')
-                              )}
-                            </Button>
+                          <td className="px-3 py-4 whitespace-nowrap text-sm font-medium w-40">
+                            <div className="flex gap-2">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleEditLesson(lesson)}
+                                className="text-xs px-2 py-1"
+                              >
+                                {t('common:edit')}
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleDeleteLesson(lesson)}
+                                disabled={deleteLoading === lesson.id}
+                                className="text-xs px-2 py-1"
+                              >
+                                {deleteLoading === lesson.id ? (
+                                  <LoadingSpinner size="sm" />
+                                ) : (
+                                  t('common:delete')
+                                )}
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}

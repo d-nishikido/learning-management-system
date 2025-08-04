@@ -133,6 +133,13 @@ export function LessonForm() {
 
       if (isEditMode && id) {
         const updateData: UpdateLessonRequest = { ...formData };
+        // Remove zero values to avoid validation errors
+        if (updateData.estimatedMinutes === 0) delete updateData.estimatedMinutes;
+        if (updateData.sortOrder === 0) delete updateData.sortOrder;
+        // Remove empty strings to avoid validation errors
+        if (!updateData.description || updateData.description.trim() === '') delete updateData.description;
+        if (!updateData.content || updateData.content.trim() === '') delete updateData.content;
+        
         const response = await lessonApi.update(courseIdNum, parseInt(id), updateData);
         if (response.success) {
           navigate(`/admin/courses/${courseId}/lessons`, { 
@@ -140,7 +147,15 @@ export function LessonForm() {
           });
         }
       } else {
-        const response = await lessonApi.create(courseIdNum, formData);
+        const createData = { ...formData };
+        // Remove zero values to avoid validation errors
+        if (createData.estimatedMinutes === 0) delete createData.estimatedMinutes;
+        if (createData.sortOrder === 0) delete createData.sortOrder;
+        // Remove empty strings to avoid validation errors
+        if (!createData.description || createData.description.trim() === '') delete createData.description;
+        if (!createData.content || createData.content.trim() === '') delete createData.content;
+        
+        const response = await lessonApi.create(courseIdNum, createData);
         if (response.success) {
           navigate(`/admin/courses/${courseId}/lessons`, { 
             state: { message: t('lesson:messages.createSuccess') } 
