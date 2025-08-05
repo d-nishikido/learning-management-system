@@ -354,3 +354,83 @@ export interface MaterialProgressUpdate {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Learning Resource Types
+export type ResourceType = 'FILE' | 'WEBSITE' | 'YOUTUBE' | 'DOCUMENT' | 'TOOL';
+export type ImportanceLevel = 'REQUIRED' | 'RECOMMENDED' | 'REFERENCE';
+
+export interface LearningResource {
+  id: number;
+  lessonId?: number;
+  courseId?: number;
+  title: string;
+  description?: string;
+  resourceType: ResourceType;
+  resourceUrl: string;
+  difficultyLevel: DifficultyLevel;
+  importance: ImportanceLevel;
+  tags?: string[];
+  parsedTags?: string[];
+  thumbnailUrl?: string;
+  viewCount: number;
+  isPublished: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  lesson?: {
+    id: number;
+    title: string;
+    courseId: number;
+    course: {
+      id: number;
+      title: string;
+    };
+  };
+  course?: {
+    id: number;
+    title: string;
+  };
+  _count?: {
+    userMaterialAccess: number;
+  };
+}
+
+export interface LearningResourceListResponse {
+  resources: LearningResource[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface CreateLearningResourceRequest {
+  title: string;
+  description?: string;
+  resourceType: ResourceType;
+  resourceUrl: string;
+  difficultyLevel?: DifficultyLevel;
+  importance?: ImportanceLevel;
+  tags?: string[];
+  thumbnailUrl?: string;
+  isPublished?: boolean;
+}
+
+export interface UpdateLearningResourceRequest {
+  title?: string;
+  description?: string;
+  resourceUrl?: string;
+  difficultyLevel?: DifficultyLevel;
+  importance?: ImportanceLevel;
+  tags?: string[];
+  thumbnailUrl?: string;
+  isPublished?: boolean;
+}
+
+export interface LearningResourceQueryParams {
+  resourceType?: ResourceType;
+  importance?: ImportanceLevel;
+  difficultyLevel?: DifficultyLevel;
+  tags?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}

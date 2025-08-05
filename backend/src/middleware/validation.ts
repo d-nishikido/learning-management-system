@@ -319,6 +319,42 @@ export const learningMaterialSchemas = {
 };
 
 /**
+ * Learning Resource validation schemas
+ */
+export const learningResourceSchemas = {
+  create: Joi.object({
+    title: Joi.string().min(1).max(200).trim().required(),
+    description: Joi.string().max(1000).trim().optional(),
+    resourceType: Joi.string().valid('FILE', 'WEBSITE', 'YOUTUBE', 'DOCUMENT', 'TOOL').required(),
+    resourceUrl: Joi.string().uri().max(1000).required(),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED').default('BEGINNER'),
+    importance: Joi.string().valid('REQUIRED', 'RECOMMENDED', 'REFERENCE').default('REFERENCE'),
+    tags: Joi.array().items(Joi.string().trim().max(50)).max(20).optional(),
+    thumbnailUrl: Joi.string().uri().max(500).optional(),
+    isPublished: Joi.boolean().default(true),
+  }),
+
+  update: Joi.object({
+    title: Joi.string().min(1).max(200).trim().optional(),
+    description: Joi.string().max(1000).trim().optional(),
+    resourceUrl: Joi.string().uri().max(1000).optional(),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED').optional(),
+    importance: Joi.string().valid('REQUIRED', 'RECOMMENDED', 'REFERENCE').optional(),
+    tags: Joi.array().items(Joi.string().trim().max(50)).max(20).optional(),
+    thumbnailUrl: Joi.string().uri().max(500).optional(),
+    isPublished: Joi.boolean().optional(),
+  }),
+
+  query: Joi.object({
+    resourceType: Joi.string().valid('FILE', 'WEBSITE', 'YOUTUBE', 'DOCUMENT', 'TOOL'),
+    importance: Joi.string().valid('REQUIRED', 'RECOMMENDED', 'REFERENCE'),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED'),
+    tags: Joi.string().trim(),
+    search: Joi.string().trim(),
+  }).concat(commonSchemas.pagination),
+};
+
+/**
  * Q&A validation schemas
  */
 export const qaSchemas = {

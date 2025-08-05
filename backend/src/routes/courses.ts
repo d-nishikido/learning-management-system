@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import Joi from 'joi';
-import { validateBody, validateQuery, validateParams, courseSchemas, commonSchemas } from '../middleware/validation';
+import { validateBody, validateQuery, validateParams, courseSchemas, learningResourceSchemas, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { CourseController } from '../controllers/courseController';
+import { LearningResourceController } from '../controllers/learningResourceController';
 import lessonRoutes from './lessons';
 
 const router = Router();
@@ -84,6 +85,30 @@ router.delete('/:id/enroll',
   authenticateToken,
   validateParams(Joi.object({ id: commonSchemas.id })),
   CourseController.unenrollFromCourse
+);
+
+/**
+ * GET /courses/:courseId/resources
+ * Get all learning resources for a course with filtering and pagination
+ * Public endpoint with optional authentication for personalized results
+ */
+router.get('/:courseId/resources',
+  validateParams(Joi.object({ courseId: commonSchemas.id })),
+  validateQuery(learningResourceSchemas.query),
+  LearningResourceController.getLearningResourcesByCourse as any
+);
+
+/**
+ * POST /courses/:courseId/resources
+ * Create new learning resource for a course
+ * Admin only
+ */
+router.post('/:courseId/resources',
+  authenticateToken,
+  requireRole('ADMIN'),
+  validateParams(Joi.object({ courseId: commonSchemas.id })),
+  validateBody(learningResourceSchemas.create),
+  LearningResourceController.createLearningResourceForCourse as any
 );
 
 /**

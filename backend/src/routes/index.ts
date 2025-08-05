@@ -4,6 +4,7 @@ import authRoutes from './auth';
 import courseRoutes from './courses';
 import userRoutes from './users';
 import qaRoutes from './qa';
+import resourceRoutes from './resources';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/auth', authRoutes);
 router.use('/courses', courseRoutes);
 router.use('/users', userRoutes);
 router.use('/qa', qaRoutes);
+router.use('/resources', resourceRoutes);
 
 export default router;

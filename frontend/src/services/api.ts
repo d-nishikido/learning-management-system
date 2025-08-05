@@ -21,7 +21,12 @@ import type {
   UpdateLearningMaterialRequest,
   LearningMaterialQueryParams,
   ManualProgressUpdateRequest,
-  MaterialProgressUpdate
+  MaterialProgressUpdate,
+  LearningResource,
+  LearningResourceListResponse,
+  CreateLearningResourceRequest,
+  UpdateLearningResourceRequest,
+  LearningResourceQueryParams
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -238,4 +243,56 @@ export const materialApi = {
     data: ManualProgressUpdateRequest
   ): Promise<ApiResponse<MaterialProgressUpdate>> =>
     apiClient.put(`/progress/materials/${materialId}/manual`, data),
+};
+
+export const resourceApi = {
+  // Search resources across the system
+  search: (params?: LearningResourceQueryParams): Promise<ApiResponse<LearningResourceListResponse>> =>
+    apiClient.get('/resources/search', { params }),
+  
+  // Get all available tags
+  getTags: (): Promise<ApiResponse<string[]>> =>
+    apiClient.get('/resources/tags'),
+  
+  // Get resource by ID
+  getById: (id: number): Promise<ApiResponse<LearningResource>> =>
+    apiClient.get(`/resources/${id}`),
+  
+  // Update resource (admin only)
+  update: (id: number, data: UpdateLearningResourceRequest): Promise<ApiResponse<LearningResource>> =>
+    apiClient.put(`/resources/${id}`, data),
+  
+  // Delete resource (admin only)
+  delete: (id: number): Promise<ApiResponse<void>> =>
+    apiClient.delete(`/resources/${id}`),
+  
+  // Get resources for a specific course
+  getByCourse: (
+    courseId: number, 
+    params?: LearningResourceQueryParams
+  ): Promise<ApiResponse<LearningResourceListResponse>> =>
+    apiClient.get(`/courses/${courseId}/resources`, { params }),
+  
+  // Create resource for a course (admin only)
+  createForCourse: (
+    courseId: number,
+    data: CreateLearningResourceRequest
+  ): Promise<ApiResponse<LearningResource>> =>
+    apiClient.post(`/courses/${courseId}/resources`, data),
+  
+  // Get resources for a specific lesson
+  getByLesson: (
+    courseId: number,
+    lessonId: number, 
+    params?: LearningResourceQueryParams
+  ): Promise<ApiResponse<LearningResourceListResponse>> =>
+    apiClient.get(`/courses/${courseId}/lessons/${lessonId}/resources`, { params }),
+  
+  // Create resource for a lesson (admin only)
+  createForLesson: (
+    courseId: number,
+    lessonId: number,
+    data: CreateLearningResourceRequest
+  ): Promise<ApiResponse<LearningResource>> =>
+    apiClient.post(`/courses/${courseId}/lessons/${lessonId}/resources`, data),
 };
