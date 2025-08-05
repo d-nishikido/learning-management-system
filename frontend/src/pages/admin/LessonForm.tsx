@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { lessonApi, courseApi } from '@/services/api';
+import { lessonApi, courseApi, materialApi } from '@/services/api';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { CreateLessonRequest, UpdateLessonRequest, ApiRequestError, Course } from '@/types';
+import { AdminMaterialList } from '@/components/materials/admin/AdminMaterialList';
+import { MaterialForm } from '@/components/materials/admin/MaterialForm';
+import type { CreateLessonRequest, UpdateLessonRequest, ApiRequestError, Course, CreateLearningMaterialRequest } from '@/types';
 
 export function LessonForm() {
   const { courseId, id } = useParams<{ courseId: string; id: string }>();
@@ -26,6 +28,10 @@ export function LessonForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
+  // Material management state
+  const [showMaterialForm, setShowMaterialForm] = useState(false);
+  const [materialError, setMaterialError] = useState<string | null>(null);
 
   // Load course and lesson data
   useEffect(() => {
@@ -172,6 +178,37 @@ export function LessonForm() {
 
   const handleCancel = () => {
     navigate(`/admin/courses/${courseId}/lessons`);
+  };
+
+  const handleCreateMaterial = async (data: CreateLearningMaterialRequest, file?: File) => {
+    const courseIdNum = parseInt(courseId || '0');
+    const lessonIdNum = parseInt(id || '0');
+    
+    if (!courseIdNum || !lessonIdNum) {
+      setMaterialError(t('material:errors.createFailed'));
+      return;
+    }
+
+    try {
+      setMaterialError(null);
+      
+      if (data.materialType === 'FILE' && file) {
+        // Handle file upload
+        const response = await materialApi.upload(courseIdNum, lessonIdNum, file, data);
+        if (response.success) {
+          setShowMaterialForm(false);
+        }
+      } else {
+        // Handle URL or manual progress material
+        const response = await materialApi.create(courseIdNum, lessonIdNum, data);
+        if (response.success) {
+          setShowMaterialForm(false);
+        }
+      }
+    } catch (err) {
+      const apiError = err as ApiRequestError;
+      setMaterialError(apiError.response?.data?.message || t('material:errors.createFailed'));
+    }
   };
 
   if (isLoading) {
@@ -385,6 +422,48 @@ export function LessonForm() {
               </Button>
             </div>
           </form>
+
+          {/* Material Management Section - Only show in edit mode */}
+          {isEditMode && id && (
+            <div className="mt-8 pt-8 border-t">
+              {showMaterialForm ? (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    {t('material:createMaterial')}
+                  </h3>
+                  
+                  {materialError && (
+                    <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+                      <div className="flex">
+                        <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        <div className="ml-3">
+                          <p className="text-sm text-red-700">{materialError}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <MaterialForm
+                    courseId={parseInt(courseId!)}
+                    lessonId={parseInt(id)}
+                    onSubmit={handleCreateMaterial}
+                    onCancel={() => {
+                      setShowMaterialForm(false);
+                      setMaterialError(null);
+                    }}
+                  />
+                </div>
+              ) : (
+                <AdminMaterialList
+                  courseId={parseInt(courseId!)}
+                  lessonId={parseInt(id)}
+                  onAddNew={() => setShowMaterialForm(true)}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

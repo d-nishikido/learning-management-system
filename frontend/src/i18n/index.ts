@@ -7,10 +7,12 @@ import enCommon from './resources/en/common.json';
 import enCourse from './resources/en/course.json';
 import enLesson from './resources/en/lesson.json';
 import enDashboard from './resources/en/dashboard.json';
+import enMaterial from './resources/en/material.json';
 import jaCommon from './resources/ja/common.json';
 import jaCourse from './resources/ja/course.json';
 import jaLesson from './resources/ja/lesson.json';
 import jaDashboard from './resources/ja/dashboard.json';
+import jaMaterial from './resources/ja/material.json';
 
 const resources = {
   en: {
@@ -18,12 +20,14 @@ const resources = {
     course: enCourse,
     lesson: enLesson,
     dashboard: enDashboard,
+    material: enMaterial,
   },
   ja: {
     common: jaCommon,
     course: jaCourse,
     lesson: jaLesson,
     dashboard: jaDashboard,
+    material: jaMaterial,
   },
 };
 
@@ -34,7 +38,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'course', 'lesson', 'dashboard'],
+    ns: ['common', 'course', 'lesson', 'dashboard', 'material'],
     
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
