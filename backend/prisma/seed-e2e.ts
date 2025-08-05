@@ -9,6 +9,7 @@ async function main() {
   // Clear existing data
   await prisma.$transaction([
     prisma.userProgress.deleteMany(),
+    prisma.learningMaterial.deleteMany(),
     prisma.lesson.deleteMany(),
     prisma.course.deleteMany(),
     prisma.user.deleteMany(),
@@ -114,14 +115,66 @@ async function main() {
     },
   });
 
+  // Get lessons to add materials
+  const lessons = await prisma.lesson.findMany({
+    where: {
+      courseId: {
+        in: [typescriptCourse.id, reactCourse.id]
+      }
+    },
+    orderBy: [
+      { courseId: 'asc' },
+      { sortOrder: 'asc' }
+    ]
+  });
+
+  // Create learning materials for E2E testing
+  const materials = [];
+  let materialId = 1;
+
+  for (const lesson of lessons) {
+    // Main material for each lesson
+    materials.push(await prisma.learningMaterial.create({
+      data: {
+        id: materialId++,
+        title: `${lesson.title} - Main Material`,
+        description: `Main learning material for ${lesson.title}`,
+        materialType: 'URL',
+        externalUrl: 'https://example.com/material',
+        materialCategory: 'MAIN',
+        sortOrder: 1,
+        isPublished: true,
+        lessonId: lesson.id,
+        durationMinutes: 30,
+      },
+    }));
+
+    // Supplementary material for each lesson
+    materials.push(await prisma.learningMaterial.create({
+      data: {
+        id: materialId++,
+        title: `${lesson.title} - Supplementary`,
+        description: `Additional practice material for ${lesson.title}`,
+        materialType: 'MANUAL_PROGRESS',
+        materialCategory: 'SUPPLEMENTARY',
+        sortOrder: 2,
+        isPublished: true,
+        lessonId: lesson.id,
+        allowManualProgress: true,
+        durationMinutes: 15,
+      },
+    }));
+  }
+
   console.log('✅ E2E test data seeding completed!');
   console.log('📧 Test accounts created:');
   console.log('   Admin: admin@test.example.com / Admin123!');
   console.log('   User1: user1@test.example.com / User123!');
   console.log('   User2: user2@test.example.com / User123!');
   console.log(`📚 Test courses created:`);
-  console.log(`   ${typescriptCourse.title} (${typescriptCourse.id})`);
-  console.log(`   ${reactCourse.title} (${reactCourse.id})`);
+  console.log(`   ${typescriptCourse.title} (${typescriptCourse.id}) - ${lessons.filter(l => l.courseId === typescriptCourse.id).length} lessons`);
+  console.log(`   ${reactCourse.title} (${reactCourse.id}) - ${lessons.filter(l => l.courseId === reactCourse.id).length} lessons`);
+  console.log(`📝 Learning materials created: ${materials.length}`);
   console.log(`👥 Test users: ${user1.email}, ${user2.email}`);
 }
 

@@ -16,12 +16,73 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showProgressForm, setShowProgressForm] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [loadingMedia, setLoadingMedia] = useState(false);
 
   useEffect(() => {
     // Reset states when material changes
     setError(null);
     setShowProgressForm(false);
+    
+    // Clean up previous blob URL
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      setBlobUrl(null);
+    }
+    
+    // Create authenticated blob URL for file materials
+    if (material.materialType === 'FILE' && material.filePath) {
+      createAuthenticatedUrl();
+    }
   }, [material.id]);
+
+  const createAuthenticatedUrl = async () => {
+    try {
+      setLoadingMedia(true);
+      const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const authToken = localStorage.getItem('authToken');
+      
+      console.log(`Creating authenticated URL for material ${material.id}`);
+      console.log(`API URL: ${baseApiUrl}/api/v1/courses/${courseId}/lessons/${lessonId}/materials/${material.id}/download`);
+      console.log(`Auth token exists: ${!!authToken}`);
+      
+      const response = await fetch(
+        `${baseApiUrl}/api/v1/courses/${courseId}/lessons/${lessonId}/materials/${material.id}/download`,
+        {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+          },
+        }
+      );
+      
+      console.log(`Download response status: ${response.status}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Download response error:', errorText);
+        throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
+      }
+      
+      const blob = await response.blob();
+      console.log(`Blob created, size: ${blob.size} bytes, type: ${blob.type}`);
+      const url = URL.createObjectURL(blob);
+      setBlobUrl(url);
+    } catch (error) {
+      console.error('Error creating authenticated URL:', error);
+      setError('ファイルの読み込みに失敗しました');
+    } finally {
+      setLoadingMedia(false);
+    }
+  };
+
+  // Cleanup blob URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [blobUrl]);
 
   const handleDownload = async () => {
     try {
@@ -54,7 +115,21 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
   const renderFileContent = () => {
     if (!material.filePath) return null;
 
-    const fileUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${material.filePath}`;
+    if (loadingMedia) {
+      return (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
+    
+    if (!blobUrl) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-red-600">ファイルの読み込みに失敗しました</p>
+        </div>
+      );
+    }
 
     if (material.fileType?.startsWith('video/')) {
       return (
@@ -63,7 +138,7 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
           className="w-full max-h-[500px]"
           controlsList="nodownload"
         >
-          <source src={fileUrl} type={material.fileType} />
+          <source src={blobUrl} type={material.fileType} />
           お使いのブラウザは動画再生に対応していません。
         </video>
       );
@@ -76,7 +151,7 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
           className="w-full"
           controlsList="nodownload"
         >
-          <source src={fileUrl} type={material.fileType} />
+          <source src={blobUrl} type={material.fileType} />
           お使いのブラウザは音声再生に対応していません。
         </audio>
       );
@@ -85,7 +160,7 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
     if (material.fileType === 'application/pdf') {
       return (
         <iframe
-          src={fileUrl}
+          src={blobUrl}
           className="w-full h-[600px] border-0"
           title={material.title}
         />
@@ -95,7 +170,7 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
     if (material.fileType?.startsWith('image/')) {
       return (
         <img 
-          src={fileUrl} 
+          src={blobUrl} 
           alt={material.title}
           className="max-w-full h-auto mx-auto"
         />

@@ -22,11 +22,16 @@ export function MaterialList({ courseId, lessonId }: MaterialListProps) {
         setError(null);
         setIsLoading(true);
         
+        console.log(`Loading materials for course ${courseId}, lesson ${lessonId}`);
+        
         const response = await materialApi.getByLesson(courseId, lessonId, {
           isPublished: true,
         });
         
+        console.log('Material API response:', response);
+        
         if (response.success && response.data) {
+          console.log(`Found ${response.data.materials.length} materials`);
           // Sort materials by category (MAIN first) and then by sortOrder
           const sortedMaterials = response.data.materials.sort((a, b) => {
             if (a.materialCategory !== b.materialCategory) {
@@ -35,9 +40,21 @@ export function MaterialList({ courseId, lessonId }: MaterialListProps) {
             return a.sortOrder - b.sortOrder;
           });
           setMaterials(sortedMaterials);
+        } else {
+          console.log('No materials found or API returned unsuccessful response');
         }
       } catch (err) {
-        setError((err as ApiRequestError).response?.data?.message || '教材の読み込みに失敗しました');
+        const apiError = err as ApiRequestError;
+        if (apiError.response?.status === 401) {
+          setError('認証が必要です。ログインしてください。');
+        } else if (apiError.response?.status === 404) {
+          setError('レッスンが見つかりません。');
+        } else if (apiError.response?.status === 403) {
+          setError('このレッスンにアクセスする権限がありません。');
+        } else {
+          setError(apiError.response?.data?.message || '教材の読み込みに失敗しました');
+        }
+        console.error('Material loading error:', apiError);
       } finally {
         setIsLoading(false);
       }

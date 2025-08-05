@@ -12,9 +12,10 @@ const router = Router({ mergeParams: true }); // Allow access to parent route pa
 /**
  * GET /courses/:courseId/lessons/:lessonId/materials
  * Get all learning materials for a lesson with filtering and pagination
- * Public endpoint with optional authentication for personalized results
+ * Authentication required for user progress tracking
  */
 router.get('/', 
+  authenticateToken,
   validateParams(Joi.object({ 
     courseId: commonSchemas.id,
     lessonId: commonSchemas.id 
@@ -26,9 +27,10 @@ router.get('/',
 /**
  * GET /courses/:courseId/lessons/:lessonId/materials/:id
  * Get learning material by ID with detailed information
- * Public endpoint
+ * Authentication required
  */
 router.get('/:id',
+  authenticateToken,
   validateParams(Joi.object({ 
     courseId: commonSchemas.id,
     lessonId: commonSchemas.id,
