@@ -371,4 +371,20 @@ export class UserService {
       console.error(`Failed to update last login for user ${id}:`, error.message);
     }
   }
+
+  /**
+   * Get enrolled course IDs for a user
+   */
+  static async getEnrolledCourseIds(userId: number): Promise<number[]> {
+    try {
+      const enrollments = await prisma.userProgress.findMany({
+        where: { userId },
+        select: { courseId: true }
+      });
+
+      return enrollments.map(enrollment => enrollment.courseId);
+    } catch (error: any) {
+      throw new Error(`Failed to get enrolled courses: ${error.message}`);
+    }
+  }
 }

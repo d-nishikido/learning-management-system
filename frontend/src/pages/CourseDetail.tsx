@@ -6,7 +6,7 @@ import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { LessonList } from '@/components/lesson';
 import { useAuth } from '@/contexts';
-import { courseApi, lessonApi } from '@/services/api';
+import { courseApi, lessonApi, userApi } from '@/services/api';
 import type { Course, Lesson, ApiRequestError } from '@/types';
 
 export function CourseDetail() {
@@ -45,6 +45,19 @@ export function CourseDetail() {
           setLessons(lessonsResponse.data.lessons);
         }
 
+        // Check enrollment status if user is logged in
+        if (user) {
+          try {
+            const enrollmentResponse = await userApi.getEnrolledCourses();
+            if (enrollmentResponse.success && enrollmentResponse.data) {
+              setIsEnrolled(enrollmentResponse.data.courseIds.includes(courseId));
+            }
+          } catch (err) {
+            console.error('Failed to check enrollment status:', err);
+            // Don't show error as this is not critical
+          }
+        }
+
       } catch (err) {
         setError((err as ApiRequestError).response?.data?.message || t('course:errors.loadFailed'));
       } finally {
@@ -54,35 +67,55 @@ export function CourseDetail() {
     };
 
     loadCourseData();
-  }, [courseId]);
+  }, [courseId, user]);
 
   const handleEnroll = async () => {
-    if (!courseId || !user) return;
+    if (!courseId || !user || !course) return;
     
     setActionLoading(true);
     try {
       const response = await courseApi.enroll(courseId);
       if (response.success) {
         setIsEnrolled(true);
+        // Update the enrollment count
+        setCourse(prev => prev ? {
+          ...prev,
+          _count: {
+            ...prev._count,
+            userProgress: (prev._count?.userProgress || 0) + 1
+          }
+        } : prev);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed'));
+      console.error('Enrollment failed:', err);
+      const errorMessage = (err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed');
+      setError(errorMessage);
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleUnenroll = async () => {
-    if (!courseId || !user) return;
+    if (!courseId || !user || !course) return;
     
     setActionLoading(true);
     try {
       const response = await courseApi.unenroll(courseId);
       if (response.success) {
         setIsEnrolled(false);
+        // Update the enrollment count
+        setCourse(prev => prev ? {
+          ...prev,
+          _count: {
+            ...prev._count,
+            userProgress: Math.max((prev._count?.userProgress || 0) - 1, 0)
+          }
+        } : prev);
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed'));
+      console.error('Unenrollment failed:', err);
+      const errorMessage = (err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed');
+      setError(errorMessage);
     } finally {
       setActionLoading(false);
     }

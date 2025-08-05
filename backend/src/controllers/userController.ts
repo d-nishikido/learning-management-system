@@ -210,6 +210,32 @@ export class UserController {
   }
 
   /**
+   * GET /users/me/enrolled-courses
+   * Get current user's enrolled course IDs
+   */
+  static async getEnrolledCourses(
+    req: RequestWithUser,
+    res: Response<ApiResponse>
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const enrolledCourseIds = await UserService.getEnrolledCourseIds(userId);
+
+      res.json({
+        success: true,
+        data: {
+          courseIds: enrolledCourseIds
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get enrolled courses'
+      });
+    }
+  }
+
+  /**
    * GET /users/:id
    * Get user by ID (Admin only or own profile)
    */

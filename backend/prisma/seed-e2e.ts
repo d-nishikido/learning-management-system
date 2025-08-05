@@ -68,18 +68,21 @@ async function main() {
             description: 'Introduction to TypeScript and setup',
             sortOrder: 1,
             estimatedMinutes: 30,
+            isPublished: true,
           },
           {
             title: 'TypeScript Types',
             description: 'Understanding TypeScript type system',
             sortOrder: 2,
             estimatedMinutes: 45,
+            isPublished: true,
           },
           {
             title: 'Interfaces and Classes',
             description: 'Working with interfaces and classes',
             sortOrder: 3,
             estimatedMinutes: 60,
+            isPublished: true,
           },
         ],
       },
@@ -102,15 +105,27 @@ async function main() {
             description: 'Building flexible compound components',
             sortOrder: 1,
             estimatedMinutes: 40,
+            isPublished: true,
           },
           {
             title: 'Render Props Pattern',
             description: 'Understanding render props',
             sortOrder: 2,
             estimatedMinutes: 35,
+            isPublished: true,
           },
         ],
       },
+    },
+  });
+
+  // Create enrollment for user1 in Advanced React Patterns course
+  await prisma.userProgress.create({
+    data: {
+      userId: user1.id,
+      courseId: reactCourse.id,
+      progressRate: 0,
+      spentMinutes: 0,
     },
   });
 

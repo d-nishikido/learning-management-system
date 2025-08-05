@@ -50,6 +50,24 @@ export interface LessonWithDetails extends Lesson {
 
 export class LessonService {
   /**
+   * Check if a user is enrolled in a course
+   */
+  private static async isUserEnrolledInCourse(userId: number, courseId: number): Promise<boolean> {
+    try {
+      const enrollment = await prisma.userProgress.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+      return !!enrollment;
+    } catch (error) {
+      console.error('Error checking enrollment:', error);
+      return false;
+    }
+  }
+
+  /**
    * Create a new lesson
    */
   static async createLesson(lessonData: CreateLessonData): Promise<LessonWithDetails> {
@@ -127,7 +145,7 @@ export class LessonService {
   /**
    * Get lesson by ID
    */
-  static async getLessonById(courseId: number, lessonId: number, includeUnpublished = false): Promise<LessonWithDetails> {
+  static async getLessonById(courseId: number, lessonId: number, includeUnpublished = false, userId?: number): Promise<LessonWithDetails> {
     try {
       const whereClause: any = { 
         id: lessonId,
@@ -136,6 +154,14 @@ export class LessonService {
       
       // If not including unpublished, filter them out
       if (!includeUnpublished) {
+        // For non-admin users, check if they are enrolled before showing the lesson
+        if (userId) {
+          const isEnrolled = await this.isUserEnrolledInCourse(userId, courseId);
+          if (!isEnrolled) {
+            throw new NotFoundError('Lesson not found');
+          }
+        }
+        
         whereClause.isPublished = true;
         whereClause.course = {
           isPublished: true,
@@ -190,7 +216,7 @@ export class LessonService {
   /**
    * Get all lessons for a course with filtering and pagination
    */
-  static async getLessonsByCourse(courseId: number, query: LessonQuery = {}, includeUnpublished = false): Promise<{
+  static async getLessonsByCourse(courseId: number, query: LessonQuery = {}, userId?: number, userRole?: string): Promise<{
     lessons: LessonWithDetails[];
     total: number;
     page: number;
@@ -218,11 +244,31 @@ export class LessonService {
         courseId,
       };
 
-      // Apply filters
+      // Determine lesson visibility based on user role and enrollment
+      let showUnpublished = false;
+      
+      if (userRole === 'ADMIN') {
+        // Admins can see all lessons (published and unpublished)
+        showUnpublished = true;
+      } else if (userId) {
+        // Check if user is enrolled in the course
+        const isEnrolled = await this.isUserEnrolledInCourse(userId, courseId);
+        if (isEnrolled) {
+          // Enrolled users can see published lessons
+          showUnpublished = false;
+        } else {
+          // Non-enrolled users can't see any lessons - use impossible condition
+          whereClause.id = -1; // This will return no results
+        }
+      } else {
+        // No user context - no lessons visible - use impossible condition
+        whereClause.id = -1; // This will return no results
+      }
+
+      // Apply isPublished filter unless user is admin
       if (isPublished !== undefined) {
         whereClause.isPublished = isPublished;
-      } else if (!includeUnpublished) {
-        // Default to only published lessons if not explicitly including unpublished
+      } else if (!showUnpublished) {
         whereClause.isPublished = true;
       }
 
