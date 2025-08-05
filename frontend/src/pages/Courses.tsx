@@ -5,6 +5,8 @@ import { useAuth } from '@/contexts';
 import { courseApi } from '@/services/api';
 import type { Course, CourseQueryParams, ApiRequestError } from '@/types';
 
+type ViewMode = 'card' | 'list';
+
 export function Courses() {
   const { user } = useAuth();
   const { t } = useTranslation(['course', 'common']);
@@ -13,6 +15,12 @@ export function Courses() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
+  
+  // View mode state with localStorage persistence
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('courseViewMode');
+    return (saved as ViewMode) || 'card';
+  });
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -126,6 +134,12 @@ export function Courses() {
     }
   };
 
+  // Handle view mode change
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('courseViewMode', mode);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
@@ -133,12 +147,6 @@ export function Courses() {
         <p className="mt-2 text-gray-600">
           {t('course:description')}
         </p>
-        
-        {total > 0 && (
-          <p className="mt-1 text-sm text-gray-500">
-            {t('common:showing', { count: courses.length, total, item: t('common:course', { count: total }) })}
-          </p>
-        )}
       </div>
 
       {error && (
@@ -168,6 +176,49 @@ export function Courses() {
 
         {/* Course List */}
         <div className="lg:col-span-3">
+          {/* View Mode Toggle */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-sm text-gray-600">
+              {total > 0 && (
+                <span>
+                  {t('common:showing', { count: courses.length, total, item: t('common:course', { count: total }) })}
+                </span>
+              )}
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 mr-2">{t('course:viewMode.view')}:</span>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => handleViewModeChange('card')}
+                  className={`p-2 rounded-md flex items-center justify-center transition-colors ${
+                    viewMode === 'card'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  title={t('course:viewMode.switchToCard')}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zM12 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V4zM12 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('list')}
+                  className={`p-2 rounded-md flex items-center justify-center transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  title={t('course:viewMode.switchToList')}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <CourseList
             courses={courses}
             isLoading={isLoading}
@@ -178,6 +229,7 @@ export function Courses() {
             onLoadMore={handleLoadMore}
             hasMore={currentPage < totalPages}
             isLoadingMore={isLoadingMore}
+            viewMode={viewMode}
           />
         </div>
       </div>

@@ -108,8 +108,15 @@ export class CourseController {
       if (req.query.limit) query.limit = parseInt(req.query.limit, 10);
 
       // Check if user is admin to include unpublished courses
-      const user = (req as RequestWithUser).user;
-      const includeUnpublished = user?.role === 'ADMIN';
+      // For public endpoints, user might not be available or authentication might fail
+      let includeUnpublished = false;
+      try {
+        const user = (req as RequestWithUser).user;
+        includeUnpublished = user?.role === 'ADMIN' || false;
+      } catch (error) {
+        // If there's any issue accessing user info, default to not including unpublished
+        includeUnpublished = false;
+      }
 
       const result = await CourseService.getAllCourses(query, includeUnpublished);
 
@@ -147,8 +154,15 @@ export class CourseController {
       }
 
       // Check if user is admin to include unpublished courses
-      const user = (req as RequestWithUser).user;
-      const includeUnpublished = user?.role === 'ADMIN';
+      // For public endpoints, user might not be available or authentication might fail
+      let includeUnpublished = false;
+      try {
+        const user = (req as RequestWithUser).user;
+        includeUnpublished = user?.role === 'ADMIN' || false;
+      } catch (error) {
+        // If there's any issue accessing user info, default to not including unpublished
+        includeUnpublished = false;
+      }
 
       const course = await CourseService.getCourseById(courseId, includeUnpublished);
 

@@ -63,5 +63,12 @@
     "unenrollFailed": "コースの登録解除に失敗しました",
     "saveFailed": "コースの保存に失敗しました",
     "deleteFailed": "コースの削除に失敗しました"
+  },
+  "viewMode": {
+    "view": "表示",
+    "card": "カード表示",
+    "list": "リスト表示",
+    "switchToCard": "カード表示に切り替える",
+    "switchToList": "リスト表示に切り替える"
   }
 }
