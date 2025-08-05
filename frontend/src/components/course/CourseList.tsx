@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { CourseCard } from './CourseCard';
+import { CourseListView } from './CourseListView';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Button } from '@/components/common/Button';
 import type { Course } from '@/types';
+
+type ViewMode = 'card' | 'list';
 
 interface CourseListProps {
   courses: Course[];
@@ -14,6 +17,7 @@ interface CourseListProps {
   onLoadMore?: () => void;
   hasMore?: boolean;
   isLoadingMore?: boolean;
+  viewMode?: ViewMode;
 }
 
 export function CourseList({ 
@@ -25,7 +29,8 @@ export function CourseList({
   enrolledCourseIds = [],
   onLoadMore,
   hasMore = false,
-  isLoadingMore = false
+  isLoadingMore = false,
+  viewMode = 'card'
 }: CourseListProps) {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
@@ -71,6 +76,24 @@ export function CourseList({
     );
   }
 
+  // Render based on view mode
+  if (viewMode === 'list') {
+    return (
+      <CourseListView
+        courses={courses}
+        isLoading={isLoading}
+        showActions={showActions}
+        onEnroll={handleEnroll}
+        onUnenroll={handleUnenroll}
+        enrolledCourseIds={enrolledCourseIds}
+        onLoadMore={onLoadMore}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
+      />
+    );
+  }
+
+  // Default card view
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

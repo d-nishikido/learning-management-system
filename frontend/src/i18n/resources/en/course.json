@@ -63,5 +63,12 @@
     "unenrollFailed": "Failed to unenroll from course",
     "saveFailed": "Failed to save course",
     "deleteFailed": "Failed to delete course"
+  },
+  "viewMode": {
+    "view": "View",
+    "card": "Card View",
+    "list": "List View",
+    "switchToCard": "Switch to card view",
+    "switchToList": "Switch to list view"
   }
 }
