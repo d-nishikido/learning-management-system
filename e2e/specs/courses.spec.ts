@@ -73,33 +73,103 @@ test.describe('Course Management', () => {
       await expect(lessons.nth(1)).toContainText('TypeScript Types');
       await expect(lessons.nth(2)).toContainText('Interfaces and Classes');
     });
+  });
 
-    test('enroll in free course', async ({ page }) => {
-      await coursePage.goto(1); // Free TypeScript course
+  test.describe('Course Enrollment', () => {
+    test('enroll in course from listing page', async ({ page, authenticatedPage }) => {
+      // Navigate to courses page
+      await page.goto('/courses');
+      await waitForAPIResponse(page, '/api/v1/courses');
 
-      // Check enroll button
-      await expect(coursePage.enrollButton).toBeVisible();
-      await expect(coursePage.enrollButton).toHaveText('Enroll for Free');
+      // Wait for enrolled courses to load
+      await waitForAPIResponse(page, '/api/v1/users/me/enrolled-courses');
+
+      // Find the first course card with an enroll button
+      const enrollButton = page.getByRole('button', { name: /今すぐ登録|Enroll Now/i }).first();
+      await expect(enrollButton).toBeVisible();
 
       // Click enroll
-      await coursePage.enrollInCourse();
-      await waitForAPIResponse(page, '/api/v1/courses/1/enroll');
+      await enrollButton.click();
+      
+      // Wait for enrollment API
+      const enrollResponse = await waitForAPIResponse(page, '**/api/v1/courses/**/enroll', 201);
+      expect(enrollResponse.ok()).toBeTruthy();
 
-      // Button should change to "Go to Course"
-      await expect(page.getByRole('button', { name: 'Go to Course' })).toBeVisible();
+      // Button should change to unenroll
+      await expect(page.getByRole('button', { name: /登録解除|Unenroll/i }).first()).toBeVisible();
     });
 
-    test('enroll in paid course', async ({ page }) => {
-      await coursePage.goto(2); // Paid React course
+    test('enroll in course from detail page', async ({ page, authenticatedPage }) => {
+      // Navigate to course detail page
+      await page.goto('/courses/1');
+      await waitForAPIResponse(page, '/api/v1/courses/1');
 
-      // Check enroll button shows price
-      await expect(coursePage.enrollButton).toBeVisible();
-      await expect(coursePage.enrollButton).toHaveText('Enroll for $49.99');
+      // Wait for enrollment status check
+      await waitForAPIResponse(page, '/api/v1/users/me/enrolled-courses');
 
-      // Click enroll should redirect to payment
-      await coursePage.enrollInCourse();
-      await page.waitForURL('/payment');
-      expect(page.url()).toContain('/payment');
+      // Find enroll button
+      const enrollButton = page.getByRole('button', { name: /コースに登録|Enroll in Course/i });
+      await expect(enrollButton).toBeVisible();
+
+      // Click enroll
+      await enrollButton.click();
+      
+      // Wait for enrollment API
+      const enrollResponse = await waitForAPIResponse(page, '/api/v1/courses/1/enroll', 201);
+      expect(enrollResponse.ok()).toBeTruthy();
+
+      // Button should change to unenroll
+      await expect(page.getByRole('button', { name: /コース登録解除|Unenroll from Course/i })).toBeVisible();
+    });
+
+    test('unenroll from course', async ({ page, authenticatedPage }) => {
+      // First enroll in a course
+      await page.goto('/courses/1');
+      await waitForAPIResponse(page, '/api/v1/courses/1');
+      await waitForAPIResponse(page, '/api/v1/users/me/enrolled-courses');
+
+      // Enroll if not already enrolled
+      const enrollButton = page.getByRole('button', { name: /コースに登録|Enroll in Course/i });
+      if (await enrollButton.isVisible()) {
+        await enrollButton.click();
+        await waitForAPIResponse(page, '/api/v1/courses/1/enroll', 201);
+      }
+
+      // Now unenroll
+      const unenrollButton = page.getByRole('button', { name: /コース登録解除|Unenroll from Course/i });
+      await expect(unenrollButton).toBeVisible();
+      await unenrollButton.click();
+
+      // Wait for unenrollment API
+      const unenrollResponse = await waitForAPIResponse(page, '/api/v1/courses/1/enroll', 200);
+      expect(unenrollResponse.ok()).toBeTruthy();
+
+      // Button should change back to enroll
+      await expect(page.getByRole('button', { name: /コースに登録|Enroll in Course/i })).toBeVisible();
+    });
+
+    test('show error message on enrollment failure', async ({ page, authenticatedPage }) => {
+      // Mock enrollment failure
+      await page.route('**/api/v1/courses/1/enroll', async route => {
+        await route.fulfill({
+          status: 409,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: false,
+            error: 'User is already enrolled in this course'
+          })
+        });
+      });
+
+      await page.goto('/courses/1');
+      await waitForAPIResponse(page, '/api/v1/courses/1');
+
+      // Try to enroll
+      const enrollButton = page.getByRole('button', { name: /コースに登録|Enroll in Course/i });
+      await enrollButton.click();
+
+      // Should show error message
+      await expect(page.getByText(/登録に失敗しました|Failed to enroll/i)).toBeVisible();
     });
   });
 
