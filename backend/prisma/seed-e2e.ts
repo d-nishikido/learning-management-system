@@ -119,6 +119,16 @@ async function main() {
     },
   });
 
+  // Create enrollment for user1 in Advanced React Patterns course
+  await prisma.userProgress.create({
+    data: {
+      userId: user1.id,
+      courseId: reactCourse.id,
+      progressRate: 0,
+      spentMinutes: 0,
+    },
+  });
+
   console.log('✅ E2E test data seeding completed!');
   console.log('📧 Test accounts created:');
   console.log('   Admin: admin@test.example.com / Admin123!');
