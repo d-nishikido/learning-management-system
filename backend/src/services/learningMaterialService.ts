@@ -213,7 +213,7 @@ export class LearningMaterialService {
   /**
    * Get all learning materials for a lesson with filtering and pagination
    */
-  static async getLearningMaterialsByLesson(lessonId: number, query: LearningMaterialQuery = {}, includeUnpublished = false): Promise<{
+  static async getLearningMaterialsByLesson(lessonId: number, query: LearningMaterialQuery = {}, includeUnpublished = false, userId?: number): Promise<{
     materials: LearningMaterialWithDetails[];
     total: number;
     page: number;
@@ -290,25 +290,41 @@ export class LearningMaterialService {
       });
 
       // Get materials
-      const materials = await prisma.learningMaterial.findMany({
-        where: whereClause,
-        include: {
-          lesson: {
-            include: {
-              course: {
-                select: {
-                  id: true,
-                  title: true,
-                }
+      const includeClause: any = {
+        lesson: {
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
               }
             }
-          },
-          _count: {
-            select: {
-              userProgress: true,
-            },
+          }
+        },
+        _count: {
+          select: {
+            userProgress: true,
           },
         },
+      };
+
+      // Include user progress if userId is provided
+      if (userId) {
+        includeClause.userProgress = {
+          where: { userId },
+          select: {
+            id: true,
+            progressRate: true,
+            isCompleted: true,
+            timeSpentMinutes: true,
+            lastAccessedAt: true,
+          },
+        };
+      }
+
+      const materials = await prisma.learningMaterial.findMany({
+        where: whereClause,
+        include: includeClause,
         orderBy: [
           { sortOrder: 'asc' },
           { createdAt: 'desc' },
@@ -319,10 +335,13 @@ export class LearningMaterialService {
 
       const totalPages = Math.ceil(total / limit);
 
-      // Convert BigInt fileSize to number for JSON serialization in materials array
+      // Convert BigInt fileSize to number for JSON serialization and format user progress
       const materialsWithConvertedFileSize = materials.map(material => ({
         ...material,
         fileSize: material.fileSize ? Number(material.fileSize) : null,
+        userProgress: material.userProgress && Array.isArray(material.userProgress) && material.userProgress.length > 0 
+          ? material.userProgress[0] 
+          : null,
       }));
 
       return {

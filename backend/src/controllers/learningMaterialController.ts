@@ -23,8 +23,9 @@ export class LearningMaterialController {
       const lessonId = parseInt(req.params.lessonId);
       const query: LearningMaterialQuery = req.query;
       const includeUnpublished = req.user?.role === 'ADMIN';
+      const userId = req.user?.id;
 
-      const result = await LearningMaterialService.getLearningMaterialsByLesson(lessonId, query, includeUnpublished);
+      const result = await LearningMaterialService.getLearningMaterialsByLesson(lessonId, query, includeUnpublished, userId);
 
       res.status(200).json({
         success: true,
@@ -208,10 +209,31 @@ export class LearningMaterialController {
       const lessonId = parseInt(req.params.lessonId);
       const materialId = parseInt(req.params.id);
 
+      console.log(`Download request: courseId=${req.params.courseId}, lessonId=${lessonId}, materialId=${materialId}`);
+
       const material = await LearningMaterialService.getLearningMaterialById(lessonId, materialId, req.user?.role === 'ADMIN');
+
+      console.log(`Material found: type=${material.materialType}, filePath=${material.filePath}`);
 
       if (material.materialType !== 'FILE' || !material.filePath) {
         throw new ValidationError('This material is not a downloadable file');
+      }
+
+      // Resolve absolute path
+      const path = require('path');
+      const fs = require('fs');
+      let absolutePath = material.filePath;
+      
+      if (!path.isAbsolute(material.filePath)) {
+        absolutePath = path.resolve(process.cwd(), material.filePath);
+      }
+
+      console.log(`Resolved file path: ${absolutePath}`);
+
+      // Check if file exists
+      if (!fs.existsSync(absolutePath)) {
+        console.error(`File not found: ${absolutePath}`);
+        throw new NotFoundError('File not found on server');
       }
 
       // Set appropriate headers for file download
@@ -219,12 +241,14 @@ export class LearningMaterialController {
       res.setHeader('Content-Type', material.fileType || 'application/octet-stream');
       
       // Send file
-      res.sendFile(material.filePath, (err) => {
+      res.sendFile(absolutePath, (err) => {
         if (err) {
+          console.error('Error sending file:', err);
           next(new NotFoundError('File not found on server'));
         }
       });
     } catch (error) {
+      console.error('Download error:', error);
       next(error);
     }
   }

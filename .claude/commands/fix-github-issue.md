@@ -11,7 +11,7 @@ Follow these steps:
 2. Understand the problem described in the issue
 3. Search the codebase for relevant files
 4. Implement the necessary changes to fix the issue
-5. Write and run tests to verify the fix
+5. Write and run tests to verify the fix(Do not E2E test)
 6. Ensure code passes linting and type checking
 8. Create a descriptive commit message
 9. NEVER delete an issue
