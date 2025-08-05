@@ -127,6 +127,12 @@ export function Courses() {
       const response = await courseApi.enroll(courseId);
       if (response.success) {
         setEnrolledCourseIds(prev => [...prev, courseId]);
+        // Update the enrollment count in the course list
+        setCourses(prev => prev.map(course => 
+          course.id === courseId 
+            ? { ...course, _count: { ...course._count, userProgress: (course._count?.userProgress || 0) + 1 } }
+            : course
+        ));
       }
     } catch (err) {
       console.error('Enrollment failed:', err);
@@ -142,6 +148,12 @@ export function Courses() {
       const response = await courseApi.unenroll(courseId);
       if (response.success) {
         setEnrolledCourseIds(prev => prev.filter(id => id !== courseId));
+        // Update the enrollment count in the course list
+        setCourses(prev => prev.map(course => 
+          course.id === courseId 
+            ? { ...course, _count: { ...course._count, userProgress: Math.max((course._count?.userProgress || 0) - 1, 0) } }
+            : course
+        ));
       }
     } catch (err) {
       console.error('Unenrollment failed:', err);

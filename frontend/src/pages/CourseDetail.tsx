@@ -70,13 +70,21 @@ export function CourseDetail() {
   }, [courseId, user]);
 
   const handleEnroll = async () => {
-    if (!courseId || !user) return;
+    if (!courseId || !user || !course) return;
     
     setActionLoading(true);
     try {
       const response = await courseApi.enroll(courseId);
       if (response.success) {
         setIsEnrolled(true);
+        // Update the enrollment count
+        setCourse(prev => prev ? {
+          ...prev,
+          _count: {
+            ...prev._count,
+            userProgress: (prev._count?.userProgress || 0) + 1
+          }
+        } : prev);
       }
     } catch (err) {
       console.error('Enrollment failed:', err);
@@ -88,13 +96,21 @@ export function CourseDetail() {
   };
 
   const handleUnenroll = async () => {
-    if (!courseId || !user) return;
+    if (!courseId || !user || !course) return;
     
     setActionLoading(true);
     try {
       const response = await courseApi.unenroll(courseId);
       if (response.success) {
         setIsEnrolled(false);
+        // Update the enrollment count
+        setCourse(prev => prev ? {
+          ...prev,
+          _count: {
+            ...prev._count,
+            userProgress: Math.max((prev._count?.userProgress || 0) - 1, 0)
+          }
+        } : prev);
       }
     } catch (err) {
       console.error('Unenrollment failed:', err);
