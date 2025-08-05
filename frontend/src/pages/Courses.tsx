@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CourseList, CourseFilters } from '@/components/course';
 import { useAuth } from '@/contexts';
-import { courseApi } from '@/services/api';
+import { courseApi, userApi } from '@/services/api';
 import type { Course, CourseQueryParams, ApiRequestError } from '@/types';
 
 type ViewMode = 'card' | 'list';
@@ -40,6 +40,21 @@ export function Courses() {
     return uniqueCategories.sort();
   }, [courses]);
 
+  // Load enrolled courses for logged-in users
+  const loadEnrolledCourses = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await userApi.getEnrolledCourses();
+      if (response.success && response.data) {
+        setEnrolledCourseIds(response.data.courseIds);
+      }
+    } catch (err) {
+      console.error('Failed to load enrolled courses:', err);
+      // Don't show error to user as this is not critical
+    }
+  };
+
   // Load courses
   const loadCourses = async (params: CourseQueryParams, append = false) => {
     try {
@@ -71,9 +86,10 @@ export function Courses() {
     }
   };
 
-  // Load initial courses
+  // Load initial data
   useEffect(() => {
     loadCourses(filters);
+    loadEnrolledCourses();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle filter changes
@@ -111,11 +127,17 @@ export function Courses() {
       const response = await courseApi.enroll(courseId);
       if (response.success) {
         setEnrolledCourseIds(prev => [...prev, courseId]);
+        // Update the enrollment count in the course list
+        setCourses(prev => prev.map(course => 
+          course.id === courseId 
+            ? { ...course, _count: { ...course._count, userProgress: (course._count?.userProgress || 0) + 1 } }
+            : course
+        ));
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed'));
-    } finally {
-      // Action completed
+      console.error('Enrollment failed:', err);
+      const errorMessage = (err as ApiRequestError).response?.data?.message || t('course:errors.enrollFailed');
+      setError(errorMessage);
     }
   };
 
@@ -126,11 +148,17 @@ export function Courses() {
       const response = await courseApi.unenroll(courseId);
       if (response.success) {
         setEnrolledCourseIds(prev => prev.filter(id => id !== courseId));
+        // Update the enrollment count in the course list
+        setCourses(prev => prev.map(course => 
+          course.id === courseId 
+            ? { ...course, _count: { ...course._count, userProgress: Math.max((course._count?.userProgress || 0) - 1, 0) } }
+            : course
+        ));
       }
     } catch (err) {
-      setError((err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed'));
-    } finally {
-      // Action completed
+      console.error('Unenrollment failed:', err);
+      const errorMessage = (err as ApiRequestError).response?.data?.message || t('course:errors.unenrollFailed');
+      setError(errorMessage);
     }
   };
 

@@ -120,14 +120,12 @@ export class LessonController {
       if (req.query.page) query.page = parseInt(req.query.page, 10);
       if (req.query.limit) query.limit = parseInt(req.query.limit, 10);
 
-      // Check if user is admin to include unpublished lessons
+      // Get user information from authenticated request
       const user = (req as RequestWithUser).user;
-      const includeUnpublished = user?.role === 'ADMIN';
-      
-      // Debug log
-      console.log('Debug - User role:', user?.role, 'includeUnpublished:', includeUnpublished);
+      const userId = user?.id;
+      const userRole = user?.role;
 
-      const result = await LessonService.getLessonsByCourse(courseId, query, includeUnpublished);
+      const result = await LessonService.getLessonsByCourse(courseId, query, userId, userRole);
 
       res.status(200).json({
         success: true,
@@ -182,8 +180,9 @@ export class LessonController {
       // Check if user is admin to include unpublished lessons
       const user = (req as RequestWithUser).user;
       const includeUnpublished = user?.role === 'ADMIN';
+      const userId = user?.id;
 
-      const lesson = await LessonService.getLessonById(courseId, lessonId, includeUnpublished);
+      const lesson = await LessonService.getLessonById(courseId, lessonId, includeUnpublished, userId);
 
       res.status(200).json({
         success: true,

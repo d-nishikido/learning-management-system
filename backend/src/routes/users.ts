@@ -52,6 +52,16 @@ router.put('/me',
 );
 
 /**
+ * GET /users/me/enrolled-courses
+ * Get current user's enrolled course IDs
+ * Authenticated users only
+ */
+router.get('/me/enrolled-courses',
+  authenticateToken,
+  UserController.getEnrolledCourses
+);
+
+/**
  * GET /users/:id
  * Get user by ID
  * Admin only or own profile

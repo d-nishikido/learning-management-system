@@ -147,6 +147,8 @@ export const userApi = {
   
   // Profile APIs
   getMe: () => apiClient.get('/users/me'),
+  getEnrolledCourses: (): Promise<ApiResponse<{ courseIds: number[] }>> => 
+    apiClient.get('/users/me/enrolled-courses'),
   updateMe: (data: unknown) => apiClient.put('/users/me', data),
   getMyProgress: (id: string) => apiClient.get(`/users/${id}/progress`),
   getMyBadges: (id: string) => apiClient.get(`/users/${id}/badges`),
