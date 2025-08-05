@@ -36,7 +36,7 @@ export function MaterialForm({
     externalUrl: '',
     durationMinutes: undefined,
     allowManualProgress: false,
-    sortOrder: 0,
+    sortOrder: 1,
     isPublished: false,
   });
 
@@ -86,7 +86,7 @@ export function MaterialForm({
       errors.durationMinutes = t('material:validation.invalidDuration');
     }
 
-    if (formData.sortOrder !== undefined && formData.sortOrder < 0) {
+    if (formData.sortOrder !== undefined && formData.sortOrder < 1) {
       errors.sortOrder = t('material:validation.invalidSortOrder');
     }
 
@@ -352,7 +352,7 @@ export function MaterialForm({
           type="number"
           id="sortOrder"
           name="sortOrder"
-          min="0"
+          min="1"
           value={formData.sortOrder}
           onChange={handleChange}
           disabled={isLoading}

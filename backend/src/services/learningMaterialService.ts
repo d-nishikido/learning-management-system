@@ -39,7 +39,8 @@ export interface LearningMaterialQuery {
   limit?: number;
 }
 
-export interface LearningMaterialWithDetails extends LearningMaterial {
+export interface LearningMaterialWithDetails extends Omit<LearningMaterial, 'fileSize'> {
+  fileSize: number | null;
   lesson: {
     id: number;
     title: string;
@@ -137,7 +138,11 @@ export class LearningMaterialService {
         },
       });
 
-      return material;
+      // Convert BigInt fileSize to number for JSON serialization
+      return {
+        ...material,
+        fileSize: material.fileSize ? Number(material.fileSize) : null,
+      };
     } catch (error) {
       if (error instanceof NotFoundError || error instanceof ConflictError || error instanceof ValidationError) {
         throw error;
@@ -192,7 +197,11 @@ export class LearningMaterialService {
         throw new NotFoundError('Learning material not found');
       }
 
-      return material;
+      // Convert BigInt fileSize to number for JSON serialization
+      return {
+        ...material,
+        fileSize: material.fileSize ? Number(material.fileSize) : null,
+      };
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -310,8 +319,14 @@ export class LearningMaterialService {
 
       const totalPages = Math.ceil(total / limit);
 
+      // Convert BigInt fileSize to number for JSON serialization in materials array
+      const materialsWithConvertedFileSize = materials.map(material => ({
+        ...material,
+        fileSize: material.fileSize ? Number(material.fileSize) : null,
+      }));
+
       return {
-        materials,
+        materials: materialsWithConvertedFileSize,
         total,
         page,
         limit,
@@ -384,7 +399,11 @@ export class LearningMaterialService {
         },
       });
 
-      return material;
+      // Convert BigInt fileSize to number for JSON serialization
+      return {
+        ...material,
+        fileSize: material.fileSize ? Number(material.fileSize) : null,
+      };
     } catch (error) {
       if (error instanceof NotFoundError || error instanceof ConflictError) {
         throw error;
@@ -491,7 +510,11 @@ export class LearningMaterialService {
         },
       });
 
-      return updatedMaterial;
+      // Convert BigInt fileSize to number for JSON serialization
+      return {
+        ...updatedMaterial,
+        fileSize: updatedMaterial.fileSize ? Number(updatedMaterial.fileSize) : null,
+      };
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;

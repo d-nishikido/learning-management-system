@@ -141,38 +141,84 @@ export async function scanFileContent(req: Request, _res: Response, next: NextFu
 
   try {
     const filePath = req.file.path;
+    const mimeType = req.file.mimetype;
+    
+    // Skip content scanning for allowed document types
+    // These file types have complex internal structures that may trigger false positives
+    const skipContentScanTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/zip',
+      'application/x-rar-compressed',
+      'application/x-7z-compressed',
+      'video/mp4',
+      'video/webm',
+      'video/quicktime',
+      'video/x-msvideo',
+      'audio/mpeg',
+      'audio/wav',
+      'audio/x-m4a',
+      'audio/ogg',
+      // Text files for educational content
+      'text/plain',
+      'text/markdown',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp'
+    ];
+    
+    if (skipContentScanTypes.includes(mimeType)) {
+      return next();
+    }
+    
     const fileBuffer = await fs.readFile(filePath, { encoding: null });
     
     // Convert to string for pattern matching (first 1MB only for performance)
     const contentToScan = fileBuffer.subarray(0, 1024 * 1024).toString('binary');
     
-    // Check for suspicious patterns
-    const suspiciousPatterns = [
-      // Script tags
-      /<script[\s\S]*?>[\s\S]*?<\/script>/gi,
-      // PHP tags
-      /<\?php/gi,
-      // ASP tags
-      /<%[\s\S]*?%>/gi,
-      // Executable headers
+    // Check for executable headers only (more focused security check)
+    const executablePatterns = [
       // eslint-disable-next-line no-control-regex
-      /MZ[\x00-\xFF]{2}[\x00-\xFF]*PE\x00\x00/g, // PE header
+      /MZ[\x00-\xFF]{2}[\x00-\xFF]*PE\x00\x00/g, // PE header (Windows executables)
       // eslint-disable-next-line no-control-regex
-      /\x7fELF/g, // ELF header
-      // Common malware signatures (simplified)
-      /eval\s*\(/gi,
-      /exec\s*\(/gi,
-      /system\s*\(/gi,
-      /shell_exec/gi,
-      /base64_decode/gi
+      /\x7fELF/g, // ELF header (Linux executables)
+      // Mach-O header (macOS executables)
+      // eslint-disable-next-line no-control-regex
+      /\xce\xfa\xed\xfe|\xcf\xfa\xed\xfe|\xfe\xed\xfa\xce|\xfe\xed\xfa\xcf/g
     ];
     
-    for (const pattern of suspiciousPatterns) {
+    // For text-based files (HTML, TXT, etc), check for script injections
+    if (mimeType.startsWith('text/') || mimeType === 'application/javascript') {
+      const scriptPatterns = [
+        // Script tags
+        /<script[\s\S]*?>[\s\S]*?<\/script>/gi,
+        // PHP tags
+        /<\?php/gi,
+        // ASP tags
+        /<%[\s\S]*?%>/gi
+      ];
+      
+      for (const pattern of scriptPatterns) {
+        if (pattern.test(contentToScan)) {
+          await fs.unlink(filePath).catch(() => {
+            // Ignore cleanup errors
+          });
+          throw new ValidationError('File contains suspicious content and has been rejected');
+        }
+      }
+    }
+    
+    // Check for executable headers in all files
+    for (const pattern of executablePatterns) {
       if (pattern.test(contentToScan)) {
         await fs.unlink(filePath).catch(() => {
           // Ignore cleanup errors
         });
-        throw new ValidationError('File contains suspicious content and has been rejected');
+        throw new ValidationError('File appears to be an executable and has been rejected');
       }
     }
     

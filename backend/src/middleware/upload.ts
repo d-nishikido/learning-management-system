@@ -124,8 +124,8 @@ const storage = multer.diskStorage({
         process.cwd(),
         'uploads',
         'materials',
-        courseId,
-        lessonId
+        courseId.toString(),
+        lessonId.toString()
       );
       
       await ensureUploadDir(uploadPath);
