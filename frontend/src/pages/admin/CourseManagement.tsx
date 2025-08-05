@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { courseApi } from '@/services/api';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { AdminCourseCard } from '@/components/course';
 import type { Course, CourseQueryParams, ApiRequestError } from '@/types';
+
+type ViewMode = 'card' | 'table';
 
 export function CourseManagement() {
   const navigate = useNavigate();
@@ -25,6 +28,12 @@ export function CourseManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterPublished, setFilterPublished] = useState<string>('all');
+  
+  // View mode state with localStorage persistence
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('adminCourseViewMode');
+    return (saved as ViewMode) || 'table';
+  });
 
   // Check for success message from navigation state
   useEffect(() => {
@@ -115,6 +124,12 @@ export function CourseManagement() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handle view mode change
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('adminCourseViewMode', mode);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -124,7 +139,37 @@ export function CourseManagement() {
             <h1 className="text-3xl font-bold text-gray-900">{t('course:adminTitle')}</h1>
             <p className="mt-2 text-gray-600">{t('course:adminDescription')}</p>
           </div>
-          <div className="mt-4 sm:mt-0">
+          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+            {/* View Mode Toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => handleViewModeChange('table')}
+                className={`p-2 rounded-md flex items-center justify-center transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                title={t('course:viewMode.switchToList')}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+              </button>
+              <button
+                onClick={() => handleViewModeChange('card')}
+                className={`p-2 rounded-md flex items-center justify-center transition-colors ${
+                  viewMode === 'card'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                title={t('course:viewMode.switchToCard')}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zM12 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V4zM12 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3z" />
+                </svg>
+              </button>
+            </div>
+            
             <Button onClick={() => navigate('/admin/courses/new')}>
               {t('course:createCourse')}
             </Button>
@@ -234,104 +279,117 @@ export function CourseManagement() {
         </div>
       ) : (
         <>
-          <div className="bg-white shadow rounded-lg overflow-x-auto">
-            <div className="min-w-full">
-              <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('course:fields.title')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('course:fields.category')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('course:fields.difficultyLevel')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('course:status')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('course:enrolledCount')}
-                  </th>
-                  <th className="relative px-6 py-3 w-48">
-                    <span className="sr-only">{t('common:actions')}</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{course.title}</div>
-                        {course.description && (
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {course.description}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.category}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {t(`course:difficulty.${course.difficultyLevel.toLowerCase()}`)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        course.isPublished
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {course.isPublished ? t('course:published') : t('course:unpublished')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.enrolledCount || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-48">
-                      <div className="flex justify-end space-x-1">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => navigate(`/courses/${course.id}`)}
-                          className="px-2"
-                        >
-                          {t('common:view')}
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => navigate(`/admin/courses/${course.id}/lessons`)}
-                          className="px-2"
-                        >
-                          Lessons
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => navigate(`/admin/courses/${course.id}/edit`)}
-                          className="px-2"
-                        >
-                          {t('common:edit')}
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleDelete(course)}
-                          className="px-2"
-                        >
-                          {t('common:delete')}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              </table>
+          {/* Course Display - Card or Table View */}
+          {viewMode === 'card' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courses.map((course) => (
+                <AdminCourseCard
+                  key={course.id}
+                  course={course}
+                  onDelete={handleDelete}
+                />
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="bg-white shadow rounded-lg overflow-x-auto">
+              <div className="min-w-full">
+                <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('course:fields.title')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('course:fields.category')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('course:fields.difficultyLevel')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('course:status')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('course:enrolledCount')}
+                    </th>
+                    <th className="relative px-6 py-3 w-48">
+                      <span className="sr-only">{t('common:actions')}</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {courses.map((course) => (
+                    <tr key={course.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{course.title}</div>
+                          {course.description && (
+                            <div className="text-sm text-gray-500 truncate max-w-xs">
+                              {course.description}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {course.category}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {t(`course:difficulty.${course.difficultyLevel.toLowerCase()}`)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          course.isPublished
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {course.isPublished ? t('course:published') : t('course:unpublished')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {course.enrolledCount || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-48">
+                        <div className="flex justify-end space-x-1">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate(`/courses/${course.id}`)}
+                            className="px-2"
+                          >
+                            {t('common:view')}
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => navigate(`/admin/courses/${course.id}/lessons`)}
+                            className="px-2"
+                          >
+                            {t('common:lesson', { count: 2 })}
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => navigate(`/admin/courses/${course.id}/edit`)}
+                            className="px-2"
+                          >
+                            {t('common:edit')}
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDelete(course)}
+                            className="px-2"
+                          >
+                            {t('common:delete')}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (

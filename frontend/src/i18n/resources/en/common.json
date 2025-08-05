@@ -8,6 +8,7 @@
   "difficulty": "Difficulty",
   "status": "Status",
   "createdBy": "Created by",
+  "created": "Created",
   "backTo": "Back to {{destination}}",
   "showing": "Showing {{from}}-{{to}} of {{total}} {{item}}",
   "lesson_one": "lesson",
