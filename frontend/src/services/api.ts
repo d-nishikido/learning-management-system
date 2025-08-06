@@ -40,7 +40,13 @@ import type {
   TimeSeriesDataPoint,
   TimeStatsQuery,
   TimeSeriesQuery,
-  PaginatedResponse
+  PaginatedResponse,
+  AccessHistoryQuery,
+  AccessHistoryRecord,
+  DetailedLearningHistory,
+  LearningStatsReport,
+  LearningPatternsResponse,
+  RecordAccessRequest
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -186,6 +192,22 @@ export const progressApi = {
   
   getTimeSeriesData: (params?: TimeSeriesQuery): Promise<ApiResponse<TimeSeriesDataPoint[]>> =>
     apiClient.get('/progress/stats/time-series', { params }),
+  
+  // Learning History
+  getAccessHistory: (params?: AccessHistoryQuery): Promise<ApiResponse<PaginatedResponse<AccessHistoryRecord>>> =>
+    apiClient.get('/progress/history/access', { params }),
+  
+  getDetailedHistory: (params?: { startDate?: string; endDate?: string }): Promise<ApiResponse<DetailedLearningHistory>> =>
+    apiClient.get('/progress/history/detailed', { params }),
+  
+  generateStatsReport: (startDate: string, endDate: string): Promise<ApiResponse<LearningStatsReport>> =>
+    apiClient.get('/progress/stats/reports', { params: { startDate, endDate } }),
+  
+  getLearningPatterns: (params?: { startDate?: string; endDate?: string }): Promise<ApiResponse<LearningPatternsResponse>> =>
+    apiClient.get('/progress/stats/patterns', { params }),
+  
+  recordAccess: (data: RecordAccessRequest): Promise<ApiResponse<AccessHistoryRecord>> =>
+    apiClient.post('/progress/history/record-access', data),
 };
 
 export const lessonApi = {
