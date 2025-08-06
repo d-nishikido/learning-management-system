@@ -37,6 +37,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "courses": "Courses",
+    "search": "Search",
     "progress": "Progress",
     "qa": "Q&A",
     "profile": "Profile",

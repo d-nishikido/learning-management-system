@@ -10,6 +10,17 @@ import { LearningMaterialController } from '../controllers/learningMaterialContr
 const router = Router({ mergeParams: true }); // Allow access to parent route params (courseId, lessonId)
 
 /**
+ * GET /materials/search
+ * Search learning materials across the system
+ * Authentication required
+ */
+router.get('/search',
+  authenticateToken,
+  validateQuery(learningMaterialSchemas.query),
+  LearningMaterialController.searchLearningMaterials as any
+);
+
+/**
  * GET /courses/:courseId/lessons/:lessonId/materials
  * Get all learning materials for a lesson with filtering and pagination
  * Authentication required for user progress tracking

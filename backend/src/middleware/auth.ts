@@ -98,7 +98,7 @@ export const requireRole = (role: 'USER' | 'ADMIN') => {
 
 export const optionalAuth = async (
   req: RequestWithUser,
-  res: Response<ApiResponse>,
+  _res: Response<ApiResponse>,
   next: NextFunction,
 ): Promise<void> => {
   try {
