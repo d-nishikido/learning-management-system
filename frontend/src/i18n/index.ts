@@ -9,12 +9,14 @@ import enLesson from './resources/en/lesson.json';
 import enDashboard from './resources/en/dashboard.json';
 import enMaterial from './resources/en/material.json';
 import enProgress from './resources/en/progress.json';
+import enSearch from './resources/en/search.json';
 import jaCommon from './resources/ja/common.json';
 import jaCourse from './resources/ja/course.json';
 import jaLesson from './resources/ja/lesson.json';
 import jaDashboard from './resources/ja/dashboard.json';
 import jaMaterial from './resources/ja/material.json';
 import jaProgress from './resources/ja/progress.json';
+import jaSearch from './resources/ja/search.json';
 
 const resources = {
   en: {
@@ -24,6 +26,7 @@ const resources = {
     dashboard: enDashboard,
     material: enMaterial,
     progress: enProgress,
+    search: enSearch,
   },
   ja: {
     common: jaCommon,
@@ -32,6 +35,7 @@ const resources = {
     dashboard: jaDashboard,
     material: jaMaterial,
     progress: jaProgress,
+    search: jaSearch,
   },
 };
 
@@ -42,7 +46,7 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'course', 'lesson', 'dashboard', 'material', 'progress'],
+    ns: ['common', 'course', 'lesson', 'dashboard', 'material', 'progress', 'search'],
     
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
