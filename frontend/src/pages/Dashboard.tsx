@@ -1,12 +1,39 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { progressApi } from '@/services/api';
+import type { ProgressSummary } from '@/types';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { t } = useTranslation('dashboard');
+  const [summary, setSummary] = useState<ProgressSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await progressApi.getProgressSummary();
+        setSummary(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch progress summary');
+        console.error('Error fetching progress summary:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchSummary();
+    }
+  }, [user]);
 
   const navigationCards = [
     {
@@ -84,18 +111,37 @@ export default function Dashboard() {
 
       {/* Quick Stats */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="text-center">
-          <div className="text-2xl font-bold text-primary-600">12</div>
-          <div className="text-sm text-gray-600">{t('stats.enrolledCourses')}</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-2xl font-bold text-primary-600">75%</div>
-          <div className="text-sm text-gray-600">{t('stats.averageProgress')}</div>
-        </Card>
-        <Card className="text-center">
-          <div className="text-2xl font-bold text-primary-600">28</div>
-          <div className="text-sm text-gray-600">{t('stats.badgesEarned')}</div>
-        </Card>
+        {loading ? (
+          <div className="col-span-full flex justify-center py-8">
+            <LoadingSpinner size="medium" />
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            <p className="text-red-600 mb-2">{t('stats.error')}</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        ) : (
+          <>
+            <Card className="text-center">
+              <div className="text-2xl font-bold text-primary-600">
+                {summary?.enrolledCourses || 0}
+              </div>
+              <div className="text-sm text-gray-600">{t('stats.enrolledCourses')}</div>
+            </Card>
+            <Card className="text-center">
+              <div className="text-2xl font-bold text-primary-600">
+                {summary?.averageProgress ? `${summary.averageProgress.toFixed(1)}%` : '0%'}
+              </div>
+              <div className="text-sm text-gray-600">{t('stats.averageProgress')}</div>
+            </Card>
+            <Card className="text-center">
+              <div className="text-2xl font-bold text-primary-600">
+                {summary?.streakDays || 0}
+              </div>
+              <div className="text-sm text-gray-600">{t('stats.currentStreak')}</div>
+            </Card>
+          </>
+        )}
       </section>
 
       {/* Navigation Cards */}

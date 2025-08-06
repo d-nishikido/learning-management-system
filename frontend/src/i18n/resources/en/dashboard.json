@@ -6,7 +6,9 @@
   "stats": {
     "enrolledCourses": "Enrolled Courses",
     "averageProgress": "Average Progress",
-    "badgesEarned": "Badges Earned"
+    "badgesEarned": "Badges Earned",
+    "currentStreak": "Current Streak",
+    "error": "Data loading error"
   },
   "sections": {
     "learningMenu": "Learning Menu",
