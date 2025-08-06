@@ -10,6 +10,7 @@ import { UserDetail } from './pages/UserDetail';
 import { Courses } from './pages/Courses';
 import { CourseDetail } from './pages/CourseDetail';
 import { LessonDetail } from './pages/LessonDetail';
+import { Search } from './pages/Search';
 import { CourseManagement } from './pages/admin/CourseManagement';
 import { CourseForm } from './pages/admin/CourseForm';
 import { LessonManagement } from './pages/admin/LessonManagement';
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: 'courses/:courseId/lessons/:id',
         element: <LessonDetail />,
+      },
+      {
+        path: 'search',
+        element: <Search />,
       },
       {
         path: 'qa',

@@ -15,6 +15,28 @@ interface LearningMaterialParams extends LearningMaterialListParams {
 
 export class LearningMaterialController {
   /**
+   * GET /materials/search
+   * Search learning materials across the system
+   */
+  static async searchLearningMaterials(req: RequestWithUser, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+    try {
+      const query: LearningMaterialQuery = req.query;
+      const includeUnpublished = req.user?.role === 'ADMIN';
+      const userId = req.user?.id;
+
+      const result = await LearningMaterialService.searchLearningMaterials(query, includeUnpublished, userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Learning materials retrieved successfully',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * GET /courses/:courseId/lessons/:lessonId/materials
    * Get all learning materials for a lesson with filtering and pagination
    */

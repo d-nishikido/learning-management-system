@@ -223,6 +223,10 @@ export const userApi = {
 };
 
 export const materialApi = {
+  // Search materials across the system
+  search: (params?: LearningMaterialQueryParams): Promise<ApiResponse<LearningMaterialListResponse>> =>
+    apiClient.get('/materials/search', { params }),
+
   getByLesson: (
     courseId: number, 
     lessonId: number, 
