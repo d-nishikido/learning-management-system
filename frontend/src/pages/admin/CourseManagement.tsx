@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { courseApi } from '@/services/api';
 import { Button } from '@/components/common/Button';
+import { Input } from '@/components/common/Input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { AdminCourseCard } from '@/components/course';
 import type { Course, CourseQueryParams, ApiRequestError } from '@/types';
@@ -211,31 +212,25 @@ export function CourseManagement() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700">
-                {t('common:search')}
-              </label>
-              <input
+              <Input
                 type="text"
                 id="search"
+                label={t('common:search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('course:searchPlaceholder')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
 
             {/* Category Filter */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.category')}
-              </label>
-              <input
+              <Input
                 type="text"
                 id="category"
+                label={t('course:fields.category')}
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
                 placeholder={t('course:filterByCategory')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
 
