@@ -1,0 +1,24 @@
+{
+  "library": {
+    "title": "リソースライブラリ",
+    "description": "すべてのコースとトピックの学習リソースを閲覧・発見できます"
+  },
+  "detail": {
+    "notFound": "リソースが見つかりません",
+    "notFoundDescription": "お探しのリソースは存在しません。",
+    "backToLibrary": "リソースライブラリに戻る",
+    "edit": "編集",
+    "delete": "削除",
+    "openResource": "リソースを開く",
+    "importance": "重要度",
+    "difficulty": "難易度",
+    "type": "タイプ",
+    "tags": "タグ",
+    "statistics": "統計",
+    "views": "回閲覧",
+    "accesses": "回アクセス",
+    "context": "コンテキスト",
+    "fromLesson": "レッスンから:",
+    "fromCourse": "コースから:"
+  }
+}

@@ -12,6 +12,8 @@ import { Courses } from './pages/Courses';
 import { CourseDetail } from './pages/CourseDetail';
 import { LessonDetail } from './pages/LessonDetail';
 import { Search } from './pages/Search';
+import { ResourceLibrary } from './pages/ResourceLibrary';
+import { ResourceDetail } from './pages/ResourceDetail';
 import { CourseManagement } from './pages/admin/CourseManagement';
 import { CourseForm } from './pages/admin/CourseForm';
 import { LessonManagement } from './pages/admin/LessonManagement';
@@ -56,6 +58,14 @@ const router = createBrowserRouter([
       {
         path: 'search',
         element: <Search />,
+      },
+      {
+        path: 'resources',
+        element: <ResourceLibrary />,
+      },
+      {
+        path: 'resources/:id',
+        element: <ResourceDetail />,
       },
       {
         path: 'qa',
