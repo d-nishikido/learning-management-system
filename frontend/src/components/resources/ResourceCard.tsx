@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Eye, Tag, Clock, Star } from 'lucide-react';
-import type { LearningResource, ImportanceLevel, ResourceType } from '@/types';
+import type { LearningResource } from '@/types';
+import { getImportanceColor, getResourceTypeIcon, getResourceTypeLabel, getDifficultyColor } from '@/utils/resourceHelpers';
 
 interface ResourceCardProps {
   resource: LearningResource;
@@ -8,49 +9,6 @@ interface ResourceCardProps {
   showStats?: boolean;
   className?: string;
 }
-
-const getImportanceColor = (importance: ImportanceLevel): string => {
-  switch (importance) {
-    case 'REQUIRED':
-      return 'text-red-600 bg-red-50 border-red-200';
-    case 'RECOMMENDED':
-      return 'text-orange-600 bg-orange-50 border-orange-200';
-    case 'REFERENCE':
-      return 'text-gray-600 bg-gray-50 border-gray-200';
-    default:
-      return 'text-gray-600 bg-gray-50 border-gray-200';
-  }
-};
-
-const getResourceTypeIcon = (type: ResourceType): React.ReactNode => {
-  switch (type) {
-    case 'YOUTUBE':
-      return '🎥';
-    case 'WEBSITE':
-      return '🌐';
-    case 'DOCUMENT':
-      return '📄';
-    case 'FILE':
-      return '📁';
-    case 'TOOL':
-      return '🔧';
-    default:
-      return '📎';
-  }
-};
-
-const getDifficultyColor = (level: string): string => {
-  switch (level) {
-    case 'BEGINNER':
-      return 'text-green-600 bg-green-50';
-    case 'INTERMEDIATE':
-      return 'text-yellow-600 bg-yellow-50';
-    case 'ADVANCED':
-      return 'text-red-600 bg-red-50';
-    default:
-      return 'text-gray-600 bg-gray-50';
-  }
-};
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({
   resource,
