@@ -146,7 +146,7 @@ export class ProgressService {
       ]
     });
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -178,7 +178,7 @@ export class ProgressService {
       orderBy: { material: { sortOrder: 'asc' } }
     });
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -209,7 +209,7 @@ export class ProgressService {
       }
     });
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -289,7 +289,7 @@ export class ProgressService {
       await this.updateLearningStreak(data.userId);
     }
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -314,7 +314,7 @@ export class ProgressService {
 
     // Calculate completion status
     const newProgressRate = data.progressRate !== undefined ? data.progressRate : existingProgress.progressRate;
-    const isCompleted = data.isCompleted !== undefined ? data.isCompleted : newProgressRate >= 100;
+    const isCompleted = data.isCompleted !== undefined ? data.isCompleted : Number(newProgressRate) >= 100;
 
     // Update progress record
     const progress = await prisma.userProgress.update({
@@ -337,7 +337,7 @@ export class ProgressService {
       await this.updateLearningStreak(userId);
     }
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -442,7 +442,7 @@ export class ProgressService {
       await this.updateLearningStreak(userId);
     }
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -522,7 +522,7 @@ export class ProgressService {
     // Update learning streak
     await this.updateLearningStreak(userId);
 
-    return progress;
+    return progress as ProgressWithDetails;
   }
 
   /**
@@ -741,30 +741,37 @@ export class ProgressService {
     today.setHours(0, 0, 0, 0);
 
     // Find or create today's streak record
-    await prisma.learningStreak.upsert({
+    const existingStreak = await prisma.learningStreak.findFirst({
       where: {
-        userId_streakDate: {
-          userId,
-          streakDate: today
-        }
-      },
-      update: {
-        materialsAccessed: {
-          increment: 1
-        },
-        pointsEarned: {
-          increment: 10 // Base points for completing a material
-        }
-      },
-      create: {
         userId,
-        streakDate: today,
-        minutesStudied: 0,
-        materialsAccessed: 1,
-        lessonsCompleted: 0,
-        pointsEarned: 10
+        streakDate: today
       }
     });
+
+    if (existingStreak) {
+      await prisma.learningStreak.update({
+        where: { id: existingStreak.id },
+        data: {
+          materialsAccessed: {
+            increment: 1
+          },
+          pointsEarned: {
+            increment: 10 // Base points for completing a material
+          }
+        }
+      });
+    } else {
+      await prisma.learningStreak.create({
+        data: {
+          userId,
+          streakDate: today,
+          minutesStudied: 0,
+          materialsAccessed: 1,
+          lessonsCompleted: 0,
+          pointsEarned: 10
+        }
+      });
+    }
   }
 
   /**
@@ -779,12 +786,10 @@ export class ProgressService {
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      const streak = await prisma.learningStreak.findUnique({
+      const streak = await prisma.learningStreak.findFirst({
         where: {
-          userId_streakDate: {
-            userId,
-            streakDate: currentDate
-          }
+          userId,
+          streakDate: currentDate
         }
       });
 
@@ -805,12 +810,12 @@ export class ProgressService {
   private static formatDateForInterval(date: Date, interval: 'day' | 'week' | 'month'): string {
     switch (interval) {
       case 'day': {
-        return date.toISOString().split('T')[0];
+        return date.toISOString().split('T')[0] || date.toISOString();
       }
       case 'week': {
         const weekStart = new Date(date);
         weekStart.setDate(date.getDate() - date.getDay());
-        return weekStart.toISOString().split('T')[0];
+        return weekStart.toISOString().split('T')[0] || weekStart.toISOString();
       }
       case 'month': {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
