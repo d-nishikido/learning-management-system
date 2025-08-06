@@ -1,0 +1,58 @@
+{
+  "title": "学習進捗",
+  "subtitle": "あなたの学習状況を詳しく確認しましょう。",
+  "error": "データの読み込みに失敗しました",
+  "stats": {
+    "enrolledCourses": "受講中のコース",
+    "averageProgress": "平均進捗率",
+    "totalStudyTime": "総学習時間",
+    "currentStreak": "現在の継続日数"
+  },
+  "sections": {
+    "progressCharts": "進捗グラフ",
+    "courseProgress": "コース別進捗",
+    "learningCalendar": "学習カレンダー"
+  },
+  "charts": {
+    "overallProgress": "全体進捗",
+    "studyTimeProgress": "学習時間推移",
+    "noData": "データがありません",
+    "noCourseData": "コースデータがありません",
+    "completed": "完了",
+    "inProgress": "進行中", 
+    "notStarted": "未開始",
+    "courses": "コース",
+    "progress": "進捗",
+    "materials": "教材",
+    "studyTime": "学習時間",
+    "minutes": "分",
+    "hours": "時間",
+    "average": "平均"
+  },
+  "calendar": {
+    "currentStreak": "現在の継続",
+    "longestStreak": "最長継続",
+    "activeDays": "活動日数",
+    "averageDaily": "日平均",
+    "materialsCompleted": "教材完了",
+    "noActivity": "学習なし",
+    "previousMonth": "前月",
+    "nextMonth": "来月",
+    "minutes": "分",
+    "hours": "時間",
+    "weekdays": {
+      "mon": "月",
+      "tue": "火",
+      "wed": "水",
+      "thu": "木",
+      "fri": "金",
+      "sat": "土",
+      "sun": "日"
+    },
+    "legend": {
+      "light": "軽い学習 (30分未満)",
+      "moderate": "中程度の学習 (30分-1時間)",
+      "intensive": "集中学習 (1時間以上)"
+    }
+  }
+}
