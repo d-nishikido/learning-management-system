@@ -342,7 +342,7 @@ export class LearningMaterialService {
         userProgress: material.userProgress && Array.isArray(material.userProgress) && material.userProgress.length > 0 
           ? material.userProgress[0] 
           : null,
-      }));
+      })) as unknown as LearningMaterialWithDetails[];
 
       return {
         materials: materialsWithConvertedFileSize,
