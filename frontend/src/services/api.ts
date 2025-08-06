@@ -26,7 +26,21 @@ import type {
   LearningResourceListResponse,
   CreateLearningResourceRequest,
   UpdateLearningResourceRequest,
-  LearningResourceQueryParams
+  LearningResourceQueryParams,
+  ProgressWithDetails,
+  ProgressQuery,
+  CreateProgressRequest,
+  UpdateProgressRequest,
+  SessionStartRequest,
+  SessionUpdateRequest,
+  LearningSession,
+  TimeStats,
+  StreakStats,
+  ProgressSummary,
+  TimeSeriesDataPoint,
+  TimeStatsQuery,
+  TimeSeriesQuery,
+  PaginatedResponse
 } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -118,12 +132,60 @@ export const courseApi = {
 };
 
 export const progressApi = {
-  getMyProgress: () => apiClient.get('/progress/me'),
-  updateProgress: (id: string, data: unknown) =>
+  // Basic progress CRUD
+  getMyProgress: (params?: ProgressQuery): Promise<ApiResponse<PaginatedResponse<ProgressWithDetails>>> =>
+    apiClient.get('/progress/me', { params }),
+  
+  getCourseProgress: (courseId: number): Promise<ApiResponse<ProgressWithDetails[]>> =>
+    apiClient.get(`/progress/courses/${courseId}`),
+  
+  getLessonProgress: (lessonId: number): Promise<ApiResponse<ProgressWithDetails[]>> =>
+    apiClient.get(`/progress/lessons/${lessonId}`),
+  
+  getMaterialProgress: (materialId: number): Promise<ApiResponse<ProgressWithDetails | null>> =>
+    apiClient.get(`/progress/materials/${materialId}`),
+  
+  createProgress: (data: CreateProgressRequest): Promise<ApiResponse<ProgressWithDetails>> =>
+    apiClient.post('/progress', data),
+  
+  updateProgress: (id: number, data: UpdateProgressRequest): Promise<ApiResponse<ProgressWithDetails>> =>
     apiClient.put(`/progress/${id}`, data),
-  markComplete: (materialId: string) =>
-    apiClient.post('/progress/complete', { materialId }),
-  getStats: () => apiClient.get('/progress/stats'),
+  
+  deleteProgress: (id: number): Promise<ApiResponse<void>> =>
+    apiClient.delete(`/progress/${id}`),
+  
+  // Manual progress
+  updateManualProgress: (
+    materialId: number, 
+    data: ManualProgressUpdateRequest
+  ): Promise<ApiResponse<ProgressWithDetails>> =>
+    apiClient.put(`/progress/materials/${materialId}/manual`, data),
+  
+  markMaterialComplete: (materialId: number): Promise<ApiResponse<ProgressWithDetails>> =>
+    apiClient.post(`/progress/materials/${materialId}/complete`),
+  
+  // Learning sessions
+  startSession: (data: SessionStartRequest): Promise<ApiResponse<LearningSession>> =>
+    apiClient.post('/progress/sessions/start', data),
+  
+  updateSession: (sessionId: number, data: SessionUpdateRequest): Promise<ApiResponse<LearningSession>> =>
+    apiClient.put(`/progress/sessions/${sessionId}/update`, data),
+  
+  endSession: (sessionId: number): Promise<ApiResponse<{ session: LearningSession; progressUpdated: boolean }>> =>
+    apiClient.post(`/progress/sessions/${sessionId}/end`),
+  
+  // Statistics and analytics
+  getTimeStats: (params?: TimeStatsQuery): Promise<ApiResponse<TimeStats>> =>
+    apiClient.get('/progress/time-stats', { params }),
+  
+  getProgressSummary: (params?: { courseId?: number }): Promise<ApiResponse<ProgressSummary>> =>
+    apiClient.get('/progress/stats/summary', { params }),
+  
+  getStreakStats: (): Promise<ApiResponse<StreakStats>> =>
+    apiClient.get('/progress/stats/streaks'),
+  
+  getTimeSeriesData: (params?: TimeSeriesQuery): Promise<ApiResponse<TimeSeriesDataPoint[]>> =>
+    apiClient.get('/progress/stats/time-series', { params }),
 };
 
 export const lessonApi = {

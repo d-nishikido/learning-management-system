@@ -434,3 +434,116 @@ export interface LearningResourceQueryParams {
   page?: number;
   limit?: number;
 }
+
+// Progress API Types
+export interface ProgressWithDetails extends MaterialProgressUpdate {
+  course: Course;
+  lesson?: Lesson | null;
+  material?: LearningMaterial | null;
+}
+
+export interface ProgressQuery {
+  courseId?: number;
+  lessonId?: number;
+  materialId?: number;
+  isCompleted?: boolean;
+  progressType?: ProgressType;
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateProgressRequest {
+  courseId: number;
+  lessonId?: number;
+  materialId?: number;
+  progressType?: ProgressType;
+  progressRate?: number;
+  spentMinutes?: number;
+  notes?: string;
+}
+
+export interface UpdateProgressRequest {
+  progressRate?: number;
+  spentMinutes?: number;
+  isCompleted?: boolean;
+  notes?: string;
+}
+
+export interface SessionStartRequest {
+  materialId?: number;
+  courseId?: number;
+  lessonId?: number;
+}
+
+export interface SessionUpdateRequest {
+  spentMinutes: number;
+}
+
+export interface LearningSession {
+  id: number;
+  userId: number;
+  materialId?: number | null;
+  courseId?: number;
+  lessonId?: number;
+  startTime: Date;
+  endTime?: Date | null;
+  duration: number;
+  isActive: boolean;
+}
+
+export interface TimeStats {
+  totalMinutes: number;
+  dailyAverage: number;
+  weeklyTotal: number;
+  monthlyTotal: number;
+  longestSession: number;
+  sessionsCount: number;
+  currentStreak: number;
+  bestStreak: number;
+}
+
+export interface StreakStats {
+  currentStreak: number;
+  longestStreak: number;
+  totalStudyDays: number;
+  averageMinutesPerDay: number;
+  streakHistory: {
+    date: string;
+    minutesStudied: number;
+    materialsAccessed: number;
+    lessonsCompleted: number;
+  }[];
+}
+
+export interface ProgressSummary {
+  totalCourses: number;
+  enrolledCourses: number;
+  completedCourses: number;
+  totalLessons: number;
+  completedLessons: number;
+  totalMaterials: number;
+  completedMaterials: number;
+  totalSpentMinutes: number;
+  averageProgress: number;
+  streakDays: number;
+}
+
+export interface TimeSeriesDataPoint {
+  date: string;
+  spentMinutes: number;
+  completedMaterials: number;
+  progressRate: number;
+}
+
+export interface TimeStatsQuery {
+  startDate?: string;
+  endDate?: string;
+  courseId?: number;
+}
+
+export interface TimeSeriesQuery {
+  startDate?: string;
+  endDate?: string;
+  interval?: 'day' | 'week' | 'month';
+  courseId?: number;
+}
