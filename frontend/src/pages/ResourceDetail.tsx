@@ -4,50 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ExternalLink, Eye, Star, Tag, Clock, Edit, Trash2 } from 'lucide-react';
 import { resourceApi } from '@/services/api';
 import { useAuth } from '@/contexts';
-import type { LearningResource, ImportanceLevel, ResourceType } from '@/types';
-
-const getImportanceColor = (importance: ImportanceLevel): string => {
-  switch (importance) {
-    case 'REQUIRED':
-      return 'text-red-600 bg-red-50 border-red-200';
-    case 'RECOMMENDED':
-      return 'text-orange-600 bg-orange-50 border-orange-200';
-    case 'REFERENCE':
-      return 'text-gray-600 bg-gray-50 border-gray-200';
-    default:
-      return 'text-gray-600 bg-gray-50 border-gray-200';
-  }
-};
-
-const getResourceTypeIcon = (type: ResourceType): React.ReactNode => {
-  switch (type) {
-    case 'YOUTUBE':
-      return '🎥';
-    case 'WEBSITE':
-      return '🌐';
-    case 'DOCUMENT':
-      return '📄';
-    case 'FILE':
-      return '📁';
-    case 'TOOL':
-      return '🔧';
-    default:
-      return '📎';
-  }
-};
-
-const getDifficultyColor = (level: string): string => {
-  switch (level) {
-    case 'BEGINNER':
-      return 'text-green-600 bg-green-50';
-    case 'INTERMEDIATE':
-      return 'text-yellow-600 bg-yellow-50';
-    case 'ADVANCED':
-      return 'text-red-600 bg-red-50';
-    default:
-      return 'text-gray-600 bg-gray-50';
-  }
-};
+import type { LearningResource } from '@/types';
+import { getImportanceColor, getResourceTypeIcon, getResourceTypeLabel, getDifficultyColor, getImportanceLabel } from '@/utils/resourceHelpers';
 
 export const ResourceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,6 +15,7 @@ export const ResourceDetail: React.FC = () => {
   const [resource, setResource] = useState<LearningResource | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -85,6 +44,40 @@ export const ResourceDetail: React.FC = () => {
   const handleOpenResource = () => {
     if (resource?.resourceUrl) {
       window.open(resource.resourceUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleEdit = () => {
+    if (resource) {
+      // Navigate to edit page - to be implemented when admin forms are available
+      alert(t('detail.editNotImplemented', 'Edit functionality will be implemented in the next phase'));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!resource) return;
+    
+    const confirmDelete = window.confirm(
+      t('detail.deleteConfirmation', 'Are you sure you want to delete this resource? This action cannot be undone.')
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      setIsDeleting(true);
+      const response = await resourceApi.delete(resource.id);
+      
+      if (response.success) {
+        alert(t('detail.deleteSuccess', 'Resource deleted successfully'));
+        navigate('/resources');
+      } else {
+        throw new Error(response.error || 'Failed to delete resource');
+      }
+    } catch (err) {
+      alert(t('detail.deleteError', 'Failed to delete resource. Please try again.'));
+      console.error('Delete resource error:', err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -135,13 +128,23 @@ export const ResourceDetail: React.FC = () => {
             </div>
             {user?.role === 'ADMIN' && (
               <div className="flex items-center space-x-2">
-                <button className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <Edit className="h-4 w-4 mr-2" />
+                <button 
+                  onClick={handleEdit}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isDeleting}
+                  aria-label={t('detail.editResource', 'Edit this resource')}
+                >
+                  <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
                   {t('detail.edit', 'Edit')}
                 </button>
-                <button className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {t('detail.delete', 'Delete')}
+                <button 
+                  onClick={handleDelete}
+                  className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isDeleting}
+                  aria-label={t('detail.deleteResource', 'Delete this resource')}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                  {isDeleting ? t('detail.deleting', 'Deleting...') : t('detail.delete', 'Delete')}
                 </button>
               </div>
             )}
@@ -156,7 +159,13 @@ export const ResourceDetail: React.FC = () => {
             {/* Resource Header */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-start space-x-4">
-                <div className="text-4xl">{getResourceTypeIcon(resource.resourceType)}</div>
+                <div 
+                  className="text-4xl" 
+                  role="img" 
+                  aria-label={`${getResourceTypeLabel(resource.resourceType)} resource`}
+                >
+                  {getResourceTypeIcon(resource.resourceType)}
+                </div>
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">{resource.title}</h1>
                   {resource.description && (
@@ -167,8 +176,9 @@ export const ResourceDetail: React.FC = () => {
               <button
                 onClick={handleOpenResource}
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                aria-label={t('detail.openResourceExternal', 'Open resource in new tab')}
               >
-                <ExternalLink className="h-5 w-5 mr-2" />
+                <ExternalLink className="h-5 w-5 mr-2" aria-hidden="true" />
                 {t('detail.openResource', 'Open Resource')}
               </button>
             </div>
@@ -178,20 +188,29 @@ export const ResourceDetail: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">{t('detail.importance', 'Importance')}</h3>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${importanceColorClass}`}>
-                    {resource.importance === 'REQUIRED' && <Star className="h-4 w-4 mr-1" />}
+                  <span 
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${importanceColorClass}`}
+                    aria-label={`Importance level: ${getImportanceLabel(resource.importance)}`}
+                  >
+                    {resource.importance === 'REQUIRED' && <Star className="h-4 w-4 mr-1" aria-hidden="true" />}
                     {resource.importance}
                   </span>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">{t('detail.difficulty', 'Difficulty')}</h3>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(resource.difficultyLevel)}`}>
+                  <span 
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(resource.difficultyLevel)}`}
+                    aria-label={`Difficulty level: ${resource.difficultyLevel}`}
+                  >
                     {resource.difficultyLevel}
                   </span>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 mb-2">{t('detail.type', 'Type')}</h3>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                  <span 
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800"
+                    aria-label={`Resource type: ${getResourceTypeLabel(resource.resourceType)}`}
+                  >
                     {resource.resourceType}
                   </span>
                 </div>
