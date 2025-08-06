@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, lessonSchemas, learningResourceSchemas, commonSchemas } from '../middleware/validation';
-import { authenticateToken, requireRole } from '../middleware/auth';
+import { authenticateToken, optionalAuth, requireRole } from '../middleware/auth';
 import { LessonController } from '../controllers/lessonController';
 import { LearningResourceController } from '../controllers/learningResourceController';
 import materialRoutes from './materials';
@@ -16,7 +16,7 @@ const router = Router({ mergeParams: true }); // Allow access to parent route pa
 router.get('/', 
   validateParams(Joi.object({ courseId: commonSchemas.id })),
   validateQuery(lessonSchemas.query),
-  authenticateToken,
+  optionalAuth,
   LessonController.getLessonsByCourse
 );
 
@@ -30,7 +30,7 @@ router.get('/:id',
     courseId: commonSchemas.id,
     id: commonSchemas.id 
   })),
-  authenticateToken,
+  optionalAuth,
   LessonController.getLessonById
 );
 
