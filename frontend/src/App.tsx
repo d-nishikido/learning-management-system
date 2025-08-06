@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Layout from './components/common/Layout';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import Progress from './pages/Progress';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import { Profile } from './pages/Profile';
@@ -86,7 +87,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'progress',
-        element: <div className="text-center py-12">Progress Page (Coming Soon)</div>,
+        element: (
+          <ProtectedRoute>
+            <Progress />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'admin',

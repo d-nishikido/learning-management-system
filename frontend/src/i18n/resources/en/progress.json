@@ -1,0 +1,58 @@
+{
+  "title": "Learning Progress",
+  "subtitle": "Review your learning status in detail.",
+  "error": "Failed to load data",
+  "stats": {
+    "enrolledCourses": "Enrolled Courses",
+    "averageProgress": "Average Progress",
+    "totalStudyTime": "Total Study Time",
+    "currentStreak": "Current Streak"
+  },
+  "sections": {
+    "progressCharts": "Progress Charts",
+    "courseProgress": "Course Progress",
+    "learningCalendar": "Learning Calendar"
+  },
+  "charts": {
+    "overallProgress": "Overall Progress",
+    "studyTimeProgress": "Study Time Trends",
+    "noData": "No data available",
+    "noCourseData": "No course data available",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "courses": "courses",
+    "progress": "Progress",
+    "materials": "materials",
+    "studyTime": "Study Time",
+    "minutes": "m",
+    "hours": "h",
+    "average": "Average"
+  },
+  "calendar": {
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "activeDays": "Active Days",
+    "averageDaily": "Daily Average",
+    "materialsCompleted": "materials completed",
+    "noActivity": "No activity",
+    "previousMonth": "Previous Month",
+    "nextMonth": "Next Month",
+    "minutes": "m",
+    "hours": "h",
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "legend": {
+      "light": "Light study (< 30 min)",
+      "moderate": "Moderate study (30 min - 1 hour)",
+      "intensive": "Intensive study (> 1 hour)"
+    }
+  }
+}

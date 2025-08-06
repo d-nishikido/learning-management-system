@@ -6,7 +6,9 @@
   "stats": {
     "enrolledCourses": "受講中のコース",
     "averageProgress": "平均進捗率",
-    "badgesEarned": "獲得バッジ"
+    "badgesEarned": "獲得バッジ",
+    "currentStreak": "現在の継続日数",
+    "error": "データの読み込みエラー"
   },
   "sections": {
     "learningMenu": "学習メニュー",
