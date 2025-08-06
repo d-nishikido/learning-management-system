@@ -153,7 +153,8 @@ describe('LessonController', () => {
       expect(mockLessonService.getLessonsByCourse).toHaveBeenCalledWith(
         1,
         { page: 1, limit: 10 },
-        true // includeUnpublished for admin
+        1, // userId 
+        'ADMIN' // userRole
       );
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -191,7 +192,8 @@ describe('LessonController', () => {
       expect(mockLessonService.getLessonsByCourse).toHaveBeenCalledWith(
         1,
         { isPublished: true, search: 'test' },
-        true
+        1, // userId
+        'ADMIN' // userRole  
       );
     });
 
@@ -208,8 +210,28 @@ describe('LessonController', () => {
       expect(mockLessonService.getLessonsByCourse).toHaveBeenCalledWith(
         1,
         {},
-        false // includeUnpublished for regular user
+        1, // userId
+        'USER' // userRole
       );
+    });
+
+    it('should handle requests with no authenticated user (optional auth)', async () => {
+      mockReq.user = undefined; // No user authenticated (optional auth)
+      mockReq.params = { courseId: '1' };
+      mockLessonService.getLessonsByCourse.mockResolvedValue(mockLessonsResult as any);
+
+      await LessonController.getLessonsByCourse(
+        mockReq as Request<{ courseId: string }>,
+        mockRes as Response
+      );
+
+      expect(mockLessonService.getLessonsByCourse).toHaveBeenCalledWith(
+        1,
+        {},
+        undefined, // userId
+        undefined // userRole
+      );
+      expect(mockRes.status).toHaveBeenCalledWith(200);
     });
   });
 
