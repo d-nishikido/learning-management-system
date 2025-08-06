@@ -57,6 +57,162 @@ export interface LearningMaterialWithDetails extends Omit<LearningMaterial, 'fil
 
 export class LearningMaterialService {
   /**
+   * Search learning materials across the system
+   */
+  static async searchLearningMaterials(query: LearningMaterialQuery = {}, includeUnpublished = false, userId?: number): Promise<{
+    materials: LearningMaterialWithDetails[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    try {
+      const {
+        materialType,
+        materialCategory,
+        isPublished,
+        search,
+        page = 1,
+        limit = 10,
+      } = query;
+
+      const whereClause: any = {};
+
+      // Apply filters
+      if (materialType) {
+        whereClause.materialType = materialType;
+      }
+
+      if (materialCategory) {
+        whereClause.materialCategory = materialCategory;
+      }
+
+      if (isPublished !== undefined) {
+        whereClause.isPublished = isPublished;
+      } else if (!includeUnpublished) {
+        // Default to only published materials if not explicitly including unpublished
+        whereClause.isPublished = true;
+        whereClause.lesson = {
+          isPublished: true,
+          course: {
+            isPublished: true,
+          }
+        };
+      }
+
+      if (search) {
+        whereClause.OR = [
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            lesson: {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            }
+          },
+          {
+            lesson: {
+              course: {
+                title: {
+                  contains: search,
+                  mode: 'insensitive',
+                }
+              }
+            }
+          }
+        ];
+      }
+
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+
+      // Get total count
+      const total = await prisma.learningMaterial.count({
+        where: whereClause,
+      });
+
+      // Get materials
+      const includeClause: any = {
+        lesson: {
+          include: {
+            course: {
+              select: {
+                id: true,
+                title: true,
+              }
+            }
+          }
+        },
+        _count: {
+          select: {
+            userProgress: true,
+          },
+        },
+      };
+
+      // Include user progress if userId is provided
+      if (userId) {
+        includeClause.userProgress = {
+          where: { userId },
+          select: {
+            id: true,
+            progressRate: true,
+            isCompleted: true,
+            spentMinutes: true,
+            lastAccessed: true,
+          },
+        };
+      }
+
+      const materials = await prisma.learningMaterial.findMany({
+        where: whereClause,
+        include: includeClause,
+        orderBy: [
+          { lesson: { course: { title: 'asc' } } },
+          { lesson: { title: 'asc' } },
+          { sortOrder: 'asc' },
+          { createdAt: 'desc' },
+        ],
+        skip,
+        take: limit,
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      // Convert BigInt fileSize to number for JSON serialization and format user progress
+      const materialsWithConvertedFileSize = materials.map(material => ({
+        ...material,
+        fileSize: material.fileSize ? Number(material.fileSize) : null,
+        userProgress: material.userProgress && Array.isArray(material.userProgress) && material.userProgress.length > 0 
+          ? material.userProgress[0] 
+          : null,
+      }));
+
+      return {
+        materials: materialsWithConvertedFileSize,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+    } catch (error) {
+      throw new Error(`Failed to search learning materials: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
    * Create a new learning material
    */
   static async createLearningMaterial(materialData: CreateLearningMaterialData): Promise<LearningMaterialWithDetails> {
