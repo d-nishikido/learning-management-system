@@ -66,17 +66,19 @@ export function SearchFilters({
       <div className="space-y-3">
         {/* Search */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="search-input" className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
             {t('common:search')}
           </label>
           <div className="relative">
             <Input
+              id="search-input"
               type="text"
               placeholder={t('search:searchPlaceholder')}
               value={query.search || ''}
               onChange={(e) => handleSearchChange(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && onSearch()}
               disabled={isLoading}
+              aria-label={t('common:search')}
             />
             <Button
               onClick={onSearch}
@@ -92,14 +94,16 @@ export function SearchFilters({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
           {/* Material Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="material-type-select" className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:materialType')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              id="material-type-select"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.materialType || 'all'}
               onChange={(e) => handleFilterChange('materialType', e.target.value)}
               disabled={isLoading}
+              aria-label={t('search:materialType')}
             >
               <option value="all">{t('search:allTypes')}</option>
               {materialTypes.map((type) => (
@@ -112,11 +116,11 @@ export function SearchFilters({
 
           {/* Resource Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:resourceType')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.resourceType || 'all'}
               onChange={(e) => handleFilterChange('resourceType', e.target.value)}
               disabled={isLoading}
@@ -132,11 +136,11 @@ export function SearchFilters({
 
           {/* Difficulty */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:difficulty')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.difficulty || 'all'}
               onChange={(e) => handleFilterChange('difficulty', e.target.value)}
               disabled={isLoading}
@@ -152,11 +156,11 @@ export function SearchFilters({
 
           {/* Importance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:importance')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.importance || 'all'}
               onChange={(e) => handleFilterChange('importance', e.target.value)}
               disabled={isLoading}
@@ -172,11 +176,11 @@ export function SearchFilters({
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:category')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.category || 'all'}
               onChange={(e) => handleFilterChange('category', e.target.value)}
               disabled={isLoading}
@@ -189,11 +193,11 @@ export function SearchFilters({
 
           {/* Published Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer">
               {t('search:status')}
             </label>
             <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full min-h-[44px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:border-gray-400"
               value={query.isPublished === undefined ? 'all' : query.isPublished ? 'published' : 'unpublished'}
               onChange={(e) => handleFilterChange('isPublished', e.target.value === 'all' ? undefined : e.target.value === 'published')}
               disabled={isLoading}
