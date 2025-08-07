@@ -8,6 +8,7 @@ import resourceRoutes from './resources';
 import progressRoutes from './progress';
 import materialRoutes from './materials';
 import questionRoutes from './questions';
+import testRoutes from './tests';
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use('/courses', courseRoutes);
 router.use('/users', userRoutes);
 router.use('/qa', qaRoutes);
 router.use('/questions', questionRoutes);
+router.use('/tests', testRoutes);
 router.use('/resources', resourceRoutes);
 router.use('/progress', progressRoutes);
 router.use('/materials', materialRoutes);
