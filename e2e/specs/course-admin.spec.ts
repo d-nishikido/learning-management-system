@@ -119,7 +119,9 @@ test.describe('Course Administration', () => {
     await firstDeleteButton.click();
     
     // Course should still be in the list (deletion was cancelled)
-    await expect(page.locator('table tbody tr')).toHaveCount({ min: 1 });
+    const courseRows = page.locator('table tbody tr');
+    const rowCount = await courseRows.count();
+    expect(rowCount).toBeGreaterThanOrEqual(1);
   });
 
   test('should paginate course list', async ({ page }) => {
