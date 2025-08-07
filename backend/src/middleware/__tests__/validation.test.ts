@@ -279,8 +279,8 @@ describe('Course Schemas', () => {
         title: 'JavaScript Basics',
         description: 'Learn JavaScript fundamentals',
         category: 'Programming',
-        level: 'BEGINNER',
-        duration: 40,
+        difficultyLevel: 'BEGINNER',
+        estimatedHours: 40,
         isPublished: true,
         prerequisites: [1, 2],
       };
@@ -293,18 +293,18 @@ describe('Course Schemas', () => {
       const input = {
         title: 'Course Title',
         category: 'Category',
-        level: 'INTERMEDIATE',
+        difficultyLevel: 'INTERMEDIATE',
       };
       const { error, value } = courseSchemas.create.validate(input);
       expect(error).toBeUndefined();
       expect(value.isPublished).toBe(false);
     });
 
-    it('should reject invalid level', () => {
+    it('should reject invalid difficultyLevel', () => {
       const input = {
         title: 'Course Title',
         category: 'Category',
-        level: 'INVALID',
+        difficultyLevel: 'INVALID',
       };
       const { error } = courseSchemas.create.validate(input);
       expect(error).toBeDefined();
@@ -315,7 +315,7 @@ describe('Course Schemas', () => {
     it('should validate course query parameters', () => {
       const input = {
         category: 'Programming',
-        level: 'BEGINNER',
+        difficultyLevel: 'BEGINNER',
         isPublished: true,
         search: 'javascript',
         page: 1,

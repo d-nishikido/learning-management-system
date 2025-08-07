@@ -164,6 +164,7 @@ export const courseSchemas = {
     thumbnailUrl: Joi.string().uri().optional().allow(''),
     isPublished: Joi.boolean().default(false),
     sortOrder: Joi.number().integer().min(0).optional(),
+    prerequisites: Joi.array().items(Joi.number().integer().positive()).optional(), // Future use
   }),
 
   update: Joi.object({
@@ -175,6 +176,7 @@ export const courseSchemas = {
     thumbnailUrl: Joi.string().uri().optional().allow(''),
     isPublished: Joi.boolean().optional(),
     sortOrder: Joi.number().integer().min(0).optional(),
+    prerequisites: Joi.array().items(Joi.number().integer().positive()).optional(), // Future use
   }),
 
   query: Joi.object({
