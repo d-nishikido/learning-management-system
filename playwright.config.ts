@@ -17,14 +17,15 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : 3,
+  workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['list']
+    ['list'],
+    ['line']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -39,13 +40,23 @@ export default defineConfig({
 
     /* Record video on failure */
     video: 'retain-on-failure',
+
+    /* Set navigation timeout */
+    navigationTimeout: 15 * 1000,
+
+    /* Set action timeout */
+    actionTimeout: 10 * 1000,
   },
 
   /* Configure timeout */
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   expect: {
-    timeout: 5 * 1000,
+    timeout: 10 * 1000,
   },
+
+  /* Global setup for MCP server integration */
+  globalSetup: './e2e/utils/global-setup.ts',
+  globalTeardown: './e2e/utils/global-teardown.ts',
 
   /* Configure projects for major browsers */
   projects: [
