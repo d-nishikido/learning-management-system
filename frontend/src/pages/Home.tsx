@@ -1,3 +1,6 @@
+import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card';
+
 export default function Home() {
   return (
     <div className="space-y-8">
@@ -11,32 +14,32 @@ export default function Home() {
           paths.
         </p>
         <div className="mt-8 flex justify-center space-x-4">
-          <button className="btn-primary">Get Started</button>
-          <button className="btn-outline">Browse Courses</button>
+          <Button variant="primary">Get Started</Button>
+          <Button variant="outline">Browse Courses</Button>
         </div>
       </section>
 
       <section className="grid md:grid-cols-3 gap-8">
-        <div className="card">
+        <Card>
           <h3 className="text-lg font-semibold mb-2">Interactive Learning</h3>
           <p className="text-gray-600">
             Engage with diverse learning materials including videos, PDFs, and interactive
             programming exercises.
           </p>
-        </div>
-        <div className="card">
+        </Card>
+        <Card>
           <h3 className="text-lg font-semibold mb-2">Progress Tracking</h3>
           <p className="text-gray-600">
             Monitor your learning journey with visual progress indicators and achievement badges.
           </p>
-        </div>
-        <div className="card">
+        </Card>
+        <Card>
           <h3 className="text-lg font-semibold mb-2">Q&A Community</h3>
           <p className="text-gray-600">
             Connect with peers and instructors through our comprehensive Q&A and knowledge base
             system.
           </p>
-        </div>
+        </Card>
       </section>
 
       <section className="bg-primary-50 rounded-lg p-8">

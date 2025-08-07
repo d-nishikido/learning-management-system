@@ -3,8 +3,11 @@ import { useAuth } from '@/contexts';
 import { userApi } from '@/services/api';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { Textarea } from '@/components/common/Textarea';
 import { Card } from '@/components/common/Card';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Alert } from '@/components/common/Alert';
+import { Badge } from '@/components/common/Badge';
 import type { UserUpdateRequest, UserProgress, UserBadge, UserSkill } from '@/types';
 
 export function Profile() {
@@ -131,15 +134,19 @@ export function Profile() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <div className="text-red-800">{error}</div>
-        </div>
+        <Alert 
+          type="error" 
+          message={error} 
+          onClose={() => setError('')} 
+        />
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-4">
-          <div className="text-green-800">{success}</div>
-        </div>
+        <Alert 
+          type="success" 
+          message={success} 
+          onClose={() => setSuccess('')}
+        />
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -186,19 +193,14 @@ export function Profile() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      自己紹介
-                    </label>
-                    <textarea
-                      name="bio"
-                      value={formData.bio || ''}
-                      onChange={handleInputChange}
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      placeholder="自己紹介を入力してください..."
-                    />
-                  </div>
+                  <Textarea
+                    label="自己紹介"
+                    name="bio"
+                    value={formData.bio || ''}
+                    onChange={handleInputChange}
+                    rows={4}
+                    placeholder="自己紹介を入力してください..."
+                  />
 
                   <Input
                     label="プロフィール画像URL"
@@ -243,13 +245,12 @@ export function Profile() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-500">ロール</label>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.role === 'ADMIN' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
+                    <Badge 
+                      variant={user.role === 'ADMIN' ? 'primary' : 'info'}
+                      size="sm"
+                    >
                       {user.role === 'ADMIN' ? '管理者' : 'ユーザー'}
-                    </span>
+                    </Badge>
                   </div>
 
                   {user.bio && (
