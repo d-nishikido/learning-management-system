@@ -382,3 +382,71 @@ export const qaSchemas = {
     search: Joi.string().trim(),
   }).concat(commonSchemas.pagination),
 };
+
+/**
+ * Question Management validation schemas
+ */
+export const questionSchemas = {
+  create: Joi.object({
+    title: Joi.string().min(1).max(200).trim().required(),
+    questionText: Joi.string().min(10).max(5000).trim().required(),
+    questionType: Joi.string().valid('MULTIPLE_CHOICE', 'ESSAY', 'PROGRAMMING', 'TRUE_FALSE').required(),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED').default('BEGINNER'),
+    points: Joi.number().integer().min(1).default(10),
+    timeLimitMinutes: Joi.number().integer().min(1).optional(),
+    explanation: Joi.string().max(2000).trim().optional(),
+    hints: Joi.array().items(Joi.string().trim().max(500)).max(5).optional(),
+    tags: Joi.array().items(Joi.string().trim().max(50)).max(20).optional(),
+    isPublished: Joi.boolean().default(false),
+    courseId: Joi.number().integer().positive().optional(),
+    lessonId: Joi.number().integer().positive().optional(),
+    options: Joi.when('questionType', {
+      is: 'MULTIPLE_CHOICE',
+      then: Joi.array().items(
+        Joi.object({
+          optionText: Joi.string().min(1).max(1000).trim().required(),
+          isCorrect: Joi.boolean().required(),
+          sortOrder: Joi.number().integer().min(1).optional(),
+          explanation: Joi.string().max(500).trim().optional(),
+        })
+      ).min(2).required(),
+      otherwise: Joi.forbidden()
+    }),
+  }),
+
+  update: Joi.object({
+    title: Joi.string().min(1).max(200).trim().optional(),
+    questionText: Joi.string().min(10).max(5000).trim().optional(),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED').optional(),
+    points: Joi.number().integer().min(1).optional(),
+    timeLimitMinutes: Joi.number().integer().min(1).optional(),
+    explanation: Joi.string().max(2000).trim().optional(),
+    hints: Joi.array().items(Joi.string().trim().max(500)).max(5).optional(),
+    tags: Joi.array().items(Joi.string().trim().max(50)).max(20).optional(),
+    isPublished: Joi.boolean().optional(),
+    courseId: Joi.number().integer().positive().optional(),
+    lessonId: Joi.number().integer().positive().optional(),
+    options: Joi.array().items(
+      Joi.object({
+        id: Joi.number().integer().positive().optional(),
+        optionText: Joi.string().min(1).max(1000).trim().required(),
+        isCorrect: Joi.boolean().required(),
+        sortOrder: Joi.number().integer().min(1).optional(),
+        explanation: Joi.string().max(500).trim().optional(),
+      })
+    ).min(2).optional(),
+  }),
+
+  query: Joi.object({
+    courseId: Joi.number().integer().positive(),
+    lessonId: Joi.number().integer().positive(),
+    questionType: Joi.string().valid('MULTIPLE_CHOICE', 'ESSAY', 'PROGRAMMING', 'TRUE_FALSE'),
+    difficultyLevel: Joi.string().valid('BEGINNER', 'INTERMEDIATE', 'ADVANCED'),
+    isPublished: Joi.boolean(),
+    tags: Joi.alternatives().try(
+      Joi.string().trim(),
+      Joi.array().items(Joi.string().trim())
+    ),
+    search: Joi.string().trim(),
+  }).concat(commonSchemas.pagination),
+};
