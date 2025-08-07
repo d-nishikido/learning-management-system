@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { QuestionService } from '../questionService';
-import { NotFoundError, ForbiddenError } from '../../utils/errors';
+import { NotFoundError, ForbiddenError, createQuestionValidationError } from '../../utils/errors';
 
 // Mock Prisma Client
 jest.mock('@prisma/client', () => ({
@@ -183,7 +183,7 @@ describe('QuestionService', () => {
       };
 
       await expect(questionService.createQuestion(createData)).rejects.toThrow(
-        'Multiple choice questions must have at least 2 options'
+        createQuestionValidationError.insufficientOptions()
       );
     });
 
@@ -200,7 +200,7 @@ describe('QuestionService', () => {
       };
 
       await expect(questionService.createQuestion(createData)).rejects.toThrow(
-        'Multiple choice questions must have at least one correct option'
+        createQuestionValidationError.noCorrectOption()
       );
     });
 
@@ -391,30 +391,54 @@ describe('QuestionService', () => {
   });
 
   describe('getTags', () => {
-    it('should return unique tags from all questions', async () => {
-      const mockQuestions = [
+    beforeEach(() => {
+      // Mock $queryRaw for optimized getTags method
+      (mockPrisma.$queryRaw as jest.Mock) = jest.fn();
+    });
+
+    it('should return unique tags from all questions using optimized query', async () => {
+      const mockResult = [
         { tags: JSON.stringify(['tag1', 'tag2']) },
         { tags: JSON.stringify(['tag2', 'tag3']) },
       ];
 
-      (mockPrisma.question.findMany as jest.Mock).mockResolvedValue(mockQuestions);
+      (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
 
       const result = await questionService.getTags();
 
+      expect(mockPrisma.$queryRaw).toHaveBeenCalledWith(
+        expect.objectContaining({
+          strings: expect.arrayContaining([
+            expect.stringContaining('SELECT DISTINCT tags')
+          ])
+        })
+      );
       expect(result).toEqual(['tag1', 'tag2', 'tag3']);
     });
 
-    it('should handle invalid JSON tags gracefully', async () => {
-      const mockQuestions = [
+    it('should handle invalid JSON tags gracefully with optimized query', async () => {
+      const mockResult = [
         { tags: 'invalid json' },
         { tags: JSON.stringify(['valid', 'tag']) },
       ];
 
-      (mockPrisma.question.findMany as jest.Mock).mockResolvedValue(mockQuestions);
+      (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
 
       const result = await questionService.getTags();
 
       expect(result).toEqual(['tag', 'valid']);
+    });
+
+    it('should filter out empty and invalid tags', async () => {
+      const mockResult = [
+        { tags: JSON.stringify(['', '  ', 'valid-tag', null, 'another-tag']) },
+      ];
+
+      (mockPrisma.$queryRaw as jest.Mock).mockResolvedValue(mockResult);
+
+      const result = await questionService.getTags();
+
+      expect(result).toEqual(['another-tag', 'valid-tag']);
     });
   });
 });

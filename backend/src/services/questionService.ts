@@ -1,5 +1,5 @@
 import { PrismaClient, Question, QuestionOption, QuestionType, DifficultyLevel } from '@prisma/client';
-import { NotFoundError, ForbiddenError } from '../utils/errors';
+import { NotFoundError, ForbiddenError, createQuestionValidationError } from '../utils/errors';
 
 const prisma = new PrismaClient();
 
@@ -64,7 +64,35 @@ export interface QuestionQueryOptions {
   search?: string;
 }
 
-export interface QuestionWithOptions extends Question {
+// Prisma include type for question with related data
+const questionInclude = {
+  questionOptions: {
+    orderBy: { sortOrder: 'asc' as const }
+  },
+  creator: {
+    select: {
+      id: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+    }
+  },
+  course: {
+    select: {
+      id: true,
+      title: true,
+    }
+  },
+  lesson: {
+    select: {
+      id: true,
+      title: true,
+    }
+  },
+} as const;
+
+// Type derived from Prisma include
+type QuestionWithRelations = Question & {
   questionOptions: QuestionOption[];
   creator: {
     id: number;
@@ -72,15 +100,18 @@ export interface QuestionWithOptions extends Question {
     firstName: string;
     lastName: string;
   };
-  course?: {
+  course: {
     id: number;
     title: string;
   } | null;
-  lesson?: {
+  lesson: {
     id: number;
     title: string;
   } | null;
-}
+};
+
+// Backwards compatibility alias
+export type QuestionWithOptions = QuestionWithRelations;
 
 export class QuestionService {
   /**
@@ -108,13 +139,13 @@ export class QuestionService {
 
     // For multiple choice questions, validate options
     if (data.questionType === 'MULTIPLE_CHOICE' && (!data.options || data.options.length < 2)) {
-      throw new Error('Multiple choice questions must have at least 2 options');
+      throw createQuestionValidationError.insufficientOptions();
     }
 
     if (data.questionType === 'MULTIPLE_CHOICE' && data.options) {
       const correctOptions = data.options.filter(opt => opt.isCorrect);
       if (correctOptions.length === 0) {
-        throw new Error('Multiple choice questions must have at least one correct option');
+        throw createQuestionValidationError.noCorrectOption();
       }
     }
 
@@ -142,31 +173,7 @@ export class QuestionService {
           }))
         } : undefined,
       },
-      include: {
-        questionOptions: {
-          orderBy: { sortOrder: 'asc' }
-        },
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-          }
-        },
-        course: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-        lesson: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-      },
+      include: questionInclude,
     });
 
     return question;
@@ -221,31 +228,7 @@ export class QuestionService {
         skip,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
-        include: {
-          questionOptions: {
-            orderBy: { sortOrder: 'asc' }
-          },
-          creator: {
-            select: {
-              id: true,
-              username: true,
-              firstName: true,
-              lastName: true,
-            }
-          },
-          course: {
-            select: {
-              id: true,
-              title: true,
-            }
-          },
-          lesson: {
-            select: {
-              id: true,
-              title: true,
-            }
-          },
-        },
+        include: questionInclude,
       }),
       prisma.question.count({ where }),
     ]);
@@ -267,31 +250,7 @@ export class QuestionService {
   async getQuestionById(id: number): Promise<QuestionWithOptions> {
     const question = await prisma.question.findUnique({
       where: { id },
-      include: {
-        questionOptions: {
-          orderBy: { sortOrder: 'asc' }
-        },
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-          }
-        },
-        course: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-        lesson: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-      },
+      include: questionInclude,
     });
 
     if (!question) {
@@ -335,7 +294,7 @@ export class QuestionService {
     if (data.options && question.questionType === 'MULTIPLE_CHOICE') {
       const correctOptions = data.options.filter(opt => opt.isCorrect);
       if (correctOptions.length === 0) {
-        throw new Error('Multiple choice questions must have at least one correct option');
+        throw createQuestionValidationError.noCorrectOption();
       }
 
       // Delete existing options and create new ones
@@ -367,31 +326,7 @@ export class QuestionService {
           }))
         } : undefined,
       },
-      include: {
-        questionOptions: {
-          orderBy: { sortOrder: 'asc' }
-        },
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-          }
-        },
-        course: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-        lesson: {
-          select: {
-            id: true,
-            title: true,
-          }
-        },
-      },
+      include: questionInclude,
     });
 
     return updatedQuestion;
@@ -428,27 +363,31 @@ export class QuestionService {
   }
 
   /**
-   * Get unique tags from all questions
+   * Get unique tags from all questions (optimized for performance)
    */
   async getTags(): Promise<string[]> {
-    const questions = await prisma.question.findMany({
-      select: {
-        tags: true
-      },
-      where: {
-        tags: {
-          not: null
-        }
-      }
-    });
+    // Use aggregation to get only distinct tag values directly from database
+    const result = await prisma.$queryRaw<Array<{ tags: string | null }>>`
+      SELECT DISTINCT tags 
+      FROM questions 
+      WHERE tags IS NOT NULL 
+      AND tags != 'null'
+      LIMIT 1000
+    `;
 
     const allTags = new Set<string>();
     
-    questions.forEach(question => {
-      if (question.tags) {
+    result.forEach(row => {
+      if (row.tags) {
         try {
-          const tags = JSON.parse(question.tags) as string[];
-          tags.forEach(tag => allTags.add(tag));
+          const tags = JSON.parse(row.tags) as string[];
+          if (Array.isArray(tags)) {
+            tags.forEach(tag => {
+              if (typeof tag === 'string' && tag.trim()) {
+                allTags.add(tag.trim());
+              }
+            });
+          }
         } catch (error) {
           // Skip invalid JSON
         }

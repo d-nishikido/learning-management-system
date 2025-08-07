@@ -26,6 +26,12 @@ export enum ErrorCode {
   LESSON_NOT_ACCESSIBLE = 'LESSON_NOT_ACCESSIBLE',
   TEST_SUBMISSION_FAILED = 'TEST_SUBMISSION_FAILED',
   
+  // Question Management
+  INVALID_QUESTION_TYPE = 'INVALID_QUESTION_TYPE',
+  INSUFFICIENT_OPTIONS = 'INSUFFICIENT_OPTIONS',
+  NO_CORRECT_OPTION = 'NO_CORRECT_OPTION',
+  QUESTION_ALREADY_PUBLISHED = 'QUESTION_ALREADY_PUBLISHED',
+  
   // System
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
   DATABASE_ERROR = 'DATABASE_ERROR',
@@ -133,3 +139,31 @@ export const createConflictError = (message: string, details?: Record<string, un
 
 export const createDatabaseError = (message?: string, details?: Record<string, unknown>) =>
   new DatabaseError(message, details);
+
+/**
+ * Question-specific error classes
+ */
+export class QuestionValidationError extends AppError {
+  constructor(message: string, errorCode: ErrorCode, details?: Record<string, unknown>) {
+    super(message, 400, errorCode, true, details);
+  }
+}
+
+export const createQuestionValidationError = {
+  insufficientOptions: () => new QuestionValidationError(
+    'Multiple choice questions must have at least 2 options',
+    ErrorCode.INSUFFICIENT_OPTIONS
+  ),
+  noCorrectOption: () => new QuestionValidationError(
+    'Multiple choice questions must have at least one correct option',
+    ErrorCode.NO_CORRECT_OPTION
+  ),
+  invalidQuestionType: (type: string) => new QuestionValidationError(
+    `Invalid question type: ${type}`,
+    ErrorCode.INVALID_QUESTION_TYPE
+  ),
+  alreadyPublished: () => new QuestionValidationError(
+    'Cannot modify a published question',
+    ErrorCode.QUESTION_ALREADY_PUBLISHED
+  )
+};
