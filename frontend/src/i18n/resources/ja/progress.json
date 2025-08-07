@@ -54,5 +54,75 @@
       "moderate": "中程度の学習 (30分-1時間)",
       "intensive": "集中学習 (1時間以上)"
     }
+  },
+  "learningHistory": {
+    "title": "学習履歴",
+    "loading": "学習履歴を読み込み中...",
+    "error": "学習履歴データの読み込みに失敗しました",
+    "generateReport": "レポート生成",
+    "generateReportError": "統計レポートの生成に失敗しました",
+    "exportCSV": "CSV出力",
+    "dateRange": {
+      "from": "開始日:",
+      "to": "終了日:"
+    },
+    "tabs": {
+      "overview": "概要",
+      "history": "アクセス履歴",
+      "patterns": "学習パターン",
+      "report": "詳細レポート"
+    },
+    "overview": {
+      "totalAccesses": "総アクセス数",
+      "totalStudyTime": "総学習時間",
+      "averageSession": "平均セッション時間",
+      "mostActive": "最も活発な時間"
+    },
+    "accessHistory": {
+      "title": "最近のアクセス履歴",
+      "dateTime": "日時",
+      "material": "教材",
+      "accessType": "アクセス種別",
+      "duration": "継続時間",
+      "unknown": "不明"
+    },
+    "patterns": {
+      "title": "学習パターン",
+      "mostActiveTimes": "最も活発な時間帯",
+      "hour": "時間",
+      "day": "曜日",
+      "materialBreakdown": "教材別内訳",
+      "accesses": "回のアクセス"
+    },
+    "report": {
+      "title": "詳細統計レポート",
+      "totalStudyTime": "総学習時間",
+      "materialsAccessed": "アクセスした教材数",
+      "uniqueMaterials": "ユニーク教材数",
+      "dailyAverage": "1日平均",
+      "longestSession": "最長セッション",
+      "shortestSession": "最短セッション",
+      "mostUsedAccessType": "最も使用されたアクセス種別",
+      "reportPeriod": "レポート期間"
+    },
+    "charts": {
+      "hourlyPattern": "時間帯別学習パターン",
+      "weeklyPattern": "曜日別学習パターン",
+      "topMaterials": "アクセス数による上位学習教材",
+      "materials": "教材",
+      "materialComparison": "教材使用状況比較",
+      "accessCount": "アクセス数",
+      "studyTime": "学習時間（分）"
+    },
+    "export": {
+      "overviewSummary": "概要サマリーを出力",
+      "accessHistory": "アクセス履歴を出力",
+      "materialBreakdown": "教材別内訳を出力",
+      "fullReport": "完全統計レポートを出力"
+    },
+    "timeFormat": {
+      "hours": "時間",
+      "minutes": "分"
+    }
   }
 }

@@ -54,5 +54,75 @@
       "moderate": "Moderate study (30 min - 1 hour)",
       "intensive": "Intensive study (> 1 hour)"
     }
+  },
+  "learningHistory": {
+    "title": "Learning History",
+    "loading": "Loading learning history...",
+    "error": "Failed to load learning history data",
+    "generateReport": "Generate Report",
+    "generateReportError": "Failed to generate stats report",
+    "exportCSV": "Export CSV",
+    "dateRange": {
+      "from": "From:",
+      "to": "To:"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "history": "Access History",
+      "patterns": "Learning Patterns",
+      "report": "Detailed Report"
+    },
+    "overview": {
+      "totalAccesses": "Total Accesses",
+      "totalStudyTime": "Total Study Time",
+      "averageSession": "Average Session",
+      "mostActive": "Most Active"
+    },
+    "accessHistory": {
+      "title": "Recent Access History",
+      "dateTime": "Date & Time",
+      "material": "Material",
+      "accessType": "Access Type",
+      "duration": "Duration",
+      "unknown": "Unknown"
+    },
+    "patterns": {
+      "title": "Learning Patterns",
+      "mostActiveTimes": "Most Active Times",
+      "hour": "Hour",
+      "day": "Day",
+      "materialBreakdown": "Material Breakdown",
+      "accesses": "accesses"
+    },
+    "report": {
+      "title": "Detailed Statistics Report",
+      "totalStudyTime": "Total Study Time",
+      "materialsAccessed": "Materials Accessed",
+      "uniqueMaterials": "Unique Materials",
+      "dailyAverage": "Daily Average",
+      "longestSession": "Longest Session",
+      "shortestSession": "Shortest Session",
+      "mostUsedAccessType": "Most Used Access Type",
+      "reportPeriod": "Report Period"
+    },
+    "charts": {
+      "hourlyPattern": "Hourly Learning Pattern",
+      "weeklyPattern": "Weekly Learning Pattern",
+      "topMaterials": "Top Learning Materials by Access Count",
+      "materials": "Materials",
+      "materialComparison": "Material Usage Comparison",
+      "accessCount": "Access Count",
+      "studyTime": "Study Time (min)"
+    },
+    "export": {
+      "overviewSummary": "Export Overview Summary",
+      "accessHistory": "Export Access History",
+      "materialBreakdown": "Export Material Breakdown",
+      "fullReport": "Export Full Statistics Report"
+    },
+    "timeFormat": {
+      "hours": "h",
+      "minutes": "m"
+    }
   }
 }
