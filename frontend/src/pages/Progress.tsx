@@ -6,6 +6,7 @@ import { ProgressChart } from '@/components/progress/ProgressChart';
 import { TimeSeriesChart } from '@/components/progress/TimeSeriesChart';
 import { CourseProgressChart } from '@/components/progress/CourseProgressChart';
 import { LearningCalendar } from '@/components/calendar/LearningCalendar';
+import { LearningHistoryDashboard } from '@/components/progress/LearningHistoryDashboard';
 import { progressApi } from '@/services/api';
 import type { ProgressSummary, TimeSeriesDataPoint } from '@/types';
 
@@ -127,6 +128,11 @@ export default function Progress() {
         <Card>
           <LearningCalendar />
         </Card>
+      </section>
+
+      {/* Learning History Dashboard Section */}
+      <section>
+        <LearningHistoryDashboard />
       </section>
     </div>
   );
