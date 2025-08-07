@@ -547,3 +547,105 @@ export interface TimeSeriesQuery {
   interval?: 'day' | 'week' | 'month';
   courseId?: number;
 }
+
+// Learning History Types
+export type AccessType = 'VIEW' | 'DOWNLOAD' | 'EXTERNAL_LINK';
+
+export interface AccessHistoryQuery {
+  materialId?: number;
+  resourceId?: number;
+  accessType?: AccessType;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface AccessHistoryRecord {
+  id: number;
+  userId: number;
+  materialId?: number | null;
+  resourceId?: number | null;
+  accessType: AccessType;
+  sessionDuration?: number | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  accessedAt: Date;
+  user: User;
+  material?: LearningMaterial | null;
+  resource?: LearningResource | null;
+}
+
+export interface LearningPattern {
+  hourOfDay: number;
+  dayOfWeek: number;
+  accessCount: number;
+  averageSessionDuration: number;
+}
+
+export interface MaterialBreakdown {
+  materialId: number;
+  materialTitle: string;
+  accessCount: number;
+  totalTime: number;
+}
+
+export interface DetailedLearningHistory {
+  totalAccesses: number;
+  totalSessionTime: number;
+  averageSessionTime: number;
+  mostActiveHour: number;
+  mostActiveDay: string;
+  recentAccesses: AccessHistoryRecord[];
+  learningPatterns: LearningPattern[];
+  materialBreakdown: MaterialBreakdown[];
+}
+
+export interface DailyBreakdown {
+  date: string;
+  studyTime: number;
+  materialsAccessed: number;
+  sessionsCount: number;
+}
+
+export interface HourlyBreakdown {
+  hour: number;
+  accessCount: number;
+  totalTime: number;
+}
+
+export interface WeeklyBreakdown {
+  dayOfWeek: string;
+  accessCount: number;
+  totalTime: number;
+}
+
+export interface LearningStatsReport {
+  userId: number;
+  periodStart: Date;
+  periodEnd: Date;
+  totalStudyTime: number;
+  totalMaterialsAccessed: number;
+  uniqueMaterialsAccessed: number;
+  averageDailyStudyTime: number;
+  longestStudySession: number;
+  shortestStudySession: number;
+  mostUsedAccessType: AccessType;
+  dailyBreakdown: DailyBreakdown[];
+  hourlyBreakdown: HourlyBreakdown[];
+  weeklyBreakdown: WeeklyBreakdown[];
+}
+
+export interface LearningPatternsResponse {
+  mostActiveHour: number;
+  mostActiveDay: string;
+  learningPatterns: LearningPattern[];
+  materialBreakdown: MaterialBreakdown[];
+}
+
+export interface RecordAccessRequest {
+  materialId?: number;
+  resourceId?: number;
+  accessType: AccessType;
+  sessionDuration?: number;
+}

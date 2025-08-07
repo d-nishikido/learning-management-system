@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { validateBody, validateQuery, validateParams, commonSchemas } from '../middleware/validation';
 import { authenticateToken, requireRole } from '../middleware/auth';
 import { ProgressController } from '../controllers/progressController';
+import { LearningHistoryController } from '../controllers/learningHistoryController';
 
 const router = Router();
 
@@ -33,6 +34,47 @@ const sessionSchema = Joi.object({
 
 const sessionUpdateSchema = Joi.object({
   spentMinutes: Joi.number().integer().min(1).required()
+});
+
+// Learning history schemas
+const accessHistoryQuerySchema = Joi.object({
+  materialId: Joi.number().integer().positive().optional(),
+  resourceId: Joi.number().integer().positive().optional(),
+  accessType: Joi.string().valid('VIEW', 'DOWNLOAD', 'EXTERNAL_LINK').optional(),
+  startDate: Joi.date().optional(),
+  endDate: Joi.date().optional(),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(20)
+});
+
+const detailedHistoryQuerySchema = Joi.object({
+  startDate: Joi.date().optional(),
+  endDate: Joi.date().optional()
+});
+
+const statsReportQuerySchema = Joi.object({
+  startDate: Joi.date().required(),
+  endDate: Joi.date().required()
+}).custom((value, helpers) => {
+  if (value.startDate >= value.endDate) {
+    return helpers.error('any.invalid', { message: 'Start date must be before end date' });
+  }
+  return value;
+});
+
+const recordAccessSchema = Joi.object({
+  materialId: Joi.number().integer().positive().optional(),
+  resourceId: Joi.number().integer().positive().optional(),
+  accessType: Joi.string().valid('VIEW', 'DOWNLOAD', 'EXTERNAL_LINK').required(),
+  sessionDuration: Joi.number().integer().min(0).optional()
+}).custom((value, helpers) => {
+  if (!value.materialId && !value.resourceId) {
+    return helpers.error('any.invalid', { message: 'Either materialId or resourceId must be provided' });
+  }
+  if (value.materialId && value.resourceId) {
+    return helpers.error('any.invalid', { message: 'Cannot specify both materialId and resourceId' });
+  }
+  return value;
 });
 
 /**
@@ -236,6 +278,65 @@ router.get('/stats/time-series',
     courseId: Joi.number().integer().positive().optional()
   })),
   ProgressController.getTimeSeriesData
+);
+
+// ==========================================
+// Learning History Routes
+// ==========================================
+
+/**
+ * GET /progress/history/access
+ * Get access history for current user
+ * Authenticated users only
+ */
+router.get('/history/access',
+  authenticateToken,
+  validateQuery(accessHistoryQuerySchema),
+  LearningHistoryController.getAccessHistory
+);
+
+/**
+ * GET /progress/history/detailed
+ * Get detailed learning history for current user
+ * Authenticated users only
+ */
+router.get('/history/detailed',
+  authenticateToken,
+  validateQuery(detailedHistoryQuerySchema),
+  LearningHistoryController.getDetailedHistory
+);
+
+/**
+ * GET /progress/stats/reports
+ * Generate learning statistics report
+ * Authenticated users only
+ */
+router.get('/stats/reports',
+  authenticateToken,
+  validateQuery(statsReportQuerySchema),
+  LearningHistoryController.generateStatsReport
+);
+
+/**
+ * GET /progress/stats/patterns
+ * Get learning patterns analysis
+ * Authenticated users only
+ */
+router.get('/stats/patterns',
+  authenticateToken,
+  validateQuery(detailedHistoryQuerySchema),
+  LearningHistoryController.getLearningPatterns
+);
+
+/**
+ * POST /progress/history/record-access
+ * Record material or resource access
+ * Authenticated users only
+ */
+router.post('/history/record-access',
+  authenticateToken,
+  validateBody(recordAccessSchema),
+  LearningHistoryController.recordAccess
 );
 
 export default router;
