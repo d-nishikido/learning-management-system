@@ -1,4 +1,5 @@
 import { Card } from '@/components/common/Card';
+import { Badge } from '@/components/common/Badge';
 import type { LearningMaterial } from '@/types';
 
 interface MaterialCardProps {
@@ -119,17 +120,17 @@ export function MaterialCard({ material, onView }: MaterialCardProps) {
                 )}
                 
                 {material.materialCategory === 'SUPPLEMENTARY' && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <Badge variant="secondary" size="sm">
                     補足教材
-                  </span>
+                  </Badge>
                 )}
               </div>
             </div>
             
             {!material.isPublished && (
-              <span className="ml-4 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              <Badge variant="warning" size="sm" className="ml-4">
                 下書き
-              </span>
+              </Badge>
             )}
           </div>
           
