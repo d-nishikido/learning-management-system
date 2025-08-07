@@ -3,6 +3,8 @@ import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
+import { Alert } from '@/components/common/Alert';
 import { useAuth } from '@/contexts';
 import type { AuthError } from '@/types';
 
@@ -61,9 +63,10 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {errors.general && (
-        <div className="rounded-md bg-red-50 p-4">
-          <p className="text-sm text-red-800">{errors.general}</p>
-        </div>
+        <Alert 
+          type="error" 
+          message={errors.general}
+        />
       )}
       
       <Input
@@ -91,17 +94,11 @@ export function LoginForm() {
       />
       
       <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <input
-            id="remember"
-            name="remember"
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-          />
-          <label htmlFor="remember" className="ml-2 block text-sm text-gray-900">
-            ログイン状態を保持する
-          </label>
-        </div>
+        <Checkbox
+          id="remember"
+          name="remember"
+          label="ログイン状態を保持する"
+        />
         
         <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-500">
           パスワードを忘れた方
