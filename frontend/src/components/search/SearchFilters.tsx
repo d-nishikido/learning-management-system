@@ -2,8 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import type { 
-  LearningMaterialQueryParams, 
-  LearningResourceQueryParams, 
   MaterialType, 
   ResourceType, 
   DifficultyLevel, 
@@ -43,7 +41,7 @@ export function SearchFilters({
     onQueryChange({ ...query, search: value || undefined });
   };
 
-  const handleFilterChange = (key: keyof SearchQuery, value: any) => {
+  const handleFilterChange = (key: keyof SearchQuery, value: string | boolean) => {
     onQueryChange({ 
       ...query, 
       [key]: value === 'all' || value === '' ? undefined : value,
@@ -65,7 +63,7 @@ export function SearchFilters({
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Search */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -91,7 +89,7 @@ export function SearchFilters({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
           {/* Material Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
