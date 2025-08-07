@@ -25,7 +25,7 @@ interface LearningPatternChartProps {
 }
 
 export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
-  learningPatterns,
+  learningPatterns: _learningPatterns,
   materialBreakdown,
   hourlyBreakdown = [],
   weeklyBreakdown = []
@@ -60,7 +60,7 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
   });
 
   // Prepare top materials data for pie chart
-  const topMaterials = materialBreakdown.slice(0, 8).map((material, index) => ({
+  const topMaterials = materialBreakdown.slice(0, 8).map((material) => ({
     name: material.materialTitle.length > 20 
       ? `${material.materialTitle.substring(0, 20)}...` 
       : material.materialTitle,
@@ -74,12 +74,16 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
     '#8884d8', '#82ca9d', '#ffc658', '#ff7300'
   ];
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: {
+    active?: boolean;
+    payload?: Array<{ name: string; value: number; dataKey: string; color: string }>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-300 rounded-lg shadow">
           <p className="font-semibold">{`${label}`}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <p key={index} style={{ color: entry.color }}>
               {entry.dataKey === 'totalTime' 
                 ? `${entry.name}: ${formatMinutes(entry.value)}`
@@ -93,7 +97,10 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
     return null;
   };
 
-  const MaterialTooltip = ({ active, payload }: any) => {
+  const MaterialTooltip = ({ active, payload }: {
+    active?: boolean;
+    payload?: Array<{ payload: { name: string; value: number; totalTime: number }; color: string }>;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -114,7 +121,7 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
   return (
     <div className="space-y-8">
       {/* Hourly Access Pattern */}
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-white p-6 rounded-lg shadow" data-testid="hourly-pattern-chart">
         <h3 className="text-lg font-semibold mb-4 text-gray-900">
           {t('learningHistory.charts.hourlyPattern')}
         </h3>
@@ -140,7 +147,7 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
       </div>
 
       {/* Weekly Learning Pattern */}
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-white p-6 rounded-lg shadow" data-testid="weekly-pattern-chart">
         <h3 className="text-lg font-semibold mb-4 text-gray-900">
           {t('learningHistory.charts.weeklyPattern')}
         </h3>
@@ -172,7 +179,7 @@ export const LearningPatternChart: React.FC<LearningPatternChartProps> = ({
       </div>
 
       {/* Material Usage Distribution */}
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-white p-6 rounded-lg shadow" data-testid="material-breakdown-chart">
         <h3 className="text-lg font-semibold mb-4 text-gray-900">
           {t('learningHistory.charts.topMaterials')}
         </h3>

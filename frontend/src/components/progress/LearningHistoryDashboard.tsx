@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -41,9 +41,9 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
 
   useEffect(() => {
     loadLearningHistory();
-  }, [dateRange]);
+  }, [dateRange, loadLearningHistory]);
 
-  const loadLearningHistory = async () => {
+  const loadLearningHistory = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -73,7 +73,7 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dateRange.startDate, dateRange.endDate, t]);
 
   const generateReport = async () => {
     try {
@@ -142,7 +142,7 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center p-8" data-testid="loading-spinner">
         <LoadingSpinner />
         <span className="ml-2">{t('learningHistory.loading')}</span>
       </div>
@@ -232,7 +232,7 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
 
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-8" role="tablist">
           {[
             { key: 'overview', label: 'Overview' },
             { key: 'history', label: 'Access History' },
@@ -241,7 +241,8 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
           ].map(tab => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              role="tab"
+              onClick={() => setActiveTab(tab.key as 'overview' | 'history' | 'patterns' | 'report')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.key
                   ? 'border-blue-500 text-blue-600'
@@ -393,7 +394,7 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
       {activeTab === 'report' && statsReport && (
         <div className="space-y-6">
           <Card>
-            <div className="p-6">
+            <div className="p-6" data-testid="report-stats">
               <h3 className="text-lg font-medium text-gray-900 mb-4">{t('learningHistory.report.title')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-4">
