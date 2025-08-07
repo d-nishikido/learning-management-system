@@ -472,8 +472,8 @@ export class LearningMaterialService {
             id: true,
             progressRate: true,
             isCompleted: true,
-            timeSpentMinutes: true,
-            lastAccessedAt: true,
+            spentMinutes: true,
+            lastAccessed: true,
           },
         };
       }
