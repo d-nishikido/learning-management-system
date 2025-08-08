@@ -1,6 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import Layout from './components/common/Layout';
-import Home from './pages/Home';
+import { AccessControl } from './components/common/AccessControl';
 import Dashboard from './pages/Dashboard';
 import Progress from './pages/Progress';
 import Login from './pages/Login';
@@ -29,14 +29,14 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: '/app',
     element: <Layout />,
     children: [
       {
         index: true,
-        element: <Home />,
-      },
-      {
-        path: 'dashboard',
         element: (
           <ProtectedRoute>
             <Dashboard />
@@ -165,9 +165,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <AccessControl>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </AccessControl>
   );
 }
 
