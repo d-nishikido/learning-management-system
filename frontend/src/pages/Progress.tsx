@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/common/Card';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { ErrorBoundary } from '@/components/common';
 import { ProgressChart } from '@/components/progress/ProgressChart';
 import { TimeSeriesChart } from '@/components/progress/TimeSeriesChart';
 import { CourseProgressChart } from '@/components/progress/CourseProgressChart';
@@ -132,7 +133,13 @@ export default function Progress() {
 
       {/* Learning History Dashboard Section */}
       <section>
-        <LearningHistoryDashboard />
+        <ErrorBoundary
+          onError={(error, errorInfo) => {
+            console.error('LearningHistoryDashboard Error:', error, errorInfo);
+          }}
+        >
+          <LearningHistoryDashboard />
+        </ErrorBoundary>
       </section>
     </div>
   );
