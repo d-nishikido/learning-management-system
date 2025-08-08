@@ -386,6 +386,7 @@ model Test {
   @@index([lessonId])
   @@index([isPublished])
   @@index([availableFrom])
+  @@index([availableFrom, availableUntil, isPublished], name: "idx_test_availability")
   @@map("tests")
 }
 
@@ -429,6 +430,7 @@ model UserTestResult {
   @@index([testId])
   @@index([isPassed])
   @@index([completedAt])
+  @@index([testId, userId, completedAt], name: "idx_user_test_results_performance")
   @@map("user_test_results")
 }
 
