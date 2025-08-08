@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import Layout from './components/common/Layout';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -22,6 +22,35 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import './i18n';
 
+// Component to handle home page blocking
+function HomePageHandler() {
+  const isTestEnvironment = import.meta.env.VITE_NODE_ENV === 'test';
+  
+  if (isTestEnvironment) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center p-8 bg-white rounded-lg shadow-md">
+          <div className="text-6xl text-gray-400 mb-4">🚫</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Access Not Available
+          </h1>
+          <p className="text-gray-600">
+            This interface is currently running in test mode and is not available for direct access.
+          </p>
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-sm text-yellow-800">
+              If you need to access the application, please use the production environment.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // In non-test environments, redirect to login
+  return <Navigate to="/login" replace />;
+}
+
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -33,7 +62,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: <HomePageHandler />,
       },
       {
         path: 'dashboard',
