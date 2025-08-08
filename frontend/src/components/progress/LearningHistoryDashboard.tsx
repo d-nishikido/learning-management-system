@@ -39,10 +39,6 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
     endDate: new Date().toISOString().split('T')[0]
   });
 
-  useEffect(() => {
-    loadLearningHistory();
-  }, [dateRange, loadLearningHistory]);
-
   const loadLearningHistory = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -74,6 +70,10 @@ export const LearningHistoryDashboard: React.FC<LearningHistoryDashboardProps> =
       setIsLoading(false);
     }
   }, [dateRange.startDate, dateRange.endDate, t]);
+
+  useEffect(() => {
+    loadLearningHistory();
+  }, [dateRange, loadLearningHistory]);
 
   const generateReport = async () => {
     try {

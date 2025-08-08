@@ -52,5 +52,12 @@
     "message": "Are you sure you want to logout?",
     "confirm": "Logout",
     "cancel": "Cancel"
+  },
+  "errorBoundary": {
+    "title": "Application Error Occurred",
+    "message": "Sorry, an unexpected error has occurred. Please refresh the page or return to the homepage.",
+    "technicalDetails": "Show technical details",
+    "retry": "Retry",
+    "goHome": "Go Home"
   }
 }
