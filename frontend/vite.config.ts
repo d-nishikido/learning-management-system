@@ -16,6 +16,10 @@ export default defineConfig({
       '@types': path.resolve(__dirname, './src/types'),
     },
   },
+  define: {
+    // Expose NODE_ENV to the client side
+    'import.meta.env.VITE_NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+  },
   server: {
     port: 3000,
     host: true,
