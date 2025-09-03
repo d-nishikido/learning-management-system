@@ -266,7 +266,7 @@ export const learningMaterialSchemas = {
     externalUrl: Joi.when('materialType', {
       is: 'URL',
       then: Joi.string().uri().max(1000).required(),
-      otherwise: Joi.forbidden()
+      otherwise: Joi.string().optional().allow('', null)
     }),
     durationMinutes: Joi.number().integer().min(1).optional(),
     allowManualProgress: Joi.when('materialType', {
@@ -277,20 +277,20 @@ export const learningMaterialSchemas = {
     sortOrder: Joi.number().integer().min(1).optional(),
     isPublished: Joi.boolean().default(false),
     // File fields are populated by upload middleware
-    filePath: Joi.string().when('materialType', {
+    filePath: Joi.when('materialType', {
       is: 'FILE',
-      then: Joi.required(),
-      otherwise: Joi.forbidden()
+      then: Joi.string().required(),
+      otherwise: Joi.string().optional().allow('', null)
     }),
-    fileSize: Joi.number().integer().min(1).when('materialType', {
+    fileSize: Joi.when('materialType', {
       is: 'FILE',
-      then: Joi.required(),
-      otherwise: Joi.forbidden()
+      then: Joi.number().integer().min(1).required(),
+      otherwise: Joi.number().optional().allow(null)
     }),
-    fileType: Joi.string().when('materialType', {
+    fileType: Joi.when('materialType', {
       is: 'FILE',
-      then: Joi.required(),
-      otherwise: Joi.forbidden()
+      then: Joi.string().required(),
+      otherwise: Joi.string().optional().allow('', null)
     }),
   }),
 

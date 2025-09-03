@@ -169,10 +169,17 @@ export function MaterialForm({
         // For create mode, handle file upload separately
         const createData = { ...formData };
         
-        // Remove empty optional fields
+        // Remove empty optional fields and fields not relevant to material type
         if (!createData.description?.trim()) delete createData.description;
         if (createData.materialType !== 'URL') delete createData.externalUrl;
         if (createData.durationMinutes === undefined) delete createData.durationMinutes;
+        
+        // Ensure file-related fields are not sent for non-FILE types
+        if (createData.materialType !== 'FILE') {
+          delete (createData as any).filePath;
+          delete (createData as any).fileSize;
+          delete (createData as any).fileType;
+        }
         
         await onSubmit(createData, selectedFile || undefined);
       }
