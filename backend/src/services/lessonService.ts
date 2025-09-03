@@ -250,19 +250,10 @@ export class LessonService {
       if (userRole === 'ADMIN') {
         // Admins can see all lessons (published and unpublished)
         showUnpublished = true;
-      } else if (userId) {
-        // Check if user is enrolled in the course
-        const isEnrolled = await this.isUserEnrolledInCourse(userId, courseId);
-        if (isEnrolled) {
-          // Enrolled users can see published lessons
-          showUnpublished = false;
-        } else {
-          // Non-enrolled users can't see any lessons - use impossible condition
-          whereClause.id = -1; // This will return no results
-        }
       } else {
-        // No user context - no lessons visible - use impossible condition
-        whereClause.id = -1; // This will return no results
+        // Non-admin users (including non-enrolled and anonymous users) can see published lessons
+        // This allows course browsing and preview functionality
+        showUnpublished = false;
       }
 
       // Apply isPublished filter unless user is admin
