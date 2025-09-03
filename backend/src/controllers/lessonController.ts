@@ -22,7 +22,7 @@ export interface LessonUpdateRequest {
 }
 
 export interface LessonQueryRequest {
-  isPublished?: string;
+  isPublished?: boolean;
   search?: string;
   page?: string;
   limit?: string;
@@ -115,7 +115,7 @@ export class LessonController {
 
       const query: LessonQuery = {};
       
-      if (req.query.isPublished !== undefined) query.isPublished = req.query.isPublished === 'true';
+      if (req.query.isPublished !== undefined) query.isPublished = req.query.isPublished;
       if (req.query.search) query.search = req.query.search;
       if (req.query.page) query.page = parseInt(req.query.page, 10);
       if (req.query.limit) query.limit = parseInt(req.query.limit, 10);
