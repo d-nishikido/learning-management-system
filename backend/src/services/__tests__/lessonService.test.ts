@@ -2,22 +2,32 @@ import { LessonService, CreateLessonData, UpdateLessonData } from '../lessonServ
 import { NotFoundError, ConflictError } from '../../utils/errors';
 import { PrismaClient } from '@prisma/client';
 
+// Create mock functions
+const mockLessonFunctions = {
+  findFirst: jest.fn(),
+  findUnique: jest.fn(),
+  findMany: jest.fn(),
+  create: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+  count: jest.fn(),
+  updateMany: jest.fn(),
+};
+
+const mockCourseFunctions = {
+  findUnique: jest.fn(),
+};
+
+const mockUserProgressFunctions = {
+  findFirst: jest.fn(),
+};
+
 // Mock Prisma Client
 jest.mock('@prisma/client', () => ({
   PrismaClient: jest.fn().mockImplementation(() => ({
-    lesson: {
-      findFirst: jest.fn(),
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      count: jest.fn(),
-      updateMany: jest.fn(),
-    },
-    course: {
-      findUnique: jest.fn(),
-    },
+    lesson: mockLessonFunctions,
+    course: mockCourseFunctions,
+    userProgress: mockUserProgressFunctions,
   })),
 }));
 
@@ -63,10 +73,10 @@ describe('LessonService', () => {
     };
 
     it('should create a lesson successfully', async () => {
-      (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
-      (mockPrisma.lesson.findFirst as jest.Mock).mockResolvedValue(null); // No existing lesson
-      (mockPrisma.lesson.findFirst as jest.Mock).mockResolvedValueOnce(null); // No last lesson
-      (mockPrisma.lesson.create as jest.Mock).mockResolvedValue(mockCreatedLesson);
+      mockCourseFunctions.findUnique.mockResolvedValue(mockCourse);
+      mockLessonFunctions.findFirst.mockResolvedValue(null); // No existing lesson
+      mockLessonFunctions.findFirst.mockResolvedValueOnce(null); // No last lesson
+      mockLessonFunctions.create.mockResolvedValue(mockCreatedLesson);
 
       const result = await LessonService.createLesson(mockLessonData);
 
@@ -281,12 +291,12 @@ describe('LessonService', () => {
       },
     ];
 
-    it('should get lessons for a course successfully', async () => {
+    it('should get lessons for a course successfully for anonymous users', async () => {
       (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
       (mockPrisma.lesson.count as jest.Mock).mockResolvedValue(2);
       (mockPrisma.lesson.findMany as jest.Mock).mockResolvedValue(mockLessons);
 
-      const result = await LessonService.getLessonsByCourse(1, { page: 1, limit: 10 }, false);
+      const result = await LessonService.getLessonsByCourse(1, { page: 1, limit: 10 });
 
       expect(result).toEqual({
         lessons: mockLessons,
@@ -298,12 +308,74 @@ describe('LessonService', () => {
       expect(mockPrisma.course.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
       });
+      expect(mockPrisma.lesson.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            courseId: 1,
+            isPublished: true, // Anonymous users should only see published lessons
+          }),
+        })
+      );
+    });
+
+    it('should allow non-enrolled users to see published lessons', async () => {
+      (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
+      (mockPrisma.lesson.count as jest.Mock).mockResolvedValue(2);
+      (mockPrisma.lesson.findMany as jest.Mock).mockResolvedValue(mockLessons);
+
+      // Non-enrolled user (has userId but not admin role)
+      const result = await LessonService.getLessonsByCourse(1, { page: 1, limit: 10 }, 123, 'USER');
+
+      expect(result).toEqual({
+        lessons: mockLessons,
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+      
+      // Should filter for published lessons only
+      expect(mockPrisma.lesson.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            courseId: 1,
+            isPublished: true, // Non-enrolled users should see published lessons
+          }),
+        })
+      );
+    });
+
+    it('should allow admin users to see all lessons including unpublished', async () => {
+      (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
+      (mockPrisma.lesson.count as jest.Mock).mockResolvedValue(2);
+      (mockPrisma.lesson.findMany as jest.Mock).mockResolvedValue(mockLessons);
+
+      // Admin user
+      const result = await LessonService.getLessonsByCourse(1, { page: 1, limit: 10 }, 456, 'ADMIN');
+
+      expect(result).toEqual({
+        lessons: mockLessons,
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
+      
+      // Should not filter by isPublished for admin
+      expect(mockPrisma.lesson.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            courseId: 1,
+            // Should not have isPublished filter for admin
+          }),
+        })
+      );
     });
 
     it('should throw NotFoundError if course does not exist', async () => {
       (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(LessonService.getLessonsByCourse(1, {}, false)).rejects.toThrow(
+      await expect(LessonService.getLessonsByCourse(1, {})).rejects.toThrow(
         new NotFoundError('Course not found')
       );
     });
@@ -313,7 +385,7 @@ describe('LessonService', () => {
       (mockPrisma.lesson.count as jest.Mock).mockResolvedValue(1);
       (mockPrisma.lesson.findMany as jest.Mock).mockResolvedValue([mockLessons[0]]);
 
-      await LessonService.getLessonsByCourse(1, { search: 'test' }, false);
+      await LessonService.getLessonsByCourse(1, { search: 'test' });
 
       expect(mockPrisma.lesson.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

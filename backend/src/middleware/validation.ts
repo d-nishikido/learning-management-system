@@ -241,7 +241,11 @@ export const lessonSchemas = {
   }),
 
   query: Joi.object({
-    isPublished: Joi.boolean(),
+    isPublished: Joi.alternatives()
+      .try(
+        Joi.boolean(),
+        Joi.string().valid('true', 'false').custom((value) => value === 'true')
+      ),
     search: Joi.string().trim(),
   }).concat(commonSchemas.pagination),
 
