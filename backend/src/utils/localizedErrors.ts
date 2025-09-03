@@ -1,7 +1,7 @@
 import { 
   NotFoundError, 
   ValidationError, 
-  ForbiddenError 
+  AuthorizationError 
 } from './errors';
 import { 
   SupportedLocale, 
@@ -30,7 +30,7 @@ export class LocalizedValidationError extends ValidationError {
   }
 }
 
-export class LocalizedForbiddenError extends ForbiddenError {
+export class LocalizedForbiddenError extends AuthorizationError {
   constructor(
     message: LocalizedMessage, 
     locale: SupportedLocale,

@@ -279,29 +279,17 @@ export const submitTestSchema = Joi.object({
         selectedOptionId: Joi.number()
           .integer()
           .positive()
-          .when('answerText', {
-            is: Joi.exist(),
-            then: Joi.optional(),
-            otherwise: Joi.required()
-          })
           .messages({
             'number.base': 'Selected option ID must be a number',
             'number.integer': 'Selected option ID must be an integer',
             'number.positive': 'Selected option ID must be positive',
-            'any.required': 'Selected option ID is required for choice questions',
           }),
 
         answerText: Joi.string()
           .max(5000)
-          .when('selectedOptionId', {
-            is: Joi.exist(),
-            then: Joi.optional(),
-            otherwise: Joi.required()
-          })
           .messages({
             'string.base': 'Answer text must be a string',
             'string.max': 'Answer text must be at most 5000 characters long',
-            'any.required': 'Answer text is required for essay/programming questions',
           }),
       }).or('selectedOptionId', 'answerText')
     )

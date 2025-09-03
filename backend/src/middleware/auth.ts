@@ -5,6 +5,9 @@ import { JwtPayload, RequestWithUser, ApiResponse } from '../types';
 
 const prisma = new PrismaClient();
 
+// Export type alias for compatibility
+export type AuthRequest<P = {}, ResBody = any, ReqBody = any, ReqQuery = any> = RequestWithUser<P, ResBody, ReqBody, ReqQuery>;
+
 export const authenticateToken = async (
   req: RequestWithUser,
   res: Response<ApiResponse>,

@@ -120,7 +120,7 @@ export class LocalizedTestController {
    * PUT /tests/:id
    * Update test with localized responses
    */
-  async updateTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async updateTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -152,7 +152,7 @@ export class LocalizedTestController {
    * DELETE /tests/:id
    * Delete test with localized responses
    */
-  async deleteTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async deleteTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -177,7 +177,7 @@ export class LocalizedTestController {
    * POST /tests/:id/questions
    * Add question to test with localized responses
    */
-  async addQuestionToTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async addQuestionToTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -203,7 +203,7 @@ export class LocalizedTestController {
    * DELETE /tests/:id/questions/:questionId
    * Remove question from test with localized responses
    */
-  async removeQuestionFromTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async removeQuestionFromTest(req: AuthRequest<{ id: string; questionId: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -229,7 +229,7 @@ export class LocalizedTestController {
    * GET /tests/:id/can-take
    * Check if user can take test with localized responses
    */
-  async canUserTakeTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async canUserTakeTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -255,7 +255,7 @@ export class LocalizedTestController {
    * POST /tests/:id/start
    * Start test with localized responses
    */
-  async startTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async startTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -284,7 +284,7 @@ export class LocalizedTestController {
    * POST /tests/:id/submit
    * Submit test with localized responses
    */
-  async submitTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async submitTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -312,7 +312,7 @@ export class LocalizedTestController {
    * GET /tests/:id/questions
    * Get test questions with localized formatting
    */
-  async getTestQuestions(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getTestQuestions(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -338,7 +338,7 @@ export class LocalizedTestController {
    * GET /tests/:id/statistics
    * Get test statistics with localized formatting
    */
-  async getTestStatistics(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getTestStatistics(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);
@@ -348,15 +348,16 @@ export class LocalizedTestController {
       // Check permissions
       const test = await testService.getTestById(testId);
       if (user.role !== 'ADMIN' && test.createdBy !== user.id) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           meta: {
             ...testService.getLocalizationInfo()
           },
-          message: user.role === 'ADMIN' ? 
+          message: user.role === 'USER' ? 
             'You can only view statistics for tests you created' :
             'テスト作成者のみ統計を表示できます'
         });
+        return;
       }
 
       const statistics = await testService.getLocalizedTestStatistics(testId);
@@ -413,7 +414,7 @@ export class LocalizedTestController {
    * GET /tests/:id/session
    * Get user's current test session
    */
-  async getUserTestSession(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getUserTestSession(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const locale = getLocaleFromRequest(req);
       const testService = new LocalizedTestService(req);

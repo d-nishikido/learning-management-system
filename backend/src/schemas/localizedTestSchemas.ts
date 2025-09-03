@@ -364,35 +364,19 @@ const createLocalizedSchema = (locale: SupportedLocale = 'en') => {
           selectedOptionId: Joi.number()
             .integer()
             .positive()
-            .when('answerText', {
-              is: Joi.exist(),
-              then: Joi.optional(),
-              otherwise: Joi.required()
-            })
             .label(labels[locale].selectedOptionId)
             .messages({
               'number.base': getMessage('number.base'),
               'number.integer': getMessage('number.integer'),
-              'number.positive': getMessage('number.positive'),
-              'any.required': locale === 'ja' ? 
-                '選択式問題には選択された選択肢IDが必要です' : 
-                'Selected option ID is required for choice questions'
+              'number.positive': getMessage('number.positive')
             }),
 
           answerText: Joi.string()
             .max(5000)
-            .when('selectedOptionId', {
-              is: Joi.exist(),
-              then: Joi.optional(),
-              otherwise: Joi.required()
-            })
             .label(labels[locale].answerText)
             .messages({
               'string.base': getMessage('string.empty'),
-              'string.max': getMessage('string.max'),
-              'any.required': locale === 'ja' ? 
-                '記述式・プログラミング問題には回答テキストが必要です' : 
-                'Answer text is required for essay/programming questions'
+              'string.max': getMessage('string.max')
             })
         }).or('selectedOptionId', 'answerText')
       )

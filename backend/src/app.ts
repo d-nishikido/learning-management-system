@@ -1,3 +1,4 @@
+console.log('Starting app.ts...');
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,12 +7,14 @@ import rateLimit from 'express-rate-limit';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
+console.log('Importing routes...');
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { ApiResponse } from './types';
 
 // Load environment variables
 dotenv.config();
+console.log('Environment loaded, NODE_ENV:', process.env.NODE_ENV);
 
 const app: Application = express();
 const prisma = new PrismaClient();

@@ -1,5 +1,5 @@
 import { PrismaClient, Test, TestQuestion, UserTestResult, UserAnswer, TestStatus, Question, QuestionOption } from '@prisma/client';
-import { NotFoundError, ForbiddenError, ValidationError } from '../utils/errors';
+import { NotFoundError, AuthorizationError, ValidationError } from '../utils/errors';
 
 const prisma = new PrismaClient();
 
@@ -334,13 +334,16 @@ export class TestService {
       prisma.test.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     return {
       data: tests,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
       },
     };
   }
@@ -369,7 +372,7 @@ export class TestService {
 
     // Check permissions - only creator or admin can update
     if (test.createdBy !== userId && userRole !== 'ADMIN') {
-      throw new ForbiddenError('You can only update tests you created');
+      throw new AuthorizationError('You can only update tests you created');
     }
 
     // Validate course exists if provided
@@ -431,7 +434,7 @@ export class TestService {
 
     // Check permissions - only creator or admin can delete
     if (test.createdBy !== userId && userRole !== 'ADMIN') {
-      throw new ForbiddenError('You can only delete tests you created');
+      throw new AuthorizationError('You can only delete tests you created');
     }
 
     // Check if test has any completed attempts
@@ -459,7 +462,7 @@ export class TestService {
 
     // Check permissions for non-admin users
     if (userId && userRole !== 'ADMIN' && test.createdBy !== userId) {
-      throw new ForbiddenError('You can only modify tests you created');
+      throw new AuthorizationError('You can only modify tests you created');
     }
 
     // Check if question exists
@@ -510,7 +513,7 @@ export class TestService {
 
     // Check permissions for non-admin users
     if (userId && userRole !== 'ADMIN' && test.createdBy !== userId) {
-      throw new ForbiddenError('You can only modify tests you created');
+      throw new AuthorizationError('You can only modify tests you created');
     }
 
     const testQuestion = await prisma.testQuestion.findUnique({
@@ -772,6 +775,8 @@ export class TestService {
         limit,
         total,
         totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
       },
     };
   }
