@@ -1,13 +1,15 @@
 services:
   frontend:
-    image: node:20-alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: lms-frontend
     working_dir: /app
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "${FRONTEND_PORT:-3002}:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - VITE_API_URL=${VITE_API_URL:-http://localhost:5000/api/v1}
@@ -19,7 +21,9 @@ services:
     restart: unless-stopped
 
   backend:
-    image: node:20-alpine
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: lms-backend
     working_dir: /app
     volumes:
@@ -33,7 +37,7 @@ services:
       - REDIS_URL=${REDIS_URL:-redis://redis:6379}
       - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_here}
       - PORT=5000
-    command: sh -c "apk add --no-cache openssl openssl-dev python3 make g++ && npm install && npx prisma generate && npm run dev"
+    command: sh -c "npm install && npx prisma generate && npm run dev"
     depends_on:
       postgres:
         condition: service_healthy

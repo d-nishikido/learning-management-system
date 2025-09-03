@@ -7,7 +7,7 @@ export { Alert } from './Alert';
 export { Badge } from './Badge';
 export { LoadingSpinner } from './LoadingSpinner';
 export { LanguageSwitcher } from './LanguageSwitcher';
-export { Layout } from './Layout';
+export { default as Layout } from './Layout';
 export { MobileMenu } from './MobileMenu';
 export { Sidebar } from './Sidebar';
 export { default as ErrorBoundary } from './ErrorBoundary';

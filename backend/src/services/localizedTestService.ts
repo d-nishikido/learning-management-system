@@ -59,7 +59,7 @@ export class LocalizedTestService extends TestService {
   }
 
   // Override methods to use localized errors
-  async getTestById(id: number) {
+  override async getTestById(id: number) {
     try {
       return await super.getTestById(id);
     } catch (error: any) {
@@ -70,7 +70,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async createTest(data: any) {
+  override async createTest(data: any) {
     try {
       return await super.createTest(data);
     } catch (error: any) {
@@ -87,7 +87,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async updateTest(id: number, data: any, userId: number, userRole: string) {
+  override async updateTest(id: number, data: any, userId: number, userRole: string) {
     try {
       return await super.updateTest(id, data, userId, userRole);
     } catch (error: any) {
@@ -104,7 +104,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async deleteTest(id: number, userId: number, userRole: string) {
+  override async deleteTest(id: number, userId: number, userRole: string) {
     try {
       return await super.deleteTest(id, userId, userRole);
     } catch (error: any) {
@@ -118,7 +118,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async addQuestionToTest(testId: number, questionId: number, sortOrder?: number, userId?: number, userRole?: string) {
+  override async addQuestionToTest(testId: number, questionId: number, sortOrder?: number, userId?: number, userRole?: string) {
     try {
       return await super.addQuestionToTest(testId, questionId, sortOrder, userId, userRole);
     } catch (error: any) {
@@ -135,7 +135,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async removeQuestionFromTest(testId: number, questionId: number, userId?: number, userRole?: string) {
+  override async removeQuestionFromTest(testId: number, questionId: number, userId?: number, userRole?: string) {
     try {
       return await super.removeQuestionFromTest(testId, questionId, userId, userRole);
     } catch (error: any) {
@@ -149,7 +149,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async canUserTakeTest(userId: number, testId: number) {
+  override async canUserTakeTest(userId: number, testId: number) {
     const result = await super.canUserTakeTest(userId, testId);
     
     // Localize the reason message
@@ -175,7 +175,7 @@ export class LocalizedTestService extends TestService {
     return result;
   }
 
-  async startTest(data: any) {
+  override async startTest(data: any) {
     try {
       return await super.startTest(data);
     } catch (error: any) {
@@ -188,7 +188,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async submitTest(data: any) {
+  override async submitTest(data: any) {
     try {
       return await super.submitTest(data);
     } catch (error: any) {
@@ -199,7 +199,7 @@ export class LocalizedTestService extends TestService {
     }
   }
 
-  async getTestQuestionsForUser(testId: number, userId: number) {
+  override async getTestQuestionsForUser(testId: number, userId: number) {
     try {
       return await super.getTestQuestionsForUser(testId, userId);
     } catch (error: any) {

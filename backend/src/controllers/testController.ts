@@ -98,7 +98,7 @@ export class TestController {
    * PUT /tests/:id
    * Update test (Creator or Admin only)
    */
-  async updateTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async updateTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const user = req.user!;
@@ -126,7 +126,7 @@ export class TestController {
    * DELETE /tests/:id
    * Delete test (Creator or Admin only)
    */
-  async deleteTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async deleteTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const user = req.user!;
@@ -146,7 +146,7 @@ export class TestController {
    * POST /tests/:id/questions
    * Add question to test
    */
-  async addQuestionToTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async addQuestionToTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const { questionId, sortOrder } = req.body;
@@ -167,7 +167,7 @@ export class TestController {
    * DELETE /tests/:id/questions/:questionId
    * Remove question from test
    */
-  async removeQuestionFromTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async removeQuestionFromTest(req: AuthRequest<{ id: string; questionId: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const questionId = parseInt(req.params.questionId);
@@ -188,7 +188,7 @@ export class TestController {
    * GET /tests/:id/can-take
    * Check if user can take test
    */
-  async canUserTakeTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async canUserTakeTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const user = req.user!;
@@ -209,7 +209,7 @@ export class TestController {
    * POST /tests/:id/start
    * Start test for user
    */
-  async startTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async startTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const user = req.user!;
@@ -235,7 +235,7 @@ export class TestController {
    * GET /tests/:id/session
    * Get user's current test session
    */
-  async getUserTestSession(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getUserTestSession(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const user = req.user!;
@@ -256,7 +256,7 @@ export class TestController {
    * POST /tests/:id/submit
    * Submit test answers
    */
-  async submitTest(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async submitTest(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const { testResultId, answers } = req.body;
 
@@ -281,7 +281,7 @@ export class TestController {
    * GET /tests/:id/questions
    * Get shuffled test questions for user
    */
-  async getTestQuestions(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getTestQuestions(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const user = req.user!;
@@ -302,7 +302,7 @@ export class TestController {
    * GET /tests/:id/statistics
    * Get test statistics (Admin/Creator only)
    */
-  async getTestStatistics(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getTestStatistics(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const user = req.user!;
@@ -310,10 +310,11 @@ export class TestController {
       // Check if user is admin or test creator
       const test = await testService.getTestById(testId);
       if (user.role !== 'ADMIN' && test.createdBy !== user.id) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           message: 'You can only view statistics for tests you created'
         });
+        return;
       }
 
       const statistics = await testService.getTestStatistics(testId);
@@ -363,7 +364,7 @@ export class TestController {
    * GET /tests/:id/results
    * Get all results for a test (Admin/Creator only)
    */
-  async getTestResults(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async getTestResults(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const testId = parseInt(req.params.id);
       const { page, limit } = req.query as any;
@@ -372,10 +373,11 @@ export class TestController {
       // Check if user is admin or test creator
       const test = await testService.getTestById(testId);
       if (user.role !== 'ADMIN' && test.createdBy !== user.id) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           message: 'You can only view results for tests you created'
         });
+        return;
       }
 
       const options = {

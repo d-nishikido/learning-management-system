@@ -100,7 +100,7 @@ export class QuestionController {
    * PUT /questions/:id
    * Update question (Creator or Admin only)
    */
-  async updateQuestion(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async updateQuestion(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const user = req.user!;
@@ -122,7 +122,7 @@ export class QuestionController {
    * DELETE /questions/:id
    * Delete question (Creator or Admin only)
    */
-  async deleteQuestion(req: AuthRequest, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
+  async deleteQuestion(req: AuthRequest<{ id: string }>, res: Response<ApiResponse>, next: NextFunction): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       const user = req.user!;

@@ -14,6 +14,15 @@ export interface ApiResponse<T = unknown> {
     method: string;
     timestamp: string;
   };
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  meta?: Record<string, any>;
 }
 
 export interface PaginationQuery {

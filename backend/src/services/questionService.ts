@@ -1,5 +1,5 @@
 import { PrismaClient, Question, QuestionOption, QuestionType, DifficultyLevel } from '@prisma/client';
-import { NotFoundError, ForbiddenError, createQuestionValidationError } from '../utils/errors';
+import { NotFoundError, AuthorizationError, createQuestionValidationError } from '../utils/errors';
 
 const prisma = new PrismaClient();
 
@@ -233,13 +233,16 @@ export class QuestionService {
       prisma.question.count({ where }),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
     return {
       data: questions,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
       },
     };
   }
@@ -268,7 +271,7 @@ export class QuestionService {
 
     // Check permissions - only creator or admin can update
     if (question.createdBy !== userId && userRole !== 'ADMIN') {
-      throw new ForbiddenError('You can only update questions you created');
+      throw new AuthorizationError('You can only update questions you created');
     }
 
     // Validate course and lesson exist if provided
@@ -340,7 +343,7 @@ export class QuestionService {
 
     // Check permissions - only creator or admin can delete
     if (question.createdBy !== userId && userRole !== 'ADMIN') {
-      throw new ForbiddenError('You can only delete questions you created');
+      throw new AuthorizationError('You can only delete questions you created');
     }
 
     await prisma.question.delete({

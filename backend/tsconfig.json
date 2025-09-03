@@ -55,7 +55,8 @@
   "ts-node": {
     "esm": false,
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      "target": "ES2022"
     },
     "transpileOnly": true
   }

@@ -74,8 +74,51 @@ npm run e2e:ui
 npm run docker:test
 ```
 
+### Port Management & Troubleshooting
+
+#### Port Configuration
+- **Development Environment**:
+  - Frontend: 3000 (configurable via FRONTEND_PORT)
+  - Backend: 5000 (configurable via BACKEND_PORT)
+  - PostgreSQL: 5432 (configurable via POSTGRES_PORT)
+  - Redis: 6379 (configurable via REDIS_PORT)
+
+- **Test Environment** (fixed ports):
+  - Frontend: 3002
+  - Backend: 3001
+  - PostgreSQL: 5433
+  - MCP Server: 3003
+
+#### Troubleshooting Port Conflicts
+If you encounter "port is already allocated" errors:
+
+```bash
+# Check which ports are in use
+node scripts/check-ports.js development  # Check dev ports
+node scripts/check-ports.js test        # Check test ports
+
+# Stop conflicting containers
+node scripts/docker-cleanup.js dev      # Stop development containers
+node scripts/docker-cleanup.js test     # Stop test containers
+node scripts/docker-cleanup.js all      # Stop all containers
+
+# Check container status
+node scripts/docker-cleanup.js status   # Show running containers
+docker ps                               # Alternative way to check
+```
+
+#### Common Port Conflict Solutions
+1. **Test containers still running**: `npm run docker:test:down`
+2. **Development containers conflict**: `npm run docker:down`
+3. **Specific container conflict**: `node scripts/docker-cleanup.js container <name>`
+4. **All LMS containers**: `node scripts/docker-cleanup.js lms`
+
 ### Development Workflow
-1. **Before starting work**: `npm run docker:up` to start services
+1. **Before starting work**: Check port availability and start services
+   ```bash
+   node scripts/check-ports.js development  # Check development ports
+   npm run docker:up                        # Start services
+   ```
 2. **During development**: Use `npm run frontend` and `npm run backend` for hot reload
 3. **Before committing**: `npm run e2e:affected` to run affected tests
 4. **Code quality**: Run `npm run lint` and `npm run typecheck` in respective directories
