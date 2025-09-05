@@ -102,7 +102,9 @@ export class CourseController {
       
       if (req.query.category) query.category = req.query.category;
       if (req.query.difficultyLevel) query.difficultyLevel = req.query.difficultyLevel;
-      if (req.query.isPublished !== undefined) query.isPublished = req.query.isPublished === 'true';
+      if (req.query.isPublished && req.query.isPublished !== '') {
+        query.isPublished = req.query.isPublished === 'true';
+      }
       if (req.query.search) query.search = req.query.search;
       if (req.query.page) query.page = parseInt(req.query.page, 10);
       if (req.query.limit) query.limit = parseInt(req.query.limit, 10);

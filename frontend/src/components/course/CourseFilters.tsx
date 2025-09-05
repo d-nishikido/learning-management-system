@@ -34,7 +34,9 @@ export function CourseFilters({ filters, onFiltersChange, onReset, categories }:
 
   const handlePublishedChange = (published: string) => {
     if (published === 'all') {
-      onFiltersChange({ ...filters, isPublished: undefined });
+      // Remove isPublished from filters when showing all courses
+      const { isPublished, ...rest } = filters;
+      onFiltersChange(rest);
     } else {
       onFiltersChange({ ...filters, isPublished: published === 'published' });
     }

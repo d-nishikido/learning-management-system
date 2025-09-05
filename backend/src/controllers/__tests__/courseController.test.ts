@@ -168,6 +168,60 @@ describe('CourseController', () => {
         limit: 5,
       }, false);
     });
+
+    it('should handle isPublished parameter correctly', async () => {
+      // Test with isPublished = 'true'
+      mockReq.query = { isPublished: 'true' };
+      mockCourseService.getAllCourses.mockResolvedValue(mockCoursesResponse as any);
+
+      await CourseController.getAllCourses(
+        mockReq as Request,
+        mockRes as Response
+      );
+
+      expect(mockCourseService.getAllCourses).toHaveBeenCalledWith({
+        isPublished: true,
+      }, false);
+
+      // Test with isPublished = 'false'
+      mockReq.query = { isPublished: 'false' };
+      await CourseController.getAllCourses(
+        mockReq as Request,
+        mockRes as Response
+      );
+
+      expect(mockCourseService.getAllCourses).toHaveBeenCalledWith({
+        isPublished: false,
+      }, false);
+    });
+
+    it('should ignore empty string for isPublished parameter', async () => {
+      // Test with empty string - should not set isPublished in query
+      mockReq.query = { isPublished: '' };
+      mockCourseService.getAllCourses.mockResolvedValue(mockCoursesResponse as any);
+
+      await CourseController.getAllCourses(
+        mockReq as Request,
+        mockRes as Response
+      );
+
+      expect(mockCourseService.getAllCourses).toHaveBeenCalledWith({}, false);
+    });
+
+    it('should not set isPublished when parameter is undefined', async () => {
+      // Test without isPublished parameter
+      mockReq.query = { category: 'Programming' };
+      mockCourseService.getAllCourses.mockResolvedValue(mockCoursesResponse as any);
+
+      await CourseController.getAllCourses(
+        mockReq as Request,
+        mockRes as Response
+      );
+
+      expect(mockCourseService.getAllCourses).toHaveBeenCalledWith({
+        category: 'Programming',
+      }, false);
+    });
   });
 
   describe('getCourseById', () => {
