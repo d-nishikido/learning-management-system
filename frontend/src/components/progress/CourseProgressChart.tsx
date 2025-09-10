@@ -103,7 +103,7 @@ export function CourseProgressChart() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <LoadingSpinner size="medium" />
+        <LoadingSpinner size="md" />
       </div>
     );
   }

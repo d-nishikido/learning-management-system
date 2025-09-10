@@ -49,7 +49,7 @@ export default function Progress() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
