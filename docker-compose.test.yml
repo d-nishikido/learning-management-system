@@ -37,7 +37,6 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      - /app/node_modules
     command: sh -c "npx prisma db push --skip-generate && npm run db:seed:e2e && npm run dev"
 
   frontend-test:
