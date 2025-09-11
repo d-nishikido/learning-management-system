@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { courseApi } from '@/services/api';
 import { Button } from '@/components/common/Button';
+import { Input } from '@/components/common/Input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import type { CreateCourseRequest, UpdateCourseRequest, ApiRequestError } from '@/types';
 
@@ -169,32 +170,23 @@ export function CourseForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* Title */}
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.title')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm ${
-                  validationErrors.title
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                } sm:text-sm`}
-              />
-              {validationErrors.title && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.title}</p>
-              )}
-            </div>
+            <Input
+              id="title"
+              name="title"
+              type="text"
+              label={t('course:fields.title')}
+              value={formData.title}
+              onChange={handleChange}
+              error={validationErrors.title}
+              required
+              fullWidth
+            />
 
             {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <div className="form-group w-full">
+              <label htmlFor="description" className="label">
                 {t('course:fields.description')}
               </label>
               <textarea
@@ -203,35 +195,26 @@ export function CourseForm() {
                 rows={4}
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="input w-full min-h-[120px]"
               />
             </div>
 
             {/* Category */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.category')} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm ${
-                  validationErrors.category
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                } sm:text-sm`}
-              />
-              {validationErrors.category && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.category}</p>
-              )}
-            </div>
+            <Input
+              id="category"
+              name="category"
+              type="text"
+              label={t('course:fields.category')}
+              value={formData.category}
+              onChange={handleChange}
+              error={validationErrors.category}
+              required
+              fullWidth
+            />
 
             {/* Difficulty Level */}
-            <div>
-              <label htmlFor="difficultyLevel" className="block text-sm font-medium text-gray-700">
+            <div className="form-group w-full">
+              <label htmlFor="difficultyLevel" className="label">
                 {t('course:fields.difficultyLevel')}
               </label>
               <select
@@ -239,7 +222,7 @@ export function CourseForm() {
                 name="difficultyLevel"
                 value={formData.difficultyLevel}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="input w-full"
               >
                 <option value="BEGINNER">{t('course:difficulty.beginner')}</option>
                 <option value="INTERMEDIATE">{t('course:difficulty.intermediate')}</option>
@@ -248,84 +231,62 @@ export function CourseForm() {
             </div>
 
             {/* Estimated Hours */}
-            <div>
-              <label htmlFor="estimatedHours" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.estimatedHours')}
-              </label>
-              <input
-                type="number"
-                id="estimatedHours"
-                name="estimatedHours"
-                min="0"
-                step="0.5"
-                value={formData.estimatedHours}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm ${
-                  validationErrors.estimatedHours
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                } sm:text-sm`}
-              />
-              {validationErrors.estimatedHours && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.estimatedHours}</p>
-              )}
-            </div>
+            <Input
+              id="estimatedHours"
+              name="estimatedHours"
+              type="number"
+              min="0"
+              step="0.5"
+              label={t('course:fields.estimatedHours')}
+              value={formData.estimatedHours}
+              onChange={handleChange}
+              error={validationErrors.estimatedHours}
+              fullWidth
+            />
 
             {/* Thumbnail URL */}
-            <div>
-              <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.thumbnailUrl')}
-              </label>
-              <input
-                type="url"
-                id="thumbnailUrl"
-                name="thumbnailUrl"
-                value={formData.thumbnailUrl}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              />
-            </div>
+            <Input
+              id="thumbnailUrl"
+              name="thumbnailUrl"
+              type="url"
+              label={t('course:fields.thumbnailUrl')}
+              value={formData.thumbnailUrl}
+              onChange={handleChange}
+              fullWidth
+            />
 
             {/* Sort Order */}
-            <div>
-              <label htmlFor="sortOrder" className="block text-sm font-medium text-gray-700">
-                {t('course:fields.sortOrder')}
-              </label>
-              <input
-                type="number"
-                id="sortOrder"
-                name="sortOrder"
-                min="0"
-                value={formData.sortOrder}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm ${
-                  validationErrors.sortOrder
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                } sm:text-sm`}
-              />
-              {validationErrors.sortOrder && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.sortOrder}</p>
-              )}
-            </div>
+            <Input
+              id="sortOrder"
+              name="sortOrder"
+              type="number"
+              min="0"
+              label={t('course:fields.sortOrder')}
+              value={formData.sortOrder}
+              onChange={handleChange}
+              error={validationErrors.sortOrder}
+              fullWidth
+            />
 
             {/* Published Status */}
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="isPublished"
-                  name="isPublished"
-                  type="checkbox"
-                  checked={formData.isPublished}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="isPublished" className="font-medium text-gray-700">
-                  {t('course:fields.isPublished')}
-                </label>
-                <p className="text-gray-500">{t('course:fields.isPublishedHelp')}</p>
+            <div className="form-group w-full">
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="isPublished"
+                    name="isPublished"
+                    type="checkbox"
+                    checked={formData.isPublished}
+                    onChange={handleChange}
+                    className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-2 focus:ring-opacity-50"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="isPublished" className="font-semibold text-gray-700">
+                    {t('course:fields.isPublished')}
+                  </label>
+                  <p className="text-gray-500 mt-1">{t('course:fields.isPublishedHelp')}</p>
+                </div>
               </div>
             </div>
 

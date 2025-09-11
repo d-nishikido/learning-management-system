@@ -125,7 +125,7 @@ export function LearningCalendar() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

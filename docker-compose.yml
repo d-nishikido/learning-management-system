@@ -28,7 +28,7 @@ services:
     working_dir: /app
     volumes:
       - ./backend:/app
-      - /app/node_modules
+      # Removed /app/node_modules volume mount to prevent conflicts
     ports:
       - "${BACKEND_PORT:-5000}:5000"
     environment:

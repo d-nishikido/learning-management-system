@@ -113,7 +113,7 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {loading ? (
           <div className="col-span-full flex justify-center py-8">
-            <LoadingSpinner size="medium" />
+            <LoadingSpinner size="md" />
           </div>
         ) : error ? (
           <div className="col-span-full text-center py-8 text-gray-500">

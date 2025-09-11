@@ -16,9 +16,9 @@ RUN apk add --no-cache \
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install all dependencies (including dev dependencies for ts-node)
-# Use npm install instead of npm ci since package-lock.json might not exist
-RUN npm install
+# Install all dependencies (including dev dependencies for ts-node-dev)
+# Use npm ci for reproducible builds, fallback to npm install if package-lock.json is missing
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Generate Prisma client
 RUN npx prisma generate
