@@ -4,8 +4,8 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { MaterialList } from '@/components/materials/MaterialList';
-import { lessonApi, courseApi } from '@/services/api';
-import type { Lesson, Course, ApiRequestError } from '@/types';
+import { lessonApi, courseApi, progressApi } from '@/services/api';
+import type { Lesson, Course, ApiRequestError, ProgressWithDetails } from '@/types';
 
 export function LessonDetail() {
   const { courseId, id } = useParams<{ courseId: string; id: string }>();
@@ -14,6 +14,9 @@ export function LessonDetail() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
+  const [lessonProgress, setLessonProgress] = useState<ProgressWithDetails | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isUpdatingProgress, setIsUpdatingProgress] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,6 +50,16 @@ export function LessonDetail() {
           setAllLessons(lessonsResponse.data.lessons.sort((a, b) => a.sortOrder - b.sortOrder));
         }
 
+        // Load lesson progress
+        const progressResponse = await progressApi.getLessonProgress(lessonIdNum);
+        if (progressResponse.success && progressResponse.data && progressResponse.data.length > 0) {
+          const progress = progressResponse.data.find(p => p.lessonId === lessonIdNum && !p.materialId);
+          if (progress) {
+            setLessonProgress(progress);
+            setIsCompleted(progress.isCompleted);
+          }
+        }
+
       } catch (err) {
         setError((err as ApiRequestError).response?.data?.message || 'Failed to load lesson');
       } finally {
@@ -64,6 +77,34 @@ export function LessonDetail() {
 
   const navigateToLesson = (targetLessonId: number) => {
     navigate(`/courses/${courseIdNum}/lessons/${targetLessonId}`);
+  };
+
+  const handleLessonComplete = async () => {
+    if (!lessonIdNum || isUpdatingProgress) return;
+
+    setIsUpdatingProgress(true);
+    setError(null);
+
+    try {
+      const response = await progressApi.markLessonComplete(lessonIdNum);
+      if (response.success) {
+        setIsCompleted(true);
+        setLessonProgress(response.data);
+        
+        // Optionally navigate to next lesson after completion
+        if (nextLesson) {
+          setTimeout(() => {
+            navigateToLesson(nextLesson.id);
+          }, 1500);
+        }
+      } else {
+        setError('Failed to mark lesson as complete');
+      }
+    } catch (err) {
+      setError((err as ApiRequestError).response?.data?.message || 'Failed to update lesson progress');
+    } finally {
+      setIsUpdatingProgress(false);
+    }
   };
 
   if (isLoading) {
@@ -159,8 +200,37 @@ export function LessonDetail() {
         </div>
 
         {lesson.description && (
-          <p className="text-gray-700">{lesson.description}</p>
+          <p className="text-gray-700 mb-4">{lesson.description}</p>
         )}
+
+        {/* Lesson Completion Checkbox */}
+        <div className="border-t pt-4 mt-4">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCompleted}
+                onChange={handleLessonComplete}
+                disabled={isUpdatingProgress || isCompleted}
+                className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 disabled:opacity-50"
+              />
+              <span className={`text-base ${isCompleted ? 'text-green-600 font-medium' : 'text-gray-700'}`}>
+                {isCompleted ? 'レッスン完了済み' : 'このレッスンを完了としてマーク'}
+              </span>
+            </label>
+            {isCompleted && lessonProgress?.completionDate && (
+              <span className="text-sm text-gray-500">
+                完了日: {new Date(lessonProgress.completionDate).toLocaleDateString('ja-JP')}
+              </span>
+            )}
+          </div>
+          {isUpdatingProgress && (
+            <div className="mt-2 text-sm text-gray-500 flex items-center">
+              <LoadingSpinner size="small" />
+              <span className="ml-2">更新中...</span>
+            </div>
+          )}
+        </div>
       </Card>
 
       {/* Lesson Content */}
