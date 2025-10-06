@@ -13,12 +13,12 @@ const fs = require('fs');
 const DEFAULT_PORTS = {
   frontend: 3000,
   backend: 5000,
-  postgres: 5432,
+  postgres: 15432,
   redis: 6379,
   // Test environment ports
   frontend_test: 3002,
   backend_test: 3001,
-  postgres_test: 5433,
+  postgres_test: 15433,
   mcp_server: 3003
 };
 

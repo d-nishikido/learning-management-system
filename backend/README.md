@@ -110,7 +110,7 @@ Key environment variables (see `.env.example` for full list):
 ```env
 NODE_ENV=development
 PORT=5000
-DATABASE_URL=postgresql://username:password@localhost:5432/lms_db
+DATABASE_URL=postgresql://username:password@localhost:15432/lms_db
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your_secret_key
 FRONTEND_URL=http://localhost:3000

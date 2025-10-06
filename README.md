@@ -31,7 +31,7 @@ A comprehensive Learning Management System designed to support programming educa
 4. **Verify the setup**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000/api/v1
-   - PostgreSQL: localhost:5432
+   - PostgreSQL: localhost:15432
    - Redis: localhost:6379
 
 ### Docker Services
@@ -40,7 +40,7 @@ A comprehensive Learning Management System designed to support programming educa
 |---------|------|-------------|
 | frontend | 3000 | React Router v7 application |
 | backend | 5000 | Node.js/Express API server |
-| postgres | 5432 | PostgreSQL database |
+| postgres | 15432 (dev) / 15433 (test) | PostgreSQL database |
 | redis | 6379 | Redis cache server |
 
 ### Useful Commands
