@@ -130,7 +130,8 @@ Services:
 
 ### データベース設定
 ```bash
-DATABASE_URL=postgresql://lms_user:lms_password@postgres:15432/lms_db
+# Note: Use container internal port (5432) for Docker inter-container communication
+DATABASE_URL=postgresql://lms_user:lms_password@postgres:5432/lms_db
 POSTGRES_USER=lms_user
 POSTGRES_PASSWORD=lms_password
 POSTGRES_DB=lms_db
