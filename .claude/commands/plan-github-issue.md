@@ -5,6 +5,8 @@ argument-hint: Issue number
 
 Please analyze and plan implementation for the GitHub issue: $ARGUMENTS.
 
+Sub agent: Architect,Analyzer
+
 Follow these steps:
 
 1. Use `gh issue view` to get the issue details
