@@ -204,6 +204,17 @@ router.post('/lessons/:lessonId/complete',
 );
 
 /**
+ * POST /progress/lessons/:lessonId/incomplete
+ * Mark lesson as incomplete (toggle off)
+ * Authenticated users only
+ */
+router.post('/lessons/:lessonId/incomplete',
+  authenticateToken,
+  validateParams(Joi.object({ lessonId: commonSchemas.id })),
+  ProgressController.markLessonIncomplete
+);
+
+/**
  * POST /progress/sessions/start
  * Start learning session
  * Authenticated users only

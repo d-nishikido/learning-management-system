@@ -172,7 +172,10 @@ export const progressApi = {
   
   markLessonComplete: (lessonId: number): Promise<ApiResponse<ProgressWithDetails>> =>
     apiClient.post(`/progress/lessons/${lessonId}/complete`),
-  
+
+  markLessonIncomplete: (lessonId: number): Promise<ApiResponse<ProgressWithDetails>> =>
+    apiClient.post(`/progress/lessons/${lessonId}/incomplete`),
+
   // Learning sessions
   startSession: (data: SessionStartRequest): Promise<ApiResponse<LearningSession>> =>
     apiClient.post('/progress/sessions/start', data),

@@ -1,21 +1,25 @@
 import { LessonCard } from './LessonCard';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import type { Lesson } from '@/types';
+import type { Lesson, ProgressWithDetails } from '@/types';
 
 interface LessonListProps {
   lessons: Lesson[];
   courseId: number;
   isLoading?: boolean;
   completedLessonIds?: number[];
-  lessonProgress?: Record<number, number>;
+  lessonProgress?: Map<number, ProgressWithDetails> | Record<number, number>;
+  onToggleComplete?: (lessonId: number, completed: boolean) => Promise<void>;
+  togglingLessonId?: number | null;
 }
 
-export function LessonList({ 
-  lessons, 
-  courseId, 
+export function LessonList({
+  lessons,
+  courseId,
   isLoading = false,
   completedLessonIds = [],
-  lessonProgress = {}
+  lessonProgress = {},
+  onToggleComplete,
+  togglingLessonId
 }: LessonListProps) {
   if (isLoading) {
     return (
@@ -42,18 +46,42 @@ export function LessonList({
   // Sort lessons by sortOrder
   const sortedLessons = [...lessons].sort((a, b) => a.sortOrder - b.sortOrder);
 
+  // Helper to get progress data
+  const getProgress = (lessonId: number) => {
+    if (lessonProgress instanceof Map) {
+      return lessonProgress.get(lessonId);
+    }
+    return lessonProgress[lessonId];
+  };
+
   return (
     <div className="space-y-4">
-      {sortedLessons.map((lesson, index) => (
-        <LessonCard
-          key={lesson.id}
-          lesson={lesson}
-          courseId={courseId}
-          index={index}
-          isCompleted={completedLessonIds.includes(lesson.id)}
-          progress={lessonProgress[lesson.id] || 0}
-        />
-      ))}
+      {sortedLessons.map((lesson, index) => {
+        const progress = getProgress(lesson.id);
+        const isCompleted = progress
+          ? typeof progress === 'object'
+            ? progress.isCompleted
+            : progress >= 100
+          : completedLessonIds.includes(lesson.id);
+        const progressRate = progress
+          ? typeof progress === 'object'
+            ? Number(progress.progressRate)
+            : progress
+          : 0;
+
+        return (
+          <LessonCard
+            key={lesson.id}
+            lesson={lesson}
+            courseId={courseId}
+            index={index}
+            isCompleted={isCompleted}
+            progress={progressRate}
+            onToggleComplete={onToggleComplete}
+            isTogglingComplete={togglingLessonId === lesson.id}
+          />
+        );
+      })}
     </div>
   );
 }

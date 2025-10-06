@@ -6,8 +6,8 @@ import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { LessonList } from '@/components/lesson';
 import { useAuth } from '@/contexts';
-import { courseApi, lessonApi, userApi } from '@/services/api';
-import type { Course, Lesson, ApiRequestError } from '@/types';
+import { courseApi, lessonApi, userApi, progressApi } from '@/services/api';
+import type { Course, Lesson, ApiRequestError, ProgressWithDetails } from '@/types';
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +20,9 @@ export function CourseDetail() {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lessonProgress, setLessonProgress] = useState<Map<number, ProgressWithDetails>>(new Map());
+  const [courseProgressRate, setCourseProgressRate] = useState<number>(0);
+  const [togglingLessonId, setTogglingLessonId] = useState<number | null>(null);
 
   const courseId = id ? parseInt(id, 10) : null;
 
@@ -54,6 +57,31 @@ export function CourseDetail() {
             }
           } catch (err) {
             console.error('Failed to check enrollment status:', err);
+            // Don't show error as this is not critical
+          }
+
+          // Load course progress if enrolled
+          try {
+            const progressResponse = await progressApi.getCourseProgress(courseId);
+            if (progressResponse.success && progressResponse.data) {
+              const progressMap = new Map<number, ProgressWithDetails>();
+              progressResponse.data.forEach((p: ProgressWithDetails) => {
+                if (p.lessonId && !p.materialId) {
+                  progressMap.set(p.lessonId, p);
+                }
+              });
+              setLessonProgress(progressMap);
+
+              // Calculate course progress rate based on time
+              const totalMinutes = lessonsResponse.data?.lessons.reduce((sum, l) => sum + (l.estimatedMinutes || 30), 0) || 0;
+              const completedMinutes = lessonsResponse.data?.lessons
+                .filter(l => progressMap.get(l.id)?.isCompleted)
+                .reduce((sum, l) => sum + (l.estimatedMinutes || 30), 0) || 0;
+              const progressRate = totalMinutes > 0 ? Math.round((completedMinutes / totalMinutes) * 100) : 0;
+              setCourseProgressRate(progressRate);
+            }
+          } catch (err) {
+            console.error('Failed to load course progress:', err);
             // Don't show error as this is not critical
           }
         }
@@ -97,7 +125,7 @@ export function CourseDetail() {
 
   const handleUnenroll = async () => {
     if (!courseId || !user || !course) return;
-    
+
     setActionLoading(true);
     try {
       const response = await courseApi.unenroll(courseId);
@@ -118,6 +146,43 @@ export function CourseDetail() {
       setError(errorMessage);
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleToggleLessonComplete = async (lessonId: number, completed: boolean) => {
+    if (!user) return;
+
+    setTogglingLessonId(lessonId);
+    try {
+      const response = completed
+        ? await progressApi.markLessonComplete(lessonId)
+        : await progressApi.markLessonIncomplete(lessonId);
+
+      if (response.success && response.data) {
+        // Update lesson progress
+        setLessonProgress(prev => {
+          const newMap = new Map(prev);
+          newMap.set(lessonId, response.data);
+          return newMap;
+        });
+
+        // Recalculate course progress
+        const totalMinutes = lessons.reduce((sum, l) => sum + (l.estimatedMinutes || 30), 0);
+        const completedMinutes = lessons
+          .filter(l => {
+            if (l.id === lessonId) return completed;
+            return lessonProgress.get(l.id)?.isCompleted;
+          })
+          .reduce((sum, l) => sum + (l.estimatedMinutes || 30), 0);
+        const progressRate = totalMinutes > 0 ? Math.round((completedMinutes / totalMinutes) * 100) : 0;
+        setCourseProgressRate(progressRate);
+      }
+    } catch (err) {
+      console.error('Failed to toggle lesson completion:', err);
+      const errorMessage = (err as ApiRequestError).response?.data?.message || 'Failed to update lesson status';
+      setError(errorMessage);
+    } finally {
+      setTogglingLessonId(null);
     }
   };
 
@@ -255,17 +320,41 @@ export function CourseDetail() {
 
       {/* Course Content */}
       <Card>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">{t('course:content')}</h2>
-          <span className="text-sm text-gray-500">
-            {lessons.length} {t('common:lesson', { count: lessons.length })}
-          </span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">{t('course:content')}</h2>
+            <span className="text-sm text-gray-500">
+              {lessons.length} {t('common:lesson', { count: lessons.length })}
+            </span>
+          </div>
+
+          {/* Progress Bar */}
+          {user && isEnrolled && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                <span>コース進捗率（時間ベース）</span>
+                <span className="font-medium">{courseProgressRate}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-green-500 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${courseProgressRate}%` }}
+                />
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                {lessons.filter(l => lessonProgress.get(l.id)?.isCompleted).length} / {lessons.length} レッスン完了
+              </div>
+            </div>
+          )}
         </div>
 
         <LessonList
           lessons={lessons}
           courseId={courseId!}
           isLoading={isLessonsLoading}
+          lessonProgress={lessonProgress}
+          onToggleComplete={user && isEnrolled ? handleToggleLessonComplete : undefined}
+          togglingLessonId={togglingLessonId}
         />
       </Card>
     </div>

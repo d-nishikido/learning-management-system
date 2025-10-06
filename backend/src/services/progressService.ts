@@ -146,7 +146,7 @@ export class ProgressService {
       ]
     });
 
-    return progress as ProgressWithDetails;
+    return progress as ProgressWithDetails[];
   }
 
   /**
@@ -178,7 +178,7 @@ export class ProgressService {
       orderBy: { material: { sortOrder: 'asc' } }
     });
 
-    return progress as ProgressWithDetails;
+    return progress as ProgressWithDetails[];
   }
 
   /**
@@ -634,6 +634,58 @@ export class ProgressService {
   }
 
   /**
+   * Mark a lesson as incomplete (toggle off completion)
+   */
+  static async markLessonIncomplete(
+    userId: number,
+    lessonId: number
+  ): Promise<ProgressWithDetails> {
+    // Verify lesson exists
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { course: true }
+    });
+
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    // Find progress record for this lesson
+    const progress = await prisma.userProgress.findFirst({
+      where: {
+        userId,
+        courseId: lesson.courseId,
+        lessonId,
+        materialId: null // Lesson-level progress
+      }
+    });
+
+    if (!progress) {
+      throw new NotFoundError('Lesson progress not found');
+    }
+
+    // Update progress record to incomplete
+    const updatedProgress = await prisma.userProgress.update({
+      where: { id: progress.id },
+      data: {
+        progressRate: 0,
+        isCompleted: false,
+        completionDate: null
+      },
+      include: {
+        course: true,
+        lesson: true,
+        material: true
+      }
+    });
+
+    // Update course progress
+    await this.updateCourseProgress(userId, lesson.courseId);
+
+    return updatedProgress as ProgressWithDetails;
+  }
+
+  /**
    * Update course progress based on lesson completions
    */
   static async updateCourseProgress(userId: number, courseId: number): Promise<void> {
@@ -661,7 +713,7 @@ export class ProgressService {
     let completedDuration = 0;
 
     for (const lesson of lessons) {
-      const duration = lesson.estimatedMinutes || 60; // Default 60 minutes if not specified
+      const duration = lesson.estimatedMinutes || 30; // Default 30 minutes if not specified
       totalDuration += duration;
       
       if (completedLessons.some(cl => cl.lessonId === lesson.id)) {
