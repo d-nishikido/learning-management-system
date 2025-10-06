@@ -193,6 +193,28 @@ router.post('/materials/:materialId/complete',
 );
 
 /**
+ * POST /progress/lessons/:lessonId/complete
+ * Mark lesson as completed
+ * Authenticated users only
+ */
+router.post('/lessons/:lessonId/complete',
+  authenticateToken,
+  validateParams(Joi.object({ lessonId: commonSchemas.id })),
+  ProgressController.markLessonComplete
+);
+
+/**
+ * POST /progress/lessons/:lessonId/incomplete
+ * Mark lesson as incomplete (toggle off)
+ * Authenticated users only
+ */
+router.post('/lessons/:lessonId/incomplete',
+  authenticateToken,
+  validateParams(Joi.object({ lessonId: commonSchemas.id })),
+  ProgressController.markLessonIncomplete
+);
+
+/**
  * POST /progress/sessions/start
  * Start learning session
  * Authenticated users only

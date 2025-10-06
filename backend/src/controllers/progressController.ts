@@ -420,6 +420,80 @@ export class ProgressController {
   }
 
   /**
+   * POST /progress/lessons/:lessonId/complete
+   * Mark lesson as completed
+   */
+  static async markLessonComplete(
+    req: RequestWithUser<{ lessonId: string }, ApiResponse>,
+    res: Response<ApiResponse>
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const lessonId = parseInt(req.params.lessonId);
+
+      const progress = await ProgressService.markLessonComplete(userId, lessonId);
+      
+      res.status(200).json({
+        success: true,
+        data: progress,
+        message: 'Lesson marked as completed'
+      });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        res.status(404).json({
+          success: false,
+          error: error.message
+        });
+        return;
+      }
+      
+      console.error('Error marking lesson complete:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to mark lesson as completed',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
+   * POST /progress/lessons/:lessonId/incomplete
+   * Mark lesson as incomplete (toggle off)
+   */
+  static async markLessonIncomplete(
+    req: RequestWithUser<{ lessonId: string }, ApiResponse>,
+    res: Response<ApiResponse>
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const lessonId = parseInt(req.params.lessonId);
+
+      const progress = await ProgressService.markLessonIncomplete(userId, lessonId);
+
+      res.status(200).json({
+        success: true,
+        data: progress,
+        message: 'Lesson marked as incomplete'
+      });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        res.status(404).json({
+          success: false,
+          error: error.message
+        });
+        return;
+      }
+
+      console.error('Error marking lesson incomplete:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to mark lesson as incomplete',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
    * POST /progress/sessions/start
    * Start learning session
    */

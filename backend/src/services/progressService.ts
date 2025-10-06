@@ -146,7 +146,7 @@ export class ProgressService {
       ]
     });
 
-    return progress as ProgressWithDetails;
+    return progress as ProgressWithDetails[];
   }
 
   /**
@@ -178,7 +178,7 @@ export class ProgressService {
       orderBy: { material: { sortOrder: 'asc' } }
     });
 
-    return progress as ProgressWithDetails;
+    return progress as ProgressWithDetails[];
   }
 
   /**
@@ -523,6 +523,240 @@ export class ProgressService {
     await this.updateLearningStreak(userId);
 
     return progress as ProgressWithDetails;
+  }
+
+  /**
+   * Mark a lesson as completed
+   */
+  static async markLessonComplete(
+    userId: number,
+    lessonId: number
+  ): Promise<ProgressWithDetails> {
+    // Verify lesson exists
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { course: true }
+    });
+
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    // Check if progress record exists for this lesson
+    let progress = await prisma.userProgress.findFirst({
+      where: {
+        userId,
+        courseId: lesson.courseId,
+        lessonId,
+        materialId: null // Lesson-level progress
+      }
+    });
+
+    if (progress) {
+      // Update existing progress record
+      progress = await prisma.userProgress.update({
+        where: { id: progress.id },
+        data: {
+          progressRate: 100,
+          isCompleted: true,
+          completionDate: new Date()
+        },
+        include: {
+          course: true,
+          lesson: true,
+          material: true
+        }
+      });
+    } else {
+      // Create new progress record for the lesson
+      progress = await prisma.userProgress.create({
+        data: {
+          userId,
+          courseId: lesson.courseId,
+          lessonId,
+          materialId: null, // This is lesson-level progress
+          progressRate: 100,
+          isCompleted: true,
+          completionDate: new Date()
+        },
+        include: {
+          course: true,
+          lesson: true,
+          material: true
+        }
+      });
+    }
+
+    // Mark all materials in the lesson as completed
+    const materials = await prisma.learningMaterial.findMany({
+      where: { lessonId }
+    });
+
+    for (const material of materials) {
+      const materialProgress = await prisma.userProgress.findFirst({
+        where: {
+          userId,
+          materialId: material.id
+        }
+      });
+
+      if (!materialProgress) {
+        await prisma.userProgress.create({
+          data: {
+            userId,
+            courseId: lesson.courseId,
+            lessonId,
+            materialId: material.id,
+            progressRate: 100,
+            isCompleted: true,
+            completionDate: new Date()
+          }
+        });
+      } else if (!materialProgress.isCompleted) {
+        await prisma.userProgress.update({
+          where: { id: materialProgress.id },
+          data: {
+            progressRate: 100,
+            isCompleted: true,
+            completionDate: new Date()
+          }
+        });
+      }
+    }
+
+    // Update course progress
+    await this.updateCourseProgress(userId, lesson.courseId);
+
+    // Update learning streak
+    await this.updateLearningStreak(userId);
+
+    return progress as ProgressWithDetails;
+  }
+
+  /**
+   * Mark a lesson as incomplete (toggle off completion)
+   */
+  static async markLessonIncomplete(
+    userId: number,
+    lessonId: number
+  ): Promise<ProgressWithDetails> {
+    // Verify lesson exists
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { course: true }
+    });
+
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    // Find progress record for this lesson
+    const progress = await prisma.userProgress.findFirst({
+      where: {
+        userId,
+        courseId: lesson.courseId,
+        lessonId,
+        materialId: null // Lesson-level progress
+      }
+    });
+
+    if (!progress) {
+      throw new NotFoundError('Lesson progress not found');
+    }
+
+    // Update progress record to incomplete
+    const updatedProgress = await prisma.userProgress.update({
+      where: { id: progress.id },
+      data: {
+        progressRate: 0,
+        isCompleted: false,
+        completionDate: null
+      },
+      include: {
+        course: true,
+        lesson: true,
+        material: true
+      }
+    });
+
+    // Update course progress
+    await this.updateCourseProgress(userId, lesson.courseId);
+
+    return updatedProgress as ProgressWithDetails;
+  }
+
+  /**
+   * Update course progress based on lesson completions
+   */
+  static async updateCourseProgress(userId: number, courseId: number): Promise<void> {
+    // Get all lessons in the course
+    const lessons = await prisma.lesson.findMany({
+      where: { 
+        courseId,
+        isPublished: true
+      }
+    });
+
+    // Get completed lessons
+    const completedLessons = await prisma.userProgress.findMany({
+      where: {
+        userId,
+        courseId,
+        lessonId: { not: null },
+        materialId: null, // Lesson-level progress only
+        isCompleted: true
+      }
+    });
+
+    // Calculate course progress percentage considering lesson duration
+    let totalDuration = 0;
+    let completedDuration = 0;
+
+    for (const lesson of lessons) {
+      const duration = lesson.estimatedMinutes || 30; // Default 30 minutes if not specified
+      totalDuration += duration;
+      
+      if (completedLessons.some(cl => cl.lessonId === lesson.id)) {
+        completedDuration += duration;
+      }
+    }
+
+    const courseProgressRate = totalDuration > 0 
+      ? Math.round((completedDuration / totalDuration) * 100)
+      : 0;
+
+    // Update or create course progress
+    const courseProgress = await prisma.userProgress.findFirst({
+      where: {
+        userId,
+        courseId,
+        lessonId: null,
+        materialId: null
+      }
+    });
+
+    if (courseProgress) {
+      await prisma.userProgress.update({
+        where: { id: courseProgress.id },
+        data: {
+          progressRate: courseProgressRate,
+          isCompleted: courseProgressRate === 100,
+          completionDate: courseProgressRate === 100 ? new Date() : null
+        }
+      });
+    } else {
+      await prisma.userProgress.create({
+        data: {
+          userId,
+          courseId,
+          lessonId: null,
+          materialId: null,
+          progressRate: courseProgressRate,
+          isCompleted: courseProgressRate === 100,
+          completionDate: courseProgressRate === 100 ? new Date() : null
+        }
+      });
+    }
   }
 
   /**

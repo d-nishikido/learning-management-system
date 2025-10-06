@@ -8,19 +8,55 @@ interface LessonCardProps {
   index?: number;
   isCompleted?: boolean;
   progress?: number;
+  onToggleComplete?: (lessonId: number, completed: boolean) => Promise<void>;
+  isTogglingComplete?: boolean;
 }
 
-export function LessonCard({ 
-  lesson, 
-  courseId, 
-  index, 
-  isCompleted = false, 
-  progress = 0 
+export function LessonCard({
+  lesson,
+  courseId,
+  index,
+  isCompleted = false,
+  progress = 0,
+  onToggleComplete,
+  isTogglingComplete = false
 }: LessonCardProps) {
+  const handleCheckboxClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (onToggleComplete && !isTogglingComplete) {
+      await onToggleComplete(lesson.id, !isCompleted);
+    }
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <Link to={`/courses/${courseId}/lessons/${lesson.id}`} className="block">
-        <div className="flex items-start space-x-4">
+    <Card className={`hover:shadow-md transition-all ${isCompleted ? 'bg-green-50 border-green-200' : ''}`}>
+      <div className="flex items-start space-x-4">
+        {/* Completion Checkbox */}
+        {onToggleComplete && (
+          <div className="flex-shrink-0 pt-1">
+            <button
+              onClick={handleCheckboxClick}
+              disabled={isTogglingComplete}
+              className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                isCompleted
+                  ? 'bg-green-500 border-green-500'
+                  : 'border-gray-300 hover:border-green-400'
+              } ${isTogglingComplete ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              aria-label={isCompleted ? 'レッスンを未完了にする' : 'レッスンを完了にする'}
+            >
+              {isCompleted && (
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              )}
+            </button>
+          </div>
+        )}
+
+        <Link to={`/courses/${courseId}/lessons/${lesson.id}`} className="flex-1 block">
+          <div className="flex items-start space-x-4">
           {/* Lesson Number Circle */}
           <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
             isCompleted 
@@ -81,7 +117,8 @@ export function LessonCard({
             </div>
           </div>
         </div>
-      </Link>
+        </Link>
+      </div>
     </Card>
   );
 }
