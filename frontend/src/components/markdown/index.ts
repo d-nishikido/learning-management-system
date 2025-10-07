@@ -6,3 +6,7 @@ export { LinkRenderer } from './LinkRenderer';
 export type { LinkRendererProps } from './LinkRenderer';
 export { ImageRenderer } from './ImageRenderer';
 export type { ImageRendererProps } from './ImageRenderer';
+export { MarkdownEditor } from './MarkdownEditor';
+export type { MarkdownEditorProps } from './MarkdownEditor';
+export { MarkdownHelp } from './MarkdownHelp';
+export type { MarkdownHelpProps } from './MarkdownHelp';
