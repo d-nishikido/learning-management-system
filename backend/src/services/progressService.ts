@@ -392,6 +392,7 @@ export class ProgressService {
     });
 
     const isCompleted = progressRate >= 100;
+    const incrementMinutes = spentMinutes || 0;
 
     if (progress) {
       // Update existing progress
@@ -403,7 +404,11 @@ export class ProgressService {
           progressRate: progressRate,
           spentMinutes: spentMinutes !== undefined ? progress.spentMinutes + spentMinutes : progress.spentMinutes,
           isCompleted,
-          completionDate: isCompleted && !progress.isCompleted ? new Date() : progress.completionDate,
+          completionDate: isCompleted && !progress.isCompleted 
+            ? new Date() 
+            : !isCompleted && progress.isCompleted 
+              ? null 
+              : progress.completionDate,
           notes: notes || progress.notes,
           lastAccessed: new Date()
         },
@@ -412,6 +417,17 @@ export class ProgressService {
           lesson: true,
           material: true
         }
+      });
+
+      // Create progress history for update
+      await prisma.progressHistory.create({
+        data: {
+          progressId: progress.id,
+          progressRate: progressRate,
+          spentMinutes: incrementMinutes,
+          changedBy: userId,
+          ...(notes && { notes }),
+        },
       });
     } else {
       // Create new progress record
@@ -435,6 +451,17 @@ export class ProgressService {
           material: true
         }
       });
+
+      // Create progress history for new record
+      await prisma.progressHistory.create({
+        data: {
+          progressId: progress.id,
+          progressRate: progressRate,
+          spentMinutes: incrementMinutes,
+          changedBy: userId,
+          ...(notes && { notes }),
+        },
+      });
     }
 
     // Update learning streak if newly completed
@@ -442,7 +469,97 @@ export class ProgressService {
       await this.updateLearningStreak(userId);
     }
 
+    // Recalculate lesson progress
+    if (material.lessonId) {
+      await this.recalculateLessonProgress(userId, material.lessonId);
+    }
+
+    // Recalculate course progress
+    await this.updateCourseProgress(userId, material.lesson!.courseId);
+
     return progress as ProgressWithDetails;
+  }
+
+  /**
+   * レッスン進捗率を再計算
+   * レッスン内の全教材（手動進捗 + 自動進捗）の進捗を集計
+   */
+  static async recalculateLessonProgress(userId: number, lessonId: number): Promise<void> {
+    // レッスン情報を取得
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        learningMaterials: {
+          where: { isPublished: true }
+        }
+      }
+    });
+
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    // レッスン内の全教材の進捗を取得
+    const materialProgresses = await prisma.userProgress.findMany({
+      where: {
+        userId,
+        lessonId,
+        materialId: { not: null }
+      }
+    });
+
+    // 教材ごとの進捗率を計算
+    let totalMaterials = lesson.learningMaterials.length;
+    let totalProgressRate = 0;
+
+    for (const material of lesson.learningMaterials) {
+      const progress = materialProgresses.find(p => p.materialId === material.id);
+      if (progress) {
+        totalProgressRate += parseFloat(progress.progressRate.toString());
+      }
+      // 進捗が存在しない教材は0%とカウント
+    }
+
+    // レッスン全体の平均進捗率を計算
+    const lessonProgressRate = totalMaterials > 0
+      ? Math.round(totalProgressRate / totalMaterials)
+      : 0;
+
+    // レッスン進捗を更新または作成
+    const lessonProgress = await prisma.userProgress.findFirst({
+      where: {
+        userId,
+        courseId: lesson.courseId,
+        lessonId,
+        materialId: null
+      }
+    });
+
+    if (lessonProgress) {
+      await prisma.userProgress.update({
+        where: { id: lessonProgress.id },
+        data: {
+          progressRate: lessonProgressRate,
+          isCompleted: lessonProgressRate >= 100,
+          completionDate: lessonProgressRate >= 100 && !lessonProgress.isCompleted 
+            ? new Date() 
+            : lessonProgress.completionDate,
+          lastAccessed: new Date()
+        }
+      });
+    } else {
+      await prisma.userProgress.create({
+        data: {
+          userId,
+          courseId: lesson.courseId,
+          lessonId,
+          materialId: null,
+          progressRate: lessonProgressRate,
+          isCompleted: lessonProgressRate >= 100,
+          completionDate: lessonProgressRate >= 100 ? new Date() : null
+        }
+      });
+    }
   }
 
   /**

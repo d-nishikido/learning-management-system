@@ -337,6 +337,17 @@ export interface ManualProgressUpdateRequest {
   notes?: string;
 }
 
+export interface ProgressHistoryEntry {
+  id: number;
+  progressRate: number;
+  spentMinutes: number;
+  changedBy: number;
+  notes: string | null;
+  createdAt: string;
+  previousProgressRate?: number;
+  delta?: number;
+}
+
 export interface MaterialProgressUpdate {
   id: number;
   userId: number;

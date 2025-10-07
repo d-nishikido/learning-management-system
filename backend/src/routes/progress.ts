@@ -170,6 +170,17 @@ router.delete('/:id',
 );
 
 /**
+ * GET /progress/materials/:materialId/history
+ * Get progress history for material
+ * Authenticated users only
+ */
+router.get('/materials/:materialId/history',
+  authenticateToken,
+  validateParams(Joi.object({ materialId: commonSchemas.id })),
+  ProgressController.getMaterialProgressHistory
+);
+
+/**
  * PUT /progress/materials/:materialId/manual
  * Update manual progress for material
  * Authenticated users only

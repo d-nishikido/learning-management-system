@@ -33,6 +33,19 @@ export default function Dashboard() {
     if (user) {
       fetchSummary();
     }
+
+    // Listen for progress update events
+    const handleProgressUpdate = () => {
+      if (user) {
+        fetchSummary();
+      }
+    };
+
+    window.addEventListener('progressUpdated', handleProgressUpdate);
+
+    return () => {
+      window.removeEventListener('progressUpdated', handleProgressUpdate);
+    };
   }, [user]);
 
   const navigationCards = [
