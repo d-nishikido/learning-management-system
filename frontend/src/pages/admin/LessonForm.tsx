@@ -330,10 +330,10 @@ export function LessonForm() {
             {/* Content */}
             <div>
               <MarkdownEditor
-                label={t('lesson:fields.content')}
+                label={t('lesson:fields.content') || ''}
                 value={formData.content}
                 onChange={handleContentChange}
-                placeholder={t('lesson:fields.contentPlaceholder')}
+                placeholder={t('lesson:fields.contentPlaceholder') || ''}
                 height="500px"
                 error={validationErrors.content}
                 disabled={isSaving}

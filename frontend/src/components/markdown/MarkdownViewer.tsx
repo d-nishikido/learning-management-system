@@ -38,9 +38,9 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({
       rehypePlugins={[rehypeSanitize]}
       className={`prose max-w-none ${className}`}
       components={{
-        code: CodeBlock,
-        a: LinkRenderer,
-        img: ImageRenderer,
+        code: CodeBlock as never,
+        a: LinkRenderer as never,
+        img: ImageRenderer as never,
       }}
     >
       {content}
