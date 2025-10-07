@@ -49,7 +49,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = React.memo(({
 
   return (
     <div
-      className={className}
+      className={`${className} prose-img:max-w-full prose-table:overflow-x-auto prose-table:block prose-table:whitespace-nowrap sm:prose-table:whitespace-normal`}
       aria-label={ariaLabel}
     >
       {renderedContent}

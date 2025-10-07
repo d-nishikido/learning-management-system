@@ -44,7 +44,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
       style={oneDark}
       language={language || 'text'}
       PreTag="div"
-      className="rounded-md overflow-x-auto"
+      className="rounded-md overflow-x-auto text-sm sm:text-base"
       customStyle={{
         margin: '1em 0',
         padding: '1em',
