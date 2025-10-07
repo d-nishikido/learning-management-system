@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ManualProgressForm } from './ManualProgressForm';
+import { MaterialProgressContainer } from '@/components/progress/MaterialProgressContainer';
 import { Button } from '@/components/common/Button';
 import { materialApi } from '@/services/api';
 import type { LearningMaterial, ApiRequestError } from '@/types';
@@ -15,14 +15,13 @@ interface MaterialViewerProps {
 export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate }: MaterialViewerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showProgressForm, setShowProgressForm] = useState(false);
+
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [loadingMedia, setLoadingMedia] = useState(false);
 
   useEffect(() => {
     // Reset states when material changes
     setError(null);
-    setShowProgressForm(false);
     
     // Clean up previous blob URL
     if (blobUrl) {
@@ -326,25 +325,24 @@ export function MaterialViewer({ material, courseId, lessonId, onClose, onUpdate
             {/* Progress Form */}
             {(material.allowManualProgress || material.materialType === 'MANUAL_PROGRESS') && (
               <div className="mt-6">
-                {!showProgressForm ? (
-                  <div className="text-center">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowProgressForm(true)}
-                    >
-                      進捗を記録する
-                    </Button>
-                  </div>
-                ) : (
-                  <ManualProgressForm
-                    material={material}
-                    onSave={(updatedMaterial) => {
-                      onUpdate(updatedMaterial);
-                      setShowProgressForm(false);
-                    }}
-                    onCancel={() => setShowProgressForm(false)}
-                  />
-                )}
+                <MaterialProgressContainer
+                  materialId={material.id}
+                  currentProgress={material.userProgress?.progressRate || 0}
+                  onProgressUpdate={(newProgress) => {
+                    // Update material with new progress
+                    const updatedMaterial: LearningMaterial = {
+                      ...material,
+                      userProgress: {
+                        ...material.userProgress,
+                        progressRate: newProgress,
+                        manualProgressRate: newProgress,
+                        isCompleted: newProgress >= 100,
+                        lastAccessed: new Date(),
+                      },
+                    };
+                    onUpdate(updatedMaterial);
+                  }}
+                />
               </div>
             )}
           </div>

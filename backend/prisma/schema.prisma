@@ -56,6 +56,7 @@ model User {
   notifications        Notification[]
   auditLogs            AuditLog[]
   fileUploads          FileUpload[]
+  progressHistory      ProgressHistory[]
 
   @@index([email])
   @@index([username])
@@ -243,6 +244,9 @@ model UserProgress {
   createdAt           DateTime          @default(now()) @map("created_at")
   updatedAt           DateTime          @updatedAt @map("updated_at")
 
+  // Relations
+  progressHistory     ProgressHistory[]
+
   @@unique([userId, courseId, lessonId, materialId], name: "unique_user_progress")
   @@index([userId])
   @@index([courseId])
@@ -250,6 +254,22 @@ model UserProgress {
   @@index([isCompleted])
   @@index([lastAccessed])
   @@map("user_progress")
+}
+
+model ProgressHistory {
+  id            Int          @id @default(autoincrement())
+  progressId    Int          @map("progress_id")
+  progress      UserProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+  progressRate  Decimal      @map("progress_rate") @db.Decimal(5, 2)
+  spentMinutes  Int          @map("spent_minutes")
+  changedBy     Int          @map("changed_by")
+  user          User         @relation(fields: [changedBy], references: [id])
+  notes         String?      @db.Text
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@index([progressId])
+  @@index([createdAt])
+  @@map("progress_history")
 }
 
 model UserMaterialAccess {

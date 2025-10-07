@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { ProgressService, CreateProgressData, UpdateProgressData, ProgressQuery, SessionData } from '../services/progressService';
 import { TimeTrackingService } from '../services/timeTrackingService';
+import { ProgressHistoryService } from '../services/progressHistoryService';
 import { ApiResponse, RequestWithUser } from '../types';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors';
 import { ProgressType } from '@prisma/client';
@@ -715,6 +716,65 @@ export class ProgressController {
         error: 'Failed to get time series data',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
+    }
+  }
+
+  /**
+   * GET /progress/materials/:materialId/history
+   * 教材の進捗履歴を取得
+   */
+  static async getMaterialProgressHistory(
+    req: RequestWithUser<{ materialId: string }, ApiResponse>,
+    res: Response<ApiResponse>
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const materialId = parseInt(req.params.materialId);
+
+      if (isNaN(materialId)) {
+        throw new ValidationError('Invalid material ID');
+      }
+
+      const progressHistoryService = new ProgressHistoryService();
+      const history = await progressHistoryService.getHistoryByMaterialId(materialId, userId);
+
+      // 前回進捗率との差分を計算
+      const historyWithDelta = history.map((entry, index) => {
+        const previousRate = index < history.length - 1 
+          ? parseFloat(history[index + 1].progressRate.toString()) 
+          : 0;
+        const currentRate = parseFloat(entry.progressRate.toString());
+        const delta = currentRate - previousRate;
+
+        return {
+          id: entry.id,
+          progressRate: currentRate,
+          spentMinutes: entry.spentMinutes,
+          changedBy: entry.changedBy,
+          notes: entry.notes,
+          createdAt: entry.createdAt,
+          previousProgressRate: previousRate,
+          delta,
+        };
+      });
+
+      res.status(200).json({
+        success: true,
+        data: historyWithDelta,
+        message: history.length === 0 ? 'No progress history found' : undefined,
+      });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(422).json({
+          success: false,
+          error: error.message,
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to fetch progress history',
+        });
+      }
     }
   }
 }

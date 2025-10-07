@@ -167,6 +167,10 @@ export const progressApi = {
   ): Promise<ApiResponse<ProgressWithDetails>> =>
     apiClient.put(`/progress/materials/${materialId}/manual`, data),
   
+  // Progress history
+  getProgressHistory: (materialId: number): Promise<ApiResponse<ProgressHistoryEntry[]>> =>
+    apiClient.get(`/progress/materials/${materialId}/history`),
+  
   markMaterialComplete: (materialId: number): Promise<ApiResponse<ProgressWithDetails>> =>
     apiClient.post(`/progress/materials/${materialId}/complete`),
   
