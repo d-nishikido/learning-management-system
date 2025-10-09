@@ -22,6 +22,7 @@
     "check-ports": "node scripts/check-ports.js"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@playwright/test": "^1.48.0",
     "@types/node": "^24.2.0",
     "typescript": "^5.9.2",

@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { AdminMaterialList } from '@/components/materials/admin/AdminMaterialList';
 import { MaterialForm } from '@/components/materials/admin/MaterialForm';
+import { MarkdownEditor } from '@/components/markdown';
 import type { CreateLessonRequest, UpdateLessonRequest, ApiRequestError, Course, CreateLearningMaterialRequest } from '@/types';
 
 export function LessonForm() {
@@ -100,7 +101,7 @@ export function LessonForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const target = e.target as HTMLInputElement;
       setFormData(prev => ({ ...prev, [name]: target.checked }));
@@ -115,6 +116,19 @@ export function LessonForm() {
       setValidationErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleContentChange = (value: string) => {
+    setFormData(prev => ({ ...prev, content: value }));
+
+    // Clear validation error for content field
+    if (validationErrors.content) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.content;
         return newErrors;
       });
     }
@@ -315,17 +329,14 @@ export function LessonForm() {
 
             {/* Content */}
             <div>
-              <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                {t('lesson:fields.content')}
-              </label>
-              <textarea
-                id="content"
-                name="content"
-                rows={8}
+              <MarkdownEditor
+                label={t('lesson:fields.content') || ''}
                 value={formData.content}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                placeholder={t('lesson:fields.contentPlaceholder')}
+                onChange={handleContentChange}
+                placeholder={t('lesson:fields.contentPlaceholder') || ''}
+                height="500px"
+                error={validationErrors.content}
+                disabled={isSaving}
               />
             </div>
 

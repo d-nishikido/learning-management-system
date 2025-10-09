@@ -15,7 +15,9 @@ Kiro-style Spec Driven Development implementation using claude code slash comman
 **Specs** (`.kiro/specs/`) - Formalize development process for individual features
 
 ### Active Specifications
-- Check `.kiro/specs/` for active specifications
+- `markdown-lesson-viewer` - マークダウン形式のレッスン内容をビューワー表示する機能
+- `main-material-progress` - メイン教材進捗率記入機能
+- `db-port-migration` - データベースポート移行
 - Use `/kiro:spec-status [feature-name]` to check progress
 
 ## Development Guidelines
